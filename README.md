@@ -1,3 +1,4 @@
+
 # merula
 
 Merula is a plain-text, flat file database.
