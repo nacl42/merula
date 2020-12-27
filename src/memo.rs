@@ -66,6 +66,10 @@ impl Memo {
         self.items[1..].iter()
     }
 
+    pub fn data_count(&self) -> usize {
+        self.items.len() - 1
+    }
+    
     pub fn last(&self) -> &Item {
         &self.items[self.items.len() - 1]
     }
@@ -112,10 +116,18 @@ impl std::fmt::Display for Memo {
 mod tests {
 
     use super::*;
+
+    fn sample_memo() -> Memo {
+        let mut memo = Memo::new("book", "The Lord of the Rings");
+        memo.push(Item::new("author", "J.R.R. Tolkien"));
+        memo.push(Item::new("character", "Bilbo Baggins"));
+        memo.push(Item::new("character", "Samweis Gamdschie"));
+        memo
+    }
     
     #[test]
-    fn new_memo() {
-        let mut memo = Memo::new("book", "The Lord of the Rings");
+    fn check_header() {
+        let memo = sample_memo();
         let header = memo.header();
         assert_eq!(header.key, "book");
         assert_eq!(header.value, Value::from("The Lord of the Rings"));
@@ -123,13 +135,15 @@ mod tests {
 
     #[test]
     fn check_data() {
-        let mut memo = Memo::new("book", "The Lord of the Rings");
-        memo.push(Item::new("author", "J.R.R. Tolkien"));
-        memo.push(Item::new("character", "Bilbo Baggins"));
-        memo.push(Item::new("character", "Samweis Gamdschie"));
-
+        let memo = sample_memo();
         let item = memo.data().next().unwrap();
         assert_eq!(item.key, "author");
         assert_eq!(item.value, Value::from("J.R.R. Tolkien"));
+    }
+
+    #[test]
+    fn data_count() {
+        let memo = sample_memo();
+        assert_eq!(memo.data_count(), 3);
     }
 }
