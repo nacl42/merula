@@ -128,9 +128,8 @@ mod tests {
     #[test]
     fn check_header() {
         let memo = sample_memo();
-        let header = memo.header();
-        assert_eq!(header.key, "book");
-        assert_eq!(header.value, Value::from("The Lord of the Rings"));
+        assert_eq!(memo.group(), "book");
+        assert_eq!(memo.title(), Value::from("The Lord of the Rings"));
     }
 
     #[test]
