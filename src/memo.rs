@@ -34,7 +34,7 @@ impl Item {
 
 #[derive(Debug)]
 pub struct Memo {
-    pub items: Vec<Item>
+    items: Vec<Item>
 }
 
 impl Memo {
