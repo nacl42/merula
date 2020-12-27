@@ -107,3 +107,29 @@ impl std::fmt::Display for Memo {
         Ok(())
     }
 }
+
+#[cfg(test)]
+mod tests {
+
+    use super::*;
+    
+    #[test]
+    fn new_memo() {
+        let mut memo = Memo::new("book", "The Lord of the Rings");
+        let header = memo.header();
+        assert_eq!(header.key, "book");
+        assert_eq!(header.value, Value::from("The Lord of the Rings"));
+    }
+
+    #[test]
+    fn check_data() {
+        let mut memo = Memo::new("book", "The Lord of the Rings");
+        memo.push(Item::new("author", "J.R.R. Tolkien"));
+        memo.push(Item::new("character", "Bilbo Baggins"));
+        memo.push(Item::new("character", "Samweis Gamdschie"));
+
+        let item = memo.data().next().unwrap();
+        assert_eq!(item.key, "author");
+        assert_eq!(item.value, Value::from("J.R.R. Tolkien"));
+    }
+}
