@@ -1,4 +1,6 @@
+#[allow(unused_imports)]
 use clap::{App, crate_version, Arg};
+#[allow(unused_imports)]
 use clap_generate::{generate, generators::Bash};
 
 pub mod memo;
@@ -33,7 +35,7 @@ fn main() {
         }        
     }
 
-    if let Some(ref matches) = matches.subcommand_matches("test") {
+    if let Some(ref _matches) = matches.subcommand_matches("test") {
         println!("testing: add some memos");
 
         let mut memo = Memo::new("book", "The Lord of the Rings");
