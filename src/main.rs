@@ -1,6 +1,9 @@
 use clap::{App, crate_version, Arg};
 use clap_generate::{generate, generators::Bash};
 
+pub mod memo;
+pub mod value;
+
 fn main() {
     let app = App::new("merula")
         .version(crate_version!())
