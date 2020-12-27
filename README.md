@@ -9,7 +9,7 @@ is subject to change.
 
 The database consists of units of information called Memos with an
 editor-friendly syntax. A single `memo` consists of a mandatory header
-and optional data nodes.
+item and optional data items.
 
 A very simple example looks like this:
 
@@ -18,24 +18,19 @@ A very simple example looks like this:
 .url https://github.com/nacl42/merula
 .tag, software, database, plain-text
 .doc Merula is a plain-text, flat file database
-.note
-This project is in its early stages.
-Promising, but not yet ready for production.
-Use at your own risk
 .license gplv3
 ```
 
 This defines the memo with the title `merula` and which belongs to the
 collection `app`. It has a `url`, a `doc` string and three different
-`tag` nodes ("software", "database" and "plain-text"). There is a
-multiline node called `note` and also a `license` node.
+`tag` items ("software", "database" and "plain-text").
 
 ## Features and Limitations
 
 Features are:
 * editor-friendly, human-editable (easy to input)
 * simple insertion of multiple nodes
-* each node can have optional attributes
+* each item can have optional attributes
 * emacs mode available (work in progress, not yet published on github)
 
 Limitations are:
@@ -46,32 +41,8 @@ Limitations are:
 ## Formal structure of a Memo
 
 A single memo consists of a mandatory header node and optionally of
-several data nodes.
+several data items.
 
-The header node is of the form `@collection [title]`.
+The header item is of the form `@collection [title]`.
 
-Data nodes can have different forms:
-* single-line value: `.key value`
-* multi-line value:
-```
-.key
-line1
-line2
-line3
-```
-
-or
-
-```
-.key<<EOF
-line1
-line2
-line3
-.line4
-EOF
-```
-
-
-
-
-
+Data items have the form `.key value`.
