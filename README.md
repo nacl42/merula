@@ -1,4 +1,8 @@
 
+>
+> **DISCLAIMER: This is work in progress and not yet production-ready!**
+>
+
 # merula
 
 Merula is a plain-text, flat-file, human-editable database. The file
