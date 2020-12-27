@@ -6,7 +6,8 @@
 //! Additional information can be stored in the subsequent Items,
 //! which are called data items.
 //!
-//! An Ite consists of a Key and a Value, with optional attributes.
+//! An Item consists of a Key and a Value, with optional attributes.
+//! Attributes are stored as a HashMap of Key/Value pairs.
 //!
 
 use std::collections::HashMap;
