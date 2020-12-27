@@ -42,11 +42,7 @@ fn main() {
         memo.push(Item::new("character", "Samweis Gamdschie"));
         
         println!("This is the first memo:");
-        let header = memo.header();
-        println!("@{} {}", header.key, header.value);
-        for item in memo.data() {
-            println!(".{} {}", item.key, item.value);
-        }
+        println!("{}", memo);
 
         let mut memo = Memo::new("book", "The Hitchhiker's Guide to the Galaxy");
         memo.push(Item::new("author", "Douglas Adams"));
@@ -54,10 +50,6 @@ fn main() {
         memo.push(Item::new("character", "Ford Prefect"));
 
         println!("\nThis is the second memo:");
-        let header = memo.header();
-        println!("@{} {}", header.key, header.value);
-        for item in memo.data() {
-            println!(".{} {}", item.key, item.value);
-        }
+        println!("{}", memo);
     }
 }

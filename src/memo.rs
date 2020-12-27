@@ -88,3 +88,22 @@ impl Memo {
             .collect::<Vec<&Item>>()
     }    
 }
+
+
+impl std::fmt::Display for Memo {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut prefix = "@";
+        for item in &self.items {
+            writeln!(f, "{}{} {}", prefix, item.key, item.value)?;
+            for (key, value) in item.attrs.iter() {
+                writeln!(f, "+{} {}", key, value)?;
+            }
+            // TODO: implement text output
+            //if let Some(text) = &item.text {
+            //    writeln!(f, "{}", text);
+            //}
+            prefix = ".";
+        }
+        Ok(())
+    }
+}
