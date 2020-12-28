@@ -1,4 +1,4 @@
-# elements of the periodic table
+# elements of the periodic table (incomplete)
 # data compiled by hand from Wikipedia
 # serves only as example file for merula
 # do not use for scientific production purposes!
@@ -184,145 +184,241 @@
 .amu 83.798
 
 @element Rb
-.name rubydium
+.name rubidium
+.number 37
+.amu 85.4678
 
 @element Sr
 .name strontium
+.number 38
+.amu 87.62
 
 @element Y
 .name yttrium
+.number 39
+.amu 88.90584
 
 @element Zr
 .name zirconium
+.number 40
+.amu 91.224
 
 @element Nb
 .name niobium
+.number 41
+.amu 92.90637
 
 @element Mo
-.name molybdenium
+.name molybdenum
+.number 42
+.amu 95.95
 
 @element Tc
-.name techneticum
+.name technetium
+.number 43
+.amu 97
 
 @element Ru
 .name ruthenium
+.number 44
+.amu 101.07
 
 @element Rh
-.name rhenium
+.name rhodium
+.number 45
+.amu 102.90549
 
 @element Pd
 .name palladium
+.number 46
+.amu 106.42
 
 @element Ag
 .name silver
+.number 47
+.amu 107.86862
 
 @element Cd
 .name cadmium
+.number 48
+.amu 112.414
 
 @element In
 .name indium
+.number 49
+.amu 114.818
 
 @element Sn
 .name tin
+.number 50
+.amu 118.710
 
 @element Sb
-.name antimonid
+.name antimony
+.number 51
+.amu 121.760
 
 @element Te
 .name tellurium
+.number 52
+.amu 127.60
 
 @element I
 .name iodine
+.number 53
+.amu 126.90447
 
 @element Xe
 .name xenon
+.number 54
+.amu 131.293
 
 @element Cs
 .name caesium
+.number 55
+.amu 132.90545196
 
 @element Ba
 .name barium
+.number 56
+.amu 137.327
 
 @element La
-.name lanthanium
+.name lanthanum
+.number 57
+.amu 138.90547
 
 @element Ce
-.name cer
+.name cerium
+.number 58
+.amu 140.116
 
 @element Pr
-.name praseodym
+.name praseodymium
+.number 59
+.amu 140.90766
 
 @element Nd
 .name neodymium
+.number 60
+.amu 144.242
 
 @element Pm
-.name
+.name promethium
+.number 61
+.amu 145
 
 @element Sm
 .name samarium
+.number 62
+.amu 150.36
 
 @element Eu
 .name europium
+.number 63
+.amu 151.964
 
 @element Gd
 .name gadolinium
+.number 64
+.amu 157.25
 
 @element Tb
 .name terbium
+.number 65
+.amu 158.925354
 
 @element Dy
 .name dysprosium
+.number 66
+.amu 162.500
 
 @element Ho
 .name holmium
+.number 67
+.amu 164.930328
 
 @element Er
 .name erbium
+.number 68
+.amu 167.259
 
 @element Tm
-.name
+.name thulium
+.number 69
+.amu 168.934218
 
 @element Yb
-.name
+.name ytterbium
+.number 70
+.amu 173.045
 
 @element Lu
-.name luthenium
+.name lutetium
+.number 71
+.amu 174.9668
 
 @element Hf
 .name hafnium
+.number 72
+.amu 178.486
 
 @element Ta
-.name tantal
+.name tantalum
+.number 73
+.amu 180.94788
 
 @element W
 .name tungsten
+.number 74
+.amu 183.84
 
 @element Re
-.name
+.name rhenium
+.number 75
+.amu 186.207
 
 @element Os
 .name osmium
+.number 76
+.amu 190.23
 
 @element Ir
-.name irenium
+.name iridium
+.number 77
+.amu 192.217
 
 @element Pt
 .name platinum
+.number 78
+.amu 195.084
 
 @element Au
 .name gold
+.number 79
+.amu 196.966570
 
 @element Hg
 .name mercury
+.number 80
+.amu 200.592
 
 @element Tl
-.name
+.name thallium
+.number 81
+.amu 204.38
 
 @element Pb
 .name lead
+.number 82
+.amu 207.2
 
 @element Bi
 .name bismuth
+.number 83
+.amu 208.98040
 
 @element Po
 .name polonium
+.number 84
+.amu 209
