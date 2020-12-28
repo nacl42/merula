@@ -1,0 +1,328 @@
+# elements of the periodic table
+# data compiled by hand from Wikipedia
+# serves only as example file for merula
+# do not use for scientific production purposes!
+
+@element H
+.name hydrogen
+.number 1
+.amu 1.008
+
+@element He
+.name helium
+.number 2
+.amu 4.002602
+
+@element Li
+.name lithium
+.number 3
+.amu 6.94
+
+@element Be
+.name beryllium
+.number 4
+.amu 9.0121831
+
+@element B
+.name boron
+.number 5
+.amu 10.81
+
+@element C
+.name carbon
+.number 6
+.amu 12.011
+
+@element N
+.name nitrogen
+.number 7
+.amu 14.007
+
+@element O
+.name oxygen
+.number 8
+.amu 15.999
+
+@element F
+.name fluorine
+.number 9
+.amu 18.998403163
+
+@element Ne
+.name neon
+.number 10
+.amu 20.1797
+
+@element Na
+.name sodium
+.number 11
+.amu 22.98976928
+
+@element Mg
+.name magnesium
+.number 12
+.amu 24.305
+
+@element Al
+.name aluminum
+.number 13
+.amu 26.9815384
+
+@element Si
+.name silicon
+.number 14
+.amu 28.085
+
+@element P
+.name phosphorous
+.number 15
+.amu 30.973761998
+
+@element S
+.name sulfur
+.number 16
+.amu 32.06
+
+@element Cl
+.name chlorine
+.number 17
+.amu 35.45
+
+@element Ar
+.name argon
+.number 18
+.amu 39.95
+
+@element K
+.name potassium
+.number 19
+.amu 39.0983
+
+@element Ca
+.name calcium
+.number 20
+.amu 40.078
+
+@element Sc
+.name scandium
+.number 21
+.amu 44.955908
+
+@element Ti
+.name titanium
+.number 22
+.amu 47.867
+
+@element V
+.name vanadium
+.number 23
+.amu 50.9415
+
+@element Cr
+.name chromium
+.number 24
+.amu 51.9961
+
+@element Mn
+.name manganese
+.number 25
+.amu 54.938043
+
+@element Fe
+.name iron
+.number 26
+.amu 55.845
+
+@element Co
+.name cobalt
+.number 27
+.amu 58.933194
+
+@element Ni
+.name nickel
+.number 28
+.amu 58.6934
+
+@element Cu
+.name copper
+.number 29
+.amu 63.546
+
+@element Zn
+.name zinc
+.number 30
+.amu 65.38
+
+@element Ga
+.name gallium
+.number 31
+.amu 69.723
+
+@element Ge
+.name germanium
+.number 32
+.amu 72.630
+
+@element As
+.name arsenic
+.number 33
+.amu 74.921595
+
+@element Se
+.name selenium
+.number 34
+.amu 78.971
+
+@element Br
+.name bromine
+.number 35
+.amu 79.904
+
+@element Kr
+.name krypton
+.number 36
+.amu 83.798
+
+@element Rb
+.name rubydium
+
+@element Sr
+.name strontium
+
+@element Y
+.name yttrium
+
+@element Zr
+.name zirconium
+
+@element Nb
+.name niobium
+
+@element Mo
+.name molybdenium
+
+@element Tc
+.name techneticum
+
+@element Ru
+.name ruthenium
+
+@element Rh
+.name rhenium
+
+@element Pd
+.name palladium
+
+@element Ag
+.name silver
+
+@element Cd
+.name cadmium
+
+@element In
+.name indium
+
+@element Sn
+.name tin
+
+@element Sb
+.name antimonid
+
+@element Te
+.name tellurium
+
+@element I
+.name iodine
+
+@element Xe
+.name xenon
+
+@element Cs
+.name caesium
+
+@element Ba
+.name barium
+
+@element La
+.name lanthanium
+
+@element Ce
+.name cer
+
+@element Pr
+.name praseodym
+
+@element Nd
+.name neodymium
+
+@element Pm
+.name
+
+@element Sm
+.name samarium
+
+@element Eu
+.name europium
+
+@element Gd
+.name gadolinium
+
+@element Tb
+.name terbium
+
+@element Dy
+.name dysprosium
+
+@element Ho
+.name holmium
+
+@element Er
+.name erbium
+
+@element Tm
+.name
+
+@element Yb
+.name
+
+@element Lu
+.name luthenium
+
+@element Hf
+.name hafnium
+
+@element Ta
+.name tantal
+
+@element W
+.name tungsten
+
+@element Re
+.name
+
+@element Os
+.name osmium
+
+@element Ir
+.name irenium
+
+@element Pt
+.name platinum
+
+@element Au
+.name gold
+
+@element Hg
+.name mercury
+
+@element Tl
+.name
+
+@element Pb
+.name lead
+
+@element Bi
+.name bismuth
+
+@element Po
+.name polonium
