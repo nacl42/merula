@@ -38,6 +38,8 @@ fn main() {
     if let Some(ref _matches) = matches.subcommand_matches("test") {
         println!("testing: add some memos");
 
+        let mut memos: Vec<Memo> = vec!();
+        
         let mut memo = Memo::new("book", "The Lord of the Rings");
         memo.push(Item::new("author", "J.R.R. Tolkien"));
         memo.push(Item::new("character", "Bilbo Baggins"));
@@ -45,7 +47,8 @@ fn main() {
         
         println!("This is the first memo:");
         println!("{}", memo);
-
+        memos.push(memo);
+        
         let mut memo = Memo::new("book", "The Hitchhiker's Guide to the Galaxy");
         memo.push(Item::new("author", "Douglas Adams"));
         memo.push(Item::new("author", "Arthur Dent"));
@@ -53,5 +56,19 @@ fn main() {
 
         println!("\nThis is the second memo:");
         println!("{}", memo);
+        memos.push(memo);
+
+        for i in 0..20 {
+            memos.push(Memo::new("foo", i));
+        }
+
+        // print out list of memos with one line for each memo
+        let digits = (memos.len() as f32).log10().trunc() as usize + 1;
+        println!("\nThis is a short list of the memos:");
+        for (n, memo) in memos.iter().enumerate() {
+            println!("[{:width$}] @{} {} ({})",
+                     n, memo.group(), memo.title(), memo.data_count(),
+                     width=digits);
+        }
     }
 }
