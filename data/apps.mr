@@ -1,0 +1,27 @@
+# list of note-taking software
+
+@app merula
+.url https://github.com/nacl42/merula
+.tag, software, database, plain-text
+.doc Merula is a plain-text, flat file database
+.license gplv3
+
+@app recutils
+.url https://www.gnu.org/software/recutils/
+.tag, software, database, plain-text
+.doc GNU Recutils is a set of tools and libraries to access
+human-editable, plain text databases called recfiles. The data is
+stored as a sequence of records, each record containing an arbitrary
+number of named fields. The picture below shows a sample database
+containing information about GNU packages, along with the main
+features provided by recutils.
+.license gplv3
+.author Jose E. Marchesi
+
+@app org-mode
+.url https://www.gnu.org/software/recutils/
+.doc A GNU Emacs major mode for convenient plain text markup — and
+much more. Org mode is for keeping notes, maintaining to-do lists,
+planning projects, authoring documents, computational notebooks,
+literate programming and more — in a fast and effective plain text
+system.
