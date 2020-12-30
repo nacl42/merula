@@ -1,6 +1,23 @@
+//! A Value is an enum for the different types of values that a
+//! Node can hold.
+//!
+//! Possible variants are:
+//! - `Value::Text` holding a single-line string (no newlines)
+//! - `Value::Integer` holding a 32-bit integer number
+//! - `Value::Float` holding a 32-bit floating point number
+//! - `Value::Bool` holding a true/false value
+//!
+//! A Value can be constructed using the From Trait:
+//! - String or &str will be converted into `Value::Text`
+//! - i32 will be converted into `Value::Integer`
+//! - f32 will be converted into `Value::Float`
+//! - bool will be converted into `Value::Bool`
+//!
 
 pub type Key = String;
 
+/// A Value is an enum for the different types of values that a
+/// Node can hold.
 #[derive(Debug, Clone, PartialEq)]
 pub enum Value {
     Text(String),

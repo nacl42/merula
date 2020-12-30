@@ -1,12 +1,21 @@
+//! merula is a command-line client for the flat-file, plain-text
+//! database format with the same name and the extension `.mr`.
+//!
+//! DISCLAIMER: This is work-in-progress and not at all ready for
+//! production purposes.
+//!
+
 #[allow(unused_imports)]
 use clap::{App, crate_version, Arg};
 #[allow(unused_imports)]
 use clap_generate::{generate, generators::Bash};
 
 pub mod memo;
+pub mod node;
 pub mod value;
 
-use memo::{Memo, Item};
+use memo::Memo;
+use node::Node;
 
 fn main() {
     let app = App::new("merula")
@@ -41,18 +50,18 @@ fn main() {
         let mut memos: Vec<Memo> = vec!();
         
         let mut memo = Memo::new("book", "The Lord of the Rings");
-        memo.push(Item::new("author", "J.R.R. Tolkien"));
-        memo.push(Item::new("character", "Bilbo Baggins"));
-        memo.push(Item::new("character", "Samweis Gamdschie"));
+        memo.push(Node::new("author", "J.R.R. Tolkien"));
+        memo.push(Node::new("character", "Bilbo Baggins"));
+        memo.push(Node::new("character", "Samweis Gamdschie"));
         
         println!("This is the first memo:");
         println!("{}", memo);
         memos.push(memo);
         
         let mut memo = Memo::new("book", "The Hitchhiker's Guide to the Galaxy");
-        memo.push(Item::new("author", "Douglas Adams"));
-        memo.push(Item::new("author", "Arthur Dent"));
-        memo.push(Item::new("character", "Ford Prefect"));
+        memo.push(Node::new("author", "Douglas Adams"));
+        memo.push(Node::new("author", "Arthur Dent"));
+        memo.push(Node::new("character", "Ford Prefect"));
 
         println!("\nThis is the second memo:");
         println!("{}", memo);
