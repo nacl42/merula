@@ -14,7 +14,7 @@ is subject to change.
 
 The database consists of units of information called Memos with an
 editor-friendly syntax. A single `memo` consists of a mandatory header
-item and optional data items.
+node and optional data nodes.
 
 A very simple example looks like this:
 
@@ -28,14 +28,14 @@ A very simple example looks like this:
 
 This defines the memo with the title `merula` and which belongs to the
 collection `app`. It has a `url`, a `doc` string and three different
-`tag` items ("software", "database" and "plain-text").
+`tag` nodes ("software", "database" and "plain-text").
 
 ## Features and Limitations
 
 Features are:
 * editor-friendly, human-editable (easy to input)
 * simple insertion of multiple nodes
-* each item can have optional attributes
+* each node can have optional attributes
 * emacs mode available (work in progress, not yet published on github)
 
 Limitations are:
@@ -46,8 +46,8 @@ Limitations are:
 ## Formal structure of a Memo
 
 A single memo consists of a mandatory header node and optionally of
-several data items.
+several data nodes.
 
-The header item is of the form `@collection [title]`.
+The header node is of the form `@collection [title]`.
 
-Data items have the form `.key value`.
+Data nodes have the form `.key value`.
