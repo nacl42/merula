@@ -43,15 +43,17 @@ impl Memo {
     }
 
     /// Adds given Node `node` to the Memo.
-    pub fn push(&mut self, node: Node) {
-        self.nodes.push(node);
+    pub fn push<N>(&mut self, node: N)
+    where N: Into<Node> {
+        self.nodes.push(node.into());
     }
 
     /// Adds given Node `node` to the Memo and returns the instance of
     /// the Memo.  With this method, the builder pattern can be used
     /// to add multiple nodes.
-    pub fn with(mut self, node: Node) -> Self {
-        self.nodes.push(node);
+    pub fn with<N>(mut self, node: N) -> Self
+    where N: Into<Node> {
+        self.nodes.push(node.into());
         self
     }
     
@@ -142,6 +144,7 @@ impl std::fmt::Display for Memo {
     }
 }
 
+
 #[cfg(test)]
 mod tests {
 
@@ -195,3 +198,4 @@ mod tests {
         }
     }
 }
+

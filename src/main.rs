@@ -54,37 +54,37 @@ fn main() {
         let mut memos: Vec<Memo> = vec!();
         
         let mut memo = Memo::new("book", "The Lord of the Rings");
-        memo.push(Node::new("author", "J.R.R. Tolkien"));
-        memo.push(Node::new("character", "Bilbo Baggins"));
-        memo.push(Node::new("character", "Samweis Gamdschie"));
+        memo.push(("author", "J.R.R. Tolkien"));
+        memo.push(("character", "Bilbo Baggins"));
+        memo.push(("character", "Samweis Gamdschie"));
 
         section("first memo");
         println!("{}", memo);
         memos.push(memo);
         
         let memo = Memo::new("book", "The Hitchhiker's Guide to the Galaxy")
-            .with(Node::new("author", "Douglas Adams"))
-            .with(Node::new("author", "Arthur Dent"))
-            .with(Node::new("character", "Ford Prefect"));
+            .with(("author", "Douglas Adams"))
+            .with(("author", "Arthur Dent"))
+            .with(("character", "Ford Prefect"));
         
         section("second memo");
         println!("{}", memo);
         memos.push(memo);
 
         let mut memo = Memo::new("character", "Bilbo Baggins");
-        memo.push(Node::new("class", "hobbit"));
-        memo.push(Node::new("friend-of", "Samweis Gamdschie"));
-        memo.push(Node::new("is-hobbit", true));
+        memo.push(("class", "hobbit"));
+        memo.push(("friend-of", "Samweis Gamdschie"));
+        memo.push(("is-hobbit", true));
         memos.push(memo);
 
         let memo = Memo::new("character", "Samweis Gamdschie")
-            .with(Node::new("is-hobbit", true));
+            .with(("is-hobbit", true));
         memos.push(memo);
         
         for i in 0..8 {
             let mut memo = Memo::new("foo", i);
             if i == 5 {
-                memo.push(Node::new("author", "foobar"));
+                memo.push(("author", "foobar"));
             }
             memos.push(memo);
         }
