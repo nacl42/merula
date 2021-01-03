@@ -32,7 +32,7 @@ impl Memo {
     /// # Examples
     ///
     /// ```
-    /// let mut metmo = Memo::new();
+    /// let mut memo = Memo::new("book", "The Lord of the Rings");
     /// ```
     pub fn new<K, V>(group: K, title: V) -> Self
         where K: Into<Key>, V: Into<Value>
@@ -83,15 +83,15 @@ impl Memo {
         self.nodes.get_mut(index).unwrap()
     }
 
-    /// Returns reference to the first Node that matches the given key.
+    /// Returns reference to the first data node that matches the given key.
     pub fn get<K: Into<Key>>(&self, key: K) -> Option<&Node> {
         let key = key.into();
         self.data()
             .find(|n| n.key == key)
     }
 
-    /// Returns vector to references to all nodes matching the given
-    /// key.
+    /// Returns vector to references to all data nodes matching the
+    /// given key.
     pub fn get_vec<K: Into<Key>>(&self, key: K) -> Vec<&Node> {
         let key = key.into();
         self.data()
@@ -99,10 +99,8 @@ impl Memo {
             .collect::<Vec<&Node>>()
     }
 
-    /// Returns true if the Memo contains at least one node with the
-    /// given key.
-    ///
-    /// TODO: should this include the header node as well ?
+    /// Returns true if the Memo contains at least one data node with
+    /// the given key.
     pub fn contains_key<K: Into<Key>>(&self, key: K) -> bool {
         let key = key.into();
         match self.data().find(|&node| node.key == key) {
@@ -153,7 +151,7 @@ mod tests {
     fn check_header() {
         let memo = sample_memo();
         assert_eq!(memo.group(), "book");
-        assert_eq!(memo.title(), Value::from("The Lord of the Rings"));
+        assert_eq!(memo.title(), "The Lord of the Rings");
     }
 
     #[test]
