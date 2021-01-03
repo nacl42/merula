@@ -113,6 +113,6 @@ fn main() {
         section("filter all memos with a title containing a number");
         for memo in memos.iter().filter(|&m| m.title().parse::<f32>().is_ok())  {
             println!("@{} {}", memo.group(), memo.title());
-        }            
+        } 
     }
 }

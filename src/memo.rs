@@ -47,6 +47,14 @@ impl Memo {
         self.nodes.push(node);
     }
 
+    /// Adds given Node `node` to the Memo and returns the instance of
+    /// the Memo.  With this method, the builder pattern can be used
+    /// to add multiple nodes.
+    pub fn with(mut self, node: Node) -> Self {
+        self.nodes.push(node);
+        self
+    }
+    
     /// Returns Memo group (key of header node).
     pub fn group(&self) -> Key {
         self.nodes[0].key.clone()
@@ -166,5 +174,24 @@ mod tests {
     fn data_count() {
         let memo = sample_memo();
         assert_eq!(memo.data_count(), 3);
+    }
+
+    #[test]
+    fn builder_pattern() {
+        let memo1 = Memo::new("book", "The Lord of the Rings")
+            .with(Node::new("author", "J.R.R. Tolkien"))
+            .with(Node::new("character", "Samweis Gamdschie"));
+
+        let mut memo2 = Memo::new("book", "The Lord of the Rings");
+        memo2.push(Node::new("author", "J.R.R. Tolkien"));
+        memo2.push(Node::new("character", "Samweis Gamdschie"));
+
+        assert_eq!(memo1.title(), memo2.title());
+        assert_eq!(memo1.group(), memo2.group());
+
+        for (node1, node2) in memo1.data().zip(memo2.data()) {
+            assert_eq!(node1.key, node2.key);
+            assert_eq!(node1.value, node2.value);
+        }
     }
 }
