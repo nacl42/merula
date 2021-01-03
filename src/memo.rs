@@ -27,6 +27,13 @@ pub struct Memo {
 }
 
 impl Memo {
+    /// Constructs a new, empty Memo.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// let mut metmo = Memo::new();
+    /// ```
     pub fn new<K, V>(group: K, title: V) -> Self
         where K: Into<Key>, V: Into<Value>
     {
@@ -35,54 +42,79 @@ impl Memo {
         }
     }
 
+    /// Adds given Node `node` to the Memo.
     pub fn push(&mut self, node: Node) {
         self.nodes.push(node);
     }
 
+    /// Returns Memo group (key of header node).
     pub fn group(&self) -> Key {
         self.nodes[0].key.clone()
     }
 
-    pub fn title(&self) -> Value {
-        self.nodes[0].value.clone()
+    /// Returns Memo title as string (value of header node).
+    pub fn title(&self) -> String {
+        self.nodes[0].value.to_string()
     }
 
+    /// Returns reference to header node.
     pub fn header(&self) -> &Node {
         &self.nodes[0]
     }
-    
+
+    /// Returns iterator to data nodes.
     pub fn data(&self) -> impl Iterator<Item=&Node> {
         self.nodes[1..].iter()
     }
 
+    /// Returns number of data nodes.
     pub fn data_count(&self) -> usize {
         self.nodes.len() - 1
     }
-    
+
+    /// Returns reference to last inserted data node.
     pub fn last(&self) -> &Node {
         &self.nodes[self.nodes.len() - 1]
     }
 
+    /// Returns mutable reference to last inserted data node.
     pub fn last_mut(&mut self) -> &mut Node {
         let index = self.nodes.len() - 1;
         self.nodes.get_mut(index).unwrap()
     }
 
-    /// Return reference to the first Node that matches the given key.
+    /// Returns reference to the first Node that matches the given key.
     pub fn get<K: Into<Key>>(&self, key: K) -> Option<&Node> {
         let key = key.into();
         self.data()
             .find(|n| n.key == key)
     }
 
-    /// Return vector to references to all nodes matching the given
+    /// Returns vector to references to all nodes matching the given
     /// key.
     pub fn get_vec<K: Into<Key>>(&self, key: K) -> Vec<&Node> {
         let key = key.into();
         self.data()
             .filter(|n| n.key == key)
             .collect::<Vec<&Node>>()
-    }    
+    }
+
+    /// Returns true if the Memo contains at least one node with the
+    /// given key.
+    ///
+    /// TODO: should this include the header node as well ?
+    pub fn contains_key<K: Into<Key>>(&self, key: K) -> bool {
+        let key = key.into();
+        match self.data().find(|&node| node.key == key) {
+            Some(_) => true,
+            _ => false
+        }            
+    }
+
+    /// Returns true if the Memo has no data nodes.
+    pub fn is_empty(&self) -> bool {
+        self.nodes.len() < 2
+    }
 }
 
 

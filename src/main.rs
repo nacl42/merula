@@ -45,7 +45,11 @@ fn main() {
     }
 
     if let Some(ref _matches) = matches.subcommand_matches("test") {
-        println!("testing: add some memos");
+        fn section(title: &'static str) {
+            println!("\n# {}\n", title);
+        }
+
+        section("add some memos");
 
         let mut memos: Vec<Memo> = vec!();
         
@@ -53,8 +57,8 @@ fn main() {
         memo.push(Node::new("author", "J.R.R. Tolkien"));
         memo.push(Node::new("character", "Bilbo Baggins"));
         memo.push(Node::new("character", "Samweis Gamdschie"));
-        
-        println!("This is the first memo:");
+
+        section("first memo");
         println!("{}", memo);
         memos.push(memo);
         
@@ -62,22 +66,53 @@ fn main() {
         memo.push(Node::new("author", "Douglas Adams"));
         memo.push(Node::new("author", "Arthur Dent"));
         memo.push(Node::new("character", "Ford Prefect"));
-
-        println!("\nThis is the second memo:");
+        
+        section("second memo");
         println!("{}", memo);
         memos.push(memo);
 
-        for i in 0..20 {
-            memos.push(Memo::new("foo", i));
+        let mut memo = Memo::new("character", "Bilbo Baggins");
+        memo.push(Node::new("class", "hobbit"));
+        memo.push(Node::new("friend-of", "Samweis Gamdschie"));
+        memos.push(memo);
+
+        let mut memo = Memo::new("character", "Samweis Gamdschie");
+        memos.push(memo);
+        
+        for i in 0..8 {
+            let mut memo = Memo::new("foo", i);
+            if i == 5 {
+                memo.push(Node::new("author", "foobar"));
+            }
+            memos.push(memo);
         }
+
 
         // print out list of memos with one line for each memo
         let digits = (memos.len() as f32).log10().trunc() as usize + 1;
-        println!("\nThis is a short list of the memos:");
+        section("this is a short list of the memos");
         for (n, memo) in memos.iter().enumerate() {
             println!("[{:width$}] @{} {} ({})",
                      n, memo.group(), memo.title(), memo.data_count(),
                      width=digits);
         }
+
+        // filter out all memos that contain at least one author node
+        section("filter all memos with at least an author node");
+        for memo in memos.iter().filter(|&m| m.contains_key("author")) {
+            println!("@{} {}", memo.group(), memo.title());
+        }
+
+        // filter out all memos from the group 'character'
+        section("filter all memos from 'character' group");
+        for memo in memos.iter().filter(|&m| m.group() == "character") {
+            println!("@{} {}", memo.group(), memo.title());
+        }
+
+        // filter out all memos with a title containing a number
+        section("filter all memos with a title containing a number");
+        for memo in memos.iter().filter(|&m| m.title().parse::<f32>().is_ok())  {
+            println!("@{} {}", memo.group(), memo.title());
+        }            
     }
 }
