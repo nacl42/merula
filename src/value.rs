@@ -26,6 +26,48 @@ pub enum Value {
     Bool(bool)
 }
 
+impl Value {
+    /// Returns true if Value is of type Value::Bool.
+    pub fn is_bool(&self) -> bool {
+        match self {
+            Value::Bool(_) => true,
+            _ => false
+        }
+    }
+
+    /// Returns true if Value is some kind of number (Value::Integer or Value::Float).
+    pub fn is_number(&self) -> bool {
+        match self {
+            Value::Integer(_) | Value::Float(_) => true,
+            _ => false
+        }
+    }
+
+    /// Returns true if Value is a Value::Text.
+    pub fn is_text(&self) -> bool {
+        match self {
+            Value::Text(_) => true,
+            _ => false
+        }
+    }
+
+    /// Returns true if Value is an Value::Integer
+    pub fn is_integer(&self) -> bool {
+        match self {
+            Value::Integer(_) => true,
+            _ => false
+        }
+    }
+
+    /// Returns true if Value is a Value::Float
+    pub fn is_float(&self) -> bool {
+        match self {
+            Value::Float(_) => true,
+            _ => false
+        }
+    }
+}
+
 impl std::fmt::Display for Value {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {

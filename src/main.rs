@@ -62,10 +62,10 @@ fn main() {
         println!("{}", memo);
         memos.push(memo);
         
-        let mut memo = Memo::new("book", "The Hitchhiker's Guide to the Galaxy");
-        memo.push(Node::new("author", "Douglas Adams"));
-        memo.push(Node::new("author", "Arthur Dent"));
-        memo.push(Node::new("character", "Ford Prefect"));
+        let memo = Memo::new("book", "The Hitchhiker's Guide to the Galaxy")
+            .with(Node::new("author", "Douglas Adams"))
+            .with(Node::new("author", "Arthur Dent"))
+            .with(Node::new("character", "Ford Prefect"));
         
         section("second memo");
         println!("{}", memo);
@@ -74,9 +74,11 @@ fn main() {
         let mut memo = Memo::new("character", "Bilbo Baggins");
         memo.push(Node::new("class", "hobbit"));
         memo.push(Node::new("friend-of", "Samweis Gamdschie"));
+        memo.push(Node::new("is-hobbit", true));
         memos.push(memo);
 
-        let mut memo = Memo::new("character", "Samweis Gamdschie");
+        let memo = Memo::new("character", "Samweis Gamdschie")
+            .with(Node::new("is-hobbit", true));
         memos.push(memo);
         
         for i in 0..8 {
@@ -113,6 +115,20 @@ fn main() {
         section("filter all memos with a title containing a number");
         for memo in memos.iter().filter(|&m| m.title().parse::<f32>().is_ok())  {
             println!("@{} {}", memo.group(), memo.title());
-        } 
+        }
+
+        // filter out all memos with a node value containing 'Bilbo'
+        section("filter all memos with a node value containing 'Bilbo'");
+        let node_filter = |node: &&Node| node.value.to_string().contains("Bilbo");
+        for memo in memos.iter().filter(|&m| m.data().find(node_filter).is_some()) {
+            println!("@{} {}", memo.group(), memo.title());
+        }
+
+        // filter out all memos with a node with a boolean value
+        section("filter all memos with a node value being a boolean value");
+        let node_filter = |node: &&Node| node.value.is_bool();
+        for memo in memos.iter().filter(|&m| m.data().find(node_filter).is_some()) {
+            println!("@{} {}", memo.group(), memo.title());
+        }
     }
 }
