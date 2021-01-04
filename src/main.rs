@@ -13,6 +13,7 @@ use clap_generate::{generate, generators::Bash};
 pub mod memo;
 pub mod node;
 pub mod value;
+pub mod sample;
 
 use memo::Memo;
 use node::Node;
@@ -51,44 +52,7 @@ fn main() {
 
         section("add some memos");
 
-        let mut memos: Vec<Memo> = vec!();
-        
-        let memo = Memo::new("book", "The Lord of the Rings")
-            .with(("author", "J.R.R. Tolkien"))
-            .with(("character", "Bilbo Baggins"))
-            .with(("character", "Samweis Gamdschie"));
-        memos.push(memo);
-
-        let memo = Memo::new("author", "J.R.R. Tolkien")
-            .with(("birthday", "1892-01-03"));
-        memos.push(memo);
-
-        let mut memo = Memo::new("character", "Bilbo Baggins")
-            .with(("class", "hobbit"))
-            .with(("friend-of", "Samweis Gamdschie"))
-            .with(("is-hobbit", true));
-        memos.push(memo);
-
-        let memo = Memo::new("character", "Samweis Gamdschie")
-            .with(("is-hobbit", true));
-        memos.push(memo);
-
-        
-        let memo = Memo::new("book", "The Hitchhiker's Guide to the Galaxy")
-            .with(("author", "Douglas Adams"))
-            .with(("character", "Arthur Dent"))
-            .with(("character", "Ford Prefect"));        
-        memos.push(memo);
-
-        let memo = Memo::new("author", "Douglas Adams")
-            .with(("birthday", "1952-03-11"));
-        memos.push(memo);
-
-        let memo = Memo::new("character", "Arthur Dent");
-        memos.push(memo);
-
-        let memo = Memo::new("character", "Ford Prefect");
-        memos.push(memo);
+        let mut memos = sample::setup_memos();        
                     
         // print out list of memos with one line for each memo
         let digits = (memos.len() as f32).log10().trunc() as usize + 1;
@@ -130,7 +94,6 @@ fn main() {
         for memo in memos.iter().filter(|&m| m.data().find(node_filter).is_some()) {
             println!("@{} {}", memo.group(), memo.title());
         }
-
         
         // what queries can we think of ?
         // SELECT author FROM book WHERE character LIKE '*Bilbo*';
