@@ -53,43 +53,43 @@ fn main() {
 
         let mut memos: Vec<Memo> = vec!();
         
-        let mut memo = Memo::new("book", "The Lord of the Rings");
-        memo.push(("author", "J.R.R. Tolkien"));
-        memo.push(("character", "Bilbo Baggins"));
-        memo.push(("character", "Samweis Gamdschie"));
-
-        section("first memo");
-        println!("{}", memo);
-        memos.push(memo);
-        
-        let memo = Memo::new("book", "The Hitchhiker's Guide to the Galaxy")
-            .with(("author", "Douglas Adams"))
-            .with(("author", "Arthur Dent"))
-            .with(("character", "Ford Prefect"));
-        
-        section("second memo");
-        println!("{}", memo);
+        let memo = Memo::new("book", "The Lord of the Rings")
+            .with(("author", "J.R.R. Tolkien"))
+            .with(("character", "Bilbo Baggins"))
+            .with(("character", "Samweis Gamdschie"));
         memos.push(memo);
 
-        let mut memo = Memo::new("character", "Bilbo Baggins");
-        memo.push(("class", "hobbit"));
-        memo.push(("friend-of", "Samweis Gamdschie"));
-        memo.push(("is-hobbit", true));
+        let memo = Memo::new("author", "J.R.R. Tolkien")
+            .with(("birthday", "1892-01-03"));
+        memos.push(memo);
+
+        let mut memo = Memo::new("character", "Bilbo Baggins")
+            .with(("class", "hobbit"))
+            .with(("friend-of", "Samweis Gamdschie"))
+            .with(("is-hobbit", true));
         memos.push(memo);
 
         let memo = Memo::new("character", "Samweis Gamdschie")
             .with(("is-hobbit", true));
         memos.push(memo);
+
         
-        for i in 0..8 {
-            let mut memo = Memo::new("foo", i);
-            if i == 5 {
-                memo.push(("author", "foobar"));
-            }
-            memos.push(memo);
-        }
+        let memo = Memo::new("book", "The Hitchhiker's Guide to the Galaxy")
+            .with(("author", "Douglas Adams"))
+            .with(("character", "Arthur Dent"))
+            .with(("character", "Ford Prefect"));        
+        memos.push(memo);
 
+        let memo = Memo::new("author", "Douglas Adams")
+            .with(("birthday", "1952-03-11"));
+        memos.push(memo);
 
+        let memo = Memo::new("character", "Arthur Dent");
+        memos.push(memo);
+
+        let memo = Memo::new("character", "Ford Prefect");
+        memos.push(memo);
+                    
         // print out list of memos with one line for each memo
         let digits = (memos.len() as f32).log10().trunc() as usize + 1;
         section("this is a short list of the memos");
@@ -130,5 +130,11 @@ fn main() {
         for memo in memos.iter().filter(|&m| m.data().find(node_filter).is_some()) {
             println!("@{} {}", memo.group(), memo.title());
         }
+
+        
+        // what queries can we think of ?
+        // SELECT author FROM book WHERE character LIKE '*Bilbo*';
+        // SELECT * FROM character;
+        // SELECT * FROM * WHERE author EXISTS;        
     }
 }

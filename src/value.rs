@@ -14,6 +14,10 @@
 //! - bool will be converted into `Value::Bool`
 //!
 
+// TODO: Value::Multiline(text, eof)
+// TODO: Value::Date, Value::DateTime, Value::Time
+// TODO: Value::Ref(group, title), Value::RefById(id)
+
 pub type Key = String;
 
 /// A Value is an enum for the different types of values that a
