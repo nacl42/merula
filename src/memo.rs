@@ -3,9 +3,9 @@
 //! Please note that this might not be the perfectly appropriate term,
 //! when considering graph theory.
 //!
-//! The `group` and `title` are stored in the first Node, which is
-//! called the header node. A memo can belong to only one group and
-//! has exactly one title.
+//! The `collection` and `title` are stored in the first Node, which
+//! is called the header node. A memo can belong to only one
+//! collection and has exactly one title.
 //!
 //! Additional information can be stored in the subsequent Nodes,
 //! which are called data nodes.
@@ -34,11 +34,11 @@ impl Memo {
     /// ```
     /// let mut memo = Memo::new("book", "The Lord of the Rings");
     /// ```
-    pub fn new<K, V>(group: K, title: V) -> Self
+    pub fn new<K, V>(collection: K, title: V) -> Self
         where K: Into<Key>, V: Into<Value>
     {
         Memo {
-            nodes: vec![Node::new(group, title)]
+            nodes: vec![Node::new(collection, title)]
         }
     }
 
@@ -57,8 +57,8 @@ impl Memo {
         self
     }
     
-    /// Returns Memo group (key of header node).
-    pub fn group(&self) -> Key {
+    /// Returns Memo collection (key of header node).
+    pub fn collection(&self) -> Key {
         self.nodes[0].key.clone()
     }
 
@@ -161,7 +161,7 @@ mod tests {
     #[test]
     fn check_header() {
         let memo = sample_memo();
-        assert_eq!(memo.group(), "book");
+        assert_eq!(memo.collection(), "book");
         assert_eq!(memo.title(), "The Lord of the Rings");
     }
 
@@ -190,7 +190,7 @@ mod tests {
         memo2.push(Node::new("character", "Samweis Gamdschie"));
 
         assert_eq!(memo1.title(), memo2.title());
-        assert_eq!(memo1.group(), memo2.group());
+        assert_eq!(memo1.collection(), memo2.collection());
 
         for (node1, node2) in memo1.data().zip(memo2.data()) {
             assert_eq!(node1.key, node2.key);

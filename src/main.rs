@@ -17,6 +17,7 @@ pub mod sample;
 
 use memo::Memo;
 use node::Node;
+use value::{Value, Key};
 
 fn main() {
     let app = App::new("merula")
@@ -59,40 +60,40 @@ fn main() {
         section("this is a short list of the memos");
         for (n, memo) in memos.iter().enumerate() {
             println!("[{:width$}] @{} {} ({})",
-                     n, memo.group(), memo.title(), memo.data_count(),
+                     n, memo.collection(), memo.title(), memo.data_count(),
                      width=digits);
         }
 
         // filter out all memos that contain at least one author node
         section("filter all memos with at least an author node");
         for memo in memos.iter().filter(|&m| m.contains_key("author")) {
-            println!("@{} {}", memo.group(), memo.title());
+            println!("@{} {}", memo.collection(), memo.title());
         }
 
-        // filter out all memos from the group 'character'
-        section("filter all memos from 'character' group");
-        for memo in memos.iter().filter(|&m| m.group() == "character") {
-            println!("@{} {}", memo.group(), memo.title());
+        // filter out all memos from the collection 'character'
+        section("filter all memos from 'character' collection");
+        for memo in memos.iter().filter(|&m| m.collection() == "character") {
+            println!("@{} {}", memo.collection(), memo.title());
         }
 
         // filter out all memos with a title containing a number
         section("filter all memos with a title containing a number");
         for memo in memos.iter().filter(|&m| m.title().parse::<f32>().is_ok())  {
-            println!("@{} {}", memo.group(), memo.title());
+            println!("@{} {}", memo.collection(), memo.title());
         }
 
         // filter out all memos with a node value containing 'Bilbo'
         section("filter all memos with a node value containing 'Bilbo'");
         let node_filter = |node: &&Node| node.value.to_string().contains("Bilbo");
         for memo in memos.iter().filter(|&m| m.data().find(node_filter).is_some()) {
-            println!("@{} {}", memo.group(), memo.title());
+            println!("@{} {}", memo.collection(), memo.title());
         }
 
         // filter out all memos with a node with a boolean value
         section("filter all memos with a node value being a boolean value");
         let node_filter = |node: &&Node| node.value.is_bool();
         for memo in memos.iter().filter(|&m| m.data().find(node_filter).is_some()) {
-            println!("@{} {}", memo.group(), memo.title());
+            println!("@{} {}", memo.collection(), memo.title());
         }
         
         // what queries can we think of ?
