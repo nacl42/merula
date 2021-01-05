@@ -10,12 +10,15 @@ use clap::{App, crate_version, Arg};
 #[allow(unused_imports)]
 use clap_generate::{generate, generators::Bash};
 
+use std::collections::hash_map::{HashMap, DefaultHasher};
+use std::hash::{Hash, Hasher};
+
 pub mod memo;
 pub mod node;
 pub mod value;
 pub mod sample;
 
-use memo::Memo;
+use memo::{Memo, MemoId};
 use node::Node;
 use value::{Value, Key};
 
@@ -53,7 +56,7 @@ fn main() {
 
         section("add some memos");
 
-        let mut memos = sample::setup_memos();        
+        let memos = sample::setup_memos();        
                     
         // print out list of memos with one line for each memo
         let digits = (memos.len() as f32).log10().trunc() as usize + 1;
@@ -96,9 +99,46 @@ fn main() {
             println!("@{} {}", memo.collection(), memo.title());
         }
         
-        // what queries can we think of ?
-        // SELECT author FROM book WHERE character LIKE '*Bilbo*';
-        // SELECT * FROM character;
-        // SELECT * FROM * WHERE author EXISTS;        
+        // create index
+        section("Create index of memos");
+
+        // move memos into index map (=primary index)
+        section("create primary index");
+        let mut index: HashMap<MemoId, Memo> = HashMap::new();
+
+        for memo in memos {
+            index.insert(memo.id(), memo);
+        }
+        println!("{:#?}", index);
+
+        // we can now create a secondary index, e.g. by collection
+        section("creating secondary index");
+        let mut index2: HashMap<Key, Vec<MemoId>>
+            = HashMap::new();
+        
+        for id in index.keys() {
+            let collection = index[id].collection();
+            index2.entry(collection).or_default().push(id.clone());
+        }
+        println!("{:#?}", index2);
+
+        // listing all characters
+        section("listing all characters by looking up secondary index");
+        for id in index2["character"].iter() {
+            let memo = &index[&id];
+            println!("@{} {}", memo.collection(), memo.title());
+        }
+
+        // we could create a third index, e.g. by (collection, title)
+        section("creating ternary index");
+        let mut index3: HashMap<(Key, String), MemoId>
+            = HashMap::new();
+
+        for id in index.keys() {
+            let memo = &index[&id];
+            index3.insert((memo.collection(), memo.title()), id.clone());
+        }
+        println!("{:#?}", index3);
+
     }
 }

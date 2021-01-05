@@ -18,12 +18,17 @@
 use crate::value::{Key, Value};
 use crate::node::Node;
 
+use std::hash::{Hash, Hasher};
+use std::collections::hash_map::DefaultHasher;
+
+pub type MemoId = u64;
 
 /// A Memo consists of multiple nodes, the first one being the header
 /// node and the subsequent ones being the data nodes.
 #[derive(Debug)]
 pub struct Memo {
-    nodes: Vec<Node>
+    header: Node,
+    data: Vec<Node>
 }
 
 impl Memo {
@@ -38,14 +43,15 @@ impl Memo {
         where K: Into<Key>, V: Into<Value>
     {
         Memo {
-            nodes: vec![Node::new(collection, title)]
+            header: Node::new(collection, title),
+            data: vec![]
         }
     }
 
     /// Adds given Node `node` to the Memo.
     pub fn push<N>(&mut self, node: N)
     where N: Into<Node> {
-        self.nodes.push(node.into());
+        self.data.push(node.into());
     }
 
     /// Adds given Node `node` to the Memo and returns the instance of
@@ -53,44 +59,52 @@ impl Memo {
     /// to add multiple nodes.
     pub fn with<N>(mut self, node: N) -> Self
     where N: Into<Node> {
-        self.nodes.push(node.into());
+        self.data.push(node.into());
         self
     }
     
     /// Returns Memo collection (key of header node).
     pub fn collection(&self) -> Key {
-        self.nodes[0].key.clone()
+        self.header.key.clone()
     }
 
     /// Returns Memo title as string (value of header node).
     pub fn title(&self) -> String {
-        self.nodes[0].value.to_string()
+        self.header.value.to_string()
     }
 
     /// Returns reference to header node.
     pub fn header(&self) -> &Node {
-        &self.nodes[0]
+        &self.header
     }
 
+    /// Returns unique header id
+    pub fn id(&self) -> MemoId {
+        let mut s = DefaultHasher::new();
+        self.collection().hash(&mut s);
+        self.title().hash(&mut s);
+        s.finish()
+    }
+    
     /// Returns iterator to data nodes.
     pub fn data(&self) -> impl Iterator<Item=&Node> {
-        self.nodes[1..].iter()
+        self.data.iter()
     }
 
     /// Returns number of data nodes.
     pub fn data_count(&self) -> usize {
-        self.nodes.len() - 1
+        self.data.len()
     }
 
     /// Returns reference to last inserted data node.
     pub fn last(&self) -> &Node {
-        &self.nodes[self.nodes.len() - 1]
+        &self.data[self.data.len() - 1]
     }
 
     /// Returns mutable reference to last inserted data node.
     pub fn last_mut(&mut self) -> &mut Node {
-        let index = self.nodes.len() - 1;
-        self.nodes.get_mut(index).unwrap()
+        let index = self.data.len() - 1;
+        self.data.get_mut(index).unwrap()
     }
 
     /// Returns reference to the first data node that matches the given key.
@@ -104,7 +118,7 @@ impl Memo {
     /// given key.
     pub fn get_vec<K: Into<Key>>(&self, key: K) -> Vec<&Node> {
         let key = key.into();
-        self.data()
+        self.data.iter()
             .filter(|n| n.key == key)
             .collect::<Vec<&Node>>()
     }
@@ -113,7 +127,7 @@ impl Memo {
     /// the given key.
     pub fn contains_key<K: Into<Key>>(&self, key: K) -> bool {
         let key = key.into();
-        match self.data().find(|&node| node.key == key) {
+        match self.data.iter().find(|&node| node.key == key) {
             Some(_) => true,
             _ => false
         }            
@@ -121,15 +135,20 @@ impl Memo {
 
     /// Returns true if the Memo has no data nodes.
     pub fn is_empty(&self) -> bool {
-        self.nodes.len() < 2
+        self.data.len() < 2
     }
 }
 
 
 impl std::fmt::Display for Memo {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        // print header
         let mut prefix = "@";
-        for node in &self.nodes {
+        writeln!(f, "{}{} {}", prefix, self.header.key, self.header.value)?;
+        
+        // print data nodes
+        let mut prefix = ".";
+        for node in &self.data {
             writeln!(f, "{}{} {}", prefix, node.key, node.value)?;
             for (key, value) in node.attrs.iter() {
                 writeln!(f, "+{} {}", key, value)?;
@@ -138,7 +157,6 @@ impl std::fmt::Display for Memo {
             //if let Some(text) = &node.text {
             //    writeln!(f, "{}", text);
             //}
-            prefix = ".";
         }
         Ok(())
     }
