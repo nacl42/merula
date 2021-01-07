@@ -25,6 +25,7 @@ pub type Key = String;
 #[derive(Debug, Clone, PartialEq)]
 pub enum Value {
     Text(String),
+    MultiLineText(String, String), // (text, sep)
     Integer(i32),
     Float(f32),
     Bool(bool)
@@ -50,7 +51,7 @@ impl Value {
     /// Returns true if Value is a Value::Text.
     pub fn is_text(&self) -> bool {
         match self {
-            Value::Text(_) => true,
+            Value::Text(_) | Value::MultiLineText(_, _) => true,
             _ => false
         }
     }
@@ -76,6 +77,8 @@ impl std::fmt::Display for Value {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Value::Text(text) => write!(f, "{}", text),
+            Value::MultiLineText(text, sep) =>
+                write!(f, "<<{}\n{}\n{}", sep, text, sep),
             Value::Integer(n) => write!(f, "{}", n),
             Value::Float(x) => write!(f, "{}", x),
             Value::Bool(b) => write!(f, "{}", b)
@@ -85,15 +88,22 @@ impl std::fmt::Display for Value {
 
 impl From<&str> for Value {
     fn from(s: &str) -> Value {
-        // TODO: check for newlines
-        Value::Text(s.to_string())
+        if s.contains("\n") {
+            Value::MultiLineText(s.to_string(), "EOF".to_string())
+        } else {
+            Value::Text(s.to_string())
+        }
     }
 }
 
 impl From<String> for Value {
     fn from(s: String) -> Value {
         // TODO: check for newlines
-        Value::Text(s)
+        if s.contains("\n") {
+            Value::MultiLineText(s, "EOF".to_string())
+        } else {
+            Value::Text(s)
+        }
     }
 }
 

@@ -37,7 +37,8 @@ pub fn setup_memos() -> Vec<Memo> {
     memos.push(memo);
     
     let memo = Memo::new("character", "Aragorn")
-        .with(("species", "men"));
+        .with(("species", "men"))
+        .with(("quote", "If by my life or death I can protect you,\n I will."));    
     memos.push(memo);
 
     let memo = Memo::new("character", "Legolas")
