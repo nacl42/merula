@@ -11,18 +11,18 @@ Introduction](https://www.wikidata.org/wiki/Wikidata:Introduction).
 The comparison between WikiData Items and merula Memos shows a lot of
 similarites:
 
-| WikiData    | merula
-|------------------------------------
-| Item        | Memo
-| Identifier  | (implicit: collection and title)
-| Description | -
-| -           | Collection
-| Label       | Title
-| Alias       | -
-| Property    | Node
-| Value       | Value
-| Qualifiers  | Attributes
-| Rank        | (implicit: node order)
+| WikiData    | merula                           |
+| ----------- | -------------------------------- |
+| Item        | Memo                             |
+| Identifier  | (implicit: collection and title) |
+| Description | n/a                              |
+| n/a         | Collection                       |
+| Label       | Title                            |
+| Alias       | n/a                              |
+| Property    | Node                             |
+| Value       | Value                            |
+| Qualifiers  | Attributes                       |
+| Rank        | (implicit: node order)           |
 
 Each WikiData Item...
 - ...describes one thing, in the same way that a Memo describes one
