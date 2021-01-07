@@ -5,6 +5,9 @@
 //! production purposes.
 //!
 
+#[macro_use] extern crate pest_derive;
+#[macro_use] extern crate lazy_static;
+
 #[allow(unused_imports)]
 use clap::{App, crate_version, Arg};
 #[allow(unused_imports)]
@@ -17,6 +20,7 @@ pub mod memo;
 pub mod node;
 pub mod value;
 pub mod sample;
+pub mod parser;
 
 use memo::{Memo, MemoId};
 use node::Node;
@@ -42,10 +46,16 @@ fn main() {
 
     if let Some(ref matches) = matches.subcommand_matches("list") {
         // read memos from .mr file into database
-        // TODO
+        // TODO: let mut db = Database::new()
         if let Some(input) = matches.value_of("input") {
             //init.logger(matches.occurences_of("verbose") as u8);
-            println!("pretending to load input file '{}'", input);
+            println!("loading input file '{}'", input);
+            let memos = parser::read_from_file(input, true).unwrap();
+            // TODO: db.memos.extend(memos)
+            println!("==> {} memos", memos.len());
+            for memo in memos {
+                println!("@{} {}", memo.collection(), memo.title())
+            }
         }        
     }
 

@@ -1,0 +1,32 @@
+WHITESPACE = _{ " " }
+
+// key key_char should be kept in sync with mql.pest
+key_char = { ASCII_ALPHANUMERIC | "_" | ":" | "/" | "."  | "-" }
+key = @{ key_char+ }
+
+value_char = { !NEWLINE ~ ANY }
+value = @{ value_char* }
+
+multiline_value = { (!POP ~ value ~ NEWLINE)* }
+
+eof = @{ value_char+ }
+sep = @{ "," | "|" | ";" }
+
+comment = { "#" ~ value }
+
+header = { "@" ~ key ~ value }
+multivalue_node = { "." ~ key ~ sep ~ value }
+node = { "." ~ key ~ value }
+attr = { "+" ~ key ~ value }
+multiline_node = {
+      "." ~ key ~ "<<" ~ PUSH(eof) ~ NEWLINE ~
+      multiline_value ~
+      POP
+}
+
+file = {
+      SOI ~
+      ((comment | header | multiline_node | multivalue_node | node | attr )? ~ NEWLINE)* ~
+    EOI
+}
+
