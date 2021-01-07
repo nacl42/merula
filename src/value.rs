@@ -3,18 +3,19 @@
 //!
 //! Possible variants are:
 //! - `Value::Text` holding a single-line string (no newlines)
+//! - `Value::MultiLineText` holding a multi-line string (with newlines)
 //! - `Value::Integer` holding a 32-bit integer number
 //! - `Value::Float` holding a 32-bit floating point number
 //! - `Value::Bool` holding a true/false value
 //!
 //! A Value can be constructed using the From Trait:
-//! - String or &str will be converted into `Value::Text`
+//! - String or &str will be converted into `Value::Text` or to
+//!   `Value::MultiLineText` if it contains at least one newline.
 //! - i32 will be converted into `Value::Integer`
 //! - f32 will be converted into `Value::Float`
 //! - bool will be converted into `Value::Bool`
 //!
 
-// TODO: Value::Multiline(text, eof)
 // TODO: Value::Date, Value::DateTime, Value::Time
 // TODO: Value::Ref(group, title), Value::RefById(id)
 

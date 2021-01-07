@@ -19,6 +19,7 @@ use crate::value::{Key, Value};
 use crate::node::Node;
 
 use std::hash::{Hash, Hasher};
+use std::collections::HashMap;
 use std::collections::hash_map::DefaultHasher;
 
 pub type MemoId = u64;
@@ -28,7 +29,8 @@ pub type MemoId = u64;
 #[derive(Debug)]
 pub struct Memo {
     header: Node,
-    data: Vec<Node>
+    data: Vec<Node>,
+    attrs: HashMap<Key, Value>
 }
 
 impl Memo {
@@ -44,7 +46,8 @@ impl Memo {
     {
         Memo {
             header: Node::new(collection, title),
-            data: vec![]
+            data: vec![],
+            attrs: HashMap::new()
         }
     }
 
@@ -145,6 +148,9 @@ impl std::fmt::Display for Memo {
         // print header
         let mut prefix = "@";
         writeln!(f, "{}{} {}", prefix, self.header.key, self.header.value)?;
+        for (key, value) in self.header.attrs.iter() {
+            writeln!(f, "+{} {}", key, value)?;
+        }
         
         // print data nodes
         let mut prefix = ".";
@@ -153,10 +159,6 @@ impl std::fmt::Display for Memo {
             for (key, value) in node.attrs.iter() {
                 writeln!(f, "+{} {}", key, value)?;
             }
-            // TODO: implement text output
-            //if let Some(text) = &node.text {
-            //    writeln!(f, "{}", text);
-            //}
         }
         Ok(())
     }
