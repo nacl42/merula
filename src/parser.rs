@@ -110,3 +110,20 @@ pub fn read_from_file(filename: &'_ str, drop_first: bool)
 }
 
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn parse_header() {
+        // testing is very limited, just check if it is valid or not
+        let result = MemoParser::parse(Rule::header, &"@foo bar");
+        assert!(result.is_ok());
+
+        let result = MemoParser::parse(Rule::header, &"@foo");
+        assert!(result.is_ok());
+
+        let result = MemoParser::parse(Rule::header, &".foo");
+        assert!(result.is_err());
+    }
+}
