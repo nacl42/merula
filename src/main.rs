@@ -21,10 +21,12 @@ pub mod node;
 pub mod value;
 pub mod sample;
 pub mod parser;
+pub mod filter;
 
 use memo::{Memo, MemoId};
 use node::Node;
 use value::{Value, Key};
+use filter::NodeFilter;
 
 fn main() {
     let app = App::new("merula")
@@ -36,6 +38,7 @@ fn main() {
             App::new("list")
                 .about("list memos")
                 .arg("<input> 'sets an input file'")
+                .arg("--filter=[FILTER] 'sets a filter condition'")
         )
         .subcommand(
             App::new("test")
@@ -53,8 +56,23 @@ fn main() {
             let memos = parser::read_from_file(input, true).unwrap();
             // TODO: db.memos.extend(memos)
             println!("==> {} memos", memos.len());
-            for memo in memos {
-                println!("@{} {}", memo.collection(), memo.title())
+
+            // check if a filter clause has been supplied
+            if let Some(filter) = matches.value_of("filter") {
+                println!("filter nodes with key '{}'", filter);
+                // TODO: parse filter expression
+                // distinguish between NodeFilter and MemoFilter ... ?
+                let f = filter::KeyFilter::new(filter);
+                for memo in memos.iter().filter(
+                    |&memo| memo.data().find(f.predicate()).is_some()
+                ) {
+                    println!("@{} {}", memo.collection(), memo.title())
+                }
+                
+            } else {
+                for memo in memos {
+                    println!("@{} {}", memo.collection(), memo.title())
+                }
             }
         }        
     }
@@ -108,7 +126,7 @@ fn main() {
         for memo in memos.iter().filter(|&m| m.data().find(node_filter).is_some()) {
             println!("@{} {}", memo.collection(), memo.title());
         }
-        
+
         // create index
         section("Create index of memos");
 

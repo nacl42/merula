@@ -55,6 +55,14 @@ List all hobbits he knows:
     $ merula bilbo.mr --select name --where 'species=hobbit'
 
 
+## Filter
 
+Node filter could filter by data nodes or by data and header nodes.
 
+In the latter case, we could distinguish between these:
 
+```
+@memo
+.field
+either-memo-or-field
+```

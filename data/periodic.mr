@@ -132,16 +132,19 @@
 .name iron
 .number 26
 .amu 55.845
+.ferromagnetic true
 
 @element Co
 .name cobalt
 .number 27
 .amu 58.933194
+.ferromagnetic true
 
 @element Ni
 .name nickel
 .number 28
 .amu 58.6934
+.ferromagnetic true
 
 @element Cu
 .name copper
