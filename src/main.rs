@@ -5,6 +5,13 @@
 //! production purposes.
 //!
 
+// TODO: filter by value ("url~github", "amu>5")
+// TODO: transform result set by applying a template to each resulting Memo
+// TODO: list all available keys for a result set (--keys)
+// TODO: filter by collection ("@app")
+// TODO: filter by data node (".url")
+
+
 #[macro_use] extern crate pest_derive;
 #[macro_use] extern crate lazy_static;
 
@@ -62,9 +69,10 @@ fn main() {
                 println!("filter nodes with key '{}'", filter);
                 // TODO: parse filter expression
                 // distinguish between NodeFilter and MemoFilter ... ?
-                let f = filter::KeyFilter::new(filter);
+                let f = filter::Comparison::Contains(filter.to_string());
+                //let f = filter::KeyFilter::new(filter);
                 for memo in memos.iter().filter(
-                    |&memo| memo.data().find(f.predicate()).is_some()
+                    |&memo| memo.nodes().find(f.predicate()).is_some()
                 ) {
                     println!("@{} {}", memo.collection(), memo.title())
                 }

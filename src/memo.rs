@@ -28,8 +28,7 @@ pub type MemoId = u64;
 /// node and the subsequent ones being the data nodes.
 #[derive(Debug)]
 pub struct Memo {
-    header: Node,
-    data: Vec<Node>,
+    nodes: Vec<Node>,
     attrs: HashMap<Key, Value>
 }
 
@@ -45,8 +44,7 @@ impl Memo {
         where K: Into<Key>, V: Into<Value>
     {
         Memo {
-            header: Node::new(collection, title),
-            data: vec![],
+            nodes: vec![Node::new(collection, title)],
             attrs: HashMap::new()
         }
     }
@@ -54,7 +52,7 @@ impl Memo {
     /// Adds given Node `node` to the Memo.
     pub fn push<N>(&mut self, node: N)
     where N: Into<Node> {
-        self.data.push(node.into());
+        self.nodes.push(node.into());
     }
 
     /// Adds given Node `node` to the Memo and returns the instance of
@@ -62,23 +60,23 @@ impl Memo {
     /// to add multiple nodes.
     pub fn with<N>(mut self, node: N) -> Self
     where N: Into<Node> {
-        self.data.push(node.into());
+        self.nodes.push(node.into());
         self
     }
     
     /// Returns Memo collection (key of header node).
     pub fn collection(&self) -> Key {
-        self.header.key.clone()
+        self.header().key.clone()
     }
 
     /// Returns Memo title as string (value of header node).
     pub fn title(&self) -> String {
-        self.header.value.to_string()
+        self.header().value.to_string()
     }
 
     /// Returns reference to header node.
     pub fn header(&self) -> &Node {
-        &self.header
+        &self.nodes[0]
     }
 
     /// Returns unique header id
@@ -88,40 +86,44 @@ impl Memo {
         self.title().hash(&mut s);
         s.finish()
     }
+
+    /// Returns iterator to all nodes (header and data)
+    pub fn nodes(&self) -> impl Iterator<Item=&Node> {
+        self.nodes.iter()
+    }
     
     /// Returns iterator to data nodes.
     pub fn data(&self) -> impl Iterator<Item=&Node> {
-        self.data.iter()
+        self.nodes[1..].iter()
     }
 
     /// Returns number of data nodes.
     pub fn data_count(&self) -> usize {
-        self.data.len()
+        self.nodes.len() - 1
     }
 
     /// Returns reference to last inserted data node.
     pub fn last(&self) -> &Node {
-        &self.data[self.data.len() - 1]
+        &self.nodes[self.nodes.len() - 1]
     }
 
     /// Returns mutable reference to last inserted data node.
     pub fn last_mut(&mut self) -> &mut Node {
-        let index = self.data.len() - 1;
-        self.data.get_mut(index).unwrap()
+        let index = self.nodes.len() - 1;
+        self.nodes.get_mut(index).unwrap()
     }
 
     /// Returns reference to the first data node that matches the given key.
     pub fn get<K: Into<Key>>(&self, key: K) -> Option<&Node> {
         let key = key.into();
-        self.data()
-            .find(|n| n.key == key)
+        self.nodes.iter().find(|n| n.key == key)
     }
 
     /// Returns vector to references to all data nodes matching the
     /// given key.
     pub fn get_vec<K: Into<Key>>(&self, key: K) -> Vec<&Node> {
         let key = key.into();
-        self.data.iter()
+        self.nodes.iter()
             .filter(|n| n.key == key)
             .collect::<Vec<&Node>>()
     }
@@ -130,7 +132,7 @@ impl Memo {
     /// the given key.
     pub fn contains_key<K: Into<Key>>(&self, key: K) -> bool {
         let key = key.into();
-        match self.data.iter().find(|&node| node.key == key) {
+        match self.nodes.iter().find(|&node| node.key == key) {
             Some(_) => true,
             _ => false
         }            
@@ -138,7 +140,7 @@ impl Memo {
 
     /// Returns true if the Memo has no data nodes.
     pub fn is_empty(&self) -> bool {
-        self.data.len() < 2
+        self.nodes.len() < 2
     }
 }
 
@@ -147,14 +149,15 @@ impl std::fmt::Display for Memo {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         // print header
         let mut prefix = "@";
-        writeln!(f, "{}{} {}", prefix, self.header.key, self.header.value)?;
-        for (key, value) in self.header.attrs.iter() {
+        let header = self.header();
+        writeln!(f, "{}{} {}", prefix, header.key, header.value)?;
+        for (key, value) in header.attrs.iter() {
             writeln!(f, "+{} {}", key, value)?;
         }
         
         // print data nodes
         let mut prefix = ".";
-        for node in &self.data {
+        for node in &self.nodes {
             writeln!(f, "{}{} {}", prefix, node.key, node.value)?;
             for (key, value) in node.attrs.iter() {
                 writeln!(f, "+{} {}", key, value)?;
