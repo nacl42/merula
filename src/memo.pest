@@ -31,11 +31,3 @@ file = {
 }
 
 
-// filter expressions
-fex = {
-      SOI ~
-      key ~ operator ~ value
-      ~ EOI
-}
-
-operator = { "=" | "~" }

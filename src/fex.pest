@@ -1,0 +1,16 @@
+WHITESPACE = _{ " " }
+
+key_char = { ASCII_ALPHANUMERIC | "_" | ":" | "/" | "."  | "-" }
+key = @{ key_char+ }
+
+value_char = { !NEWLINE ~ ANY }
+value = @{ value_char* }
+
+operator = { "=" | "~" }
+
+fex = {
+      SOI ~
+      key ~ operator ~ value
+      ~ EOI
+}
+

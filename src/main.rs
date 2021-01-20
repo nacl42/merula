@@ -27,6 +27,7 @@ pub mod value;
 pub mod sample;
 pub mod parser;
 pub mod filter;
+pub mod fex;
 
 use memo::{Memo, MemoId};
 use node::Node;
@@ -66,7 +67,10 @@ fn main() {
             if let Some(fex) = matches.value_of("filter") {
                 println!("filter expression: '{}'", fex);
                 // TODO: parse filter expression
-
+                // either by regular expression or by parser
+                //  key, .key, @key, ~value, +~value, @key~value
+                // [qualifier][key_expression][operator][value]
+                // 
                 let filter = match fex.contains("~") {
                     true => {
                         let fk = NodeFilter::HasKey("tag".to_string());

@@ -124,25 +124,4 @@ mod tests {
         let result = MemoParser::parse(Rule::header, &".foo");
         assert!(result.is_err());
     }
-
-    #[test]
-    fn parse_fex() {
-        let input = "name~ium";
-        let fex = MemoParser::parse(Rule::fex, &input)
-            .expect("unsuccessful parse")
-            .next().unwrap();
-
-        // TODO: print output of test function
-        
-        // for line in fex.into_inner() {
-        //     match line.as_rule() {
-        //         Rule:: => {
-        //             // comments are currently ignored
-        //             let mut inner_rules = line.into_inner();
-        //             let value = inner_rules.next().unwrap().as_str();
-        //             debug!("# {}", value);
-        //         }
-        //     }
-        // }
-    }
 }
