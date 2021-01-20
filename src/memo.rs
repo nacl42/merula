@@ -148,7 +148,7 @@ impl Memo {
 impl std::fmt::Display for Memo {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         // print header
-        let mut prefix = "@";
+        let prefix = "@";
         let header = self.header();
         writeln!(f, "{}{} {}", prefix, header.key, header.value)?;
         for (key, value) in header.attrs.iter() {
@@ -156,7 +156,7 @@ impl std::fmt::Display for Memo {
         }
         
         // print data nodes
-        let mut prefix = ".";
+        let prefix = ".";
         for node in &self.nodes {
             writeln!(f, "{}{} {}", prefix, node.key, node.value)?;
             for (key, value) in node.attrs.iter() {

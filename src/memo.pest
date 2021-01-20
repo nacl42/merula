@@ -30,3 +30,12 @@ file = {
     EOI
 }
 
+
+// filter expressions
+fex = {
+      SOI ~
+      key ~ operator ~ value
+      ~ EOI
+}
+
+operator = { "=" | "~" }

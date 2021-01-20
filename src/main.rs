@@ -13,15 +13,13 @@
 
 
 #[macro_use] extern crate pest_derive;
-#[macro_use] extern crate lazy_static;
 
 #[allow(unused_imports)]
 use clap::{App, crate_version, Arg};
 #[allow(unused_imports)]
 use clap_generate::{generate, generators::Bash};
 
-use std::collections::hash_map::{HashMap, DefaultHasher};
-use std::hash::{Hash, Hasher};
+use std::collections::hash_map::{HashMap};
 
 pub mod memo;
 pub mod node;
@@ -33,7 +31,7 @@ pub mod filter;
 use memo::{Memo, MemoId};
 use node::Node;
 use value::{Value, Key};
-use filter::NodeFilter;
+use filter::{NodeFilter, IntoPredicate};
 
 fn main() {
     let app = App::new("merula")
@@ -65,16 +63,30 @@ fn main() {
             println!("==> {} memos", memos.len());
 
             // check if a filter clause has been supplied
-            if let Some(filter) = matches.value_of("filter") {
-                println!("filter nodes with key '{}'", filter);
+            if let Some(fex) = matches.value_of("filter") {
+                println!("filter expression: '{}'", fex);
                 // TODO: parse filter expression
-                // distinguish between NodeFilter and MemoFilter ... ?
-                let f = filter::Comparison::Contains(filter.to_string());
-                //let f = filter::KeyFilter::new(filter);
+
+                let filter = match fex.contains("~") {
+                    true => {
+                        let fk = NodeFilter::HasKey("tag".to_string());
+                        let fv = NodeFilter::ContainsValue("database".to_string());
+                        (fk & fv).into()
+                    },
+                    false => {
+                        NodeFilter::ContainsValue(fex.to_string())
+                    }
+                };
+                println!("Filter = {:#?}", filter);
+                
                 for memo in memos.iter().filter(
-                    |&memo| memo.nodes().find(f.predicate()).is_some()
+                    |&memo| memo.nodes().find(filter.predicate()).is_some()
                 ) {
-                    println!("@{} {}", memo.collection(), memo.title())
+                    println!("@{} {}", memo.collection(), memo.title());
+                    for node in memo.data() {
+                        println!(".{} {}", node.key, node.value);
+                    }
+                        
                 }
                 
             } else {
@@ -134,7 +146,7 @@ fn main() {
         for memo in memos.iter().filter(|&m| m.data().find(node_filter).is_some()) {
             println!("@{} {}", memo.collection(), memo.title());
         }
-
+        
         // create index
         section("Create index of memos");
 

@@ -66,3 +66,37 @@ In the latter case, we could distinguish between these:
 .field
 either-memo-or-field
 ```
+
+
+```
+[key][operator][value]
+
+tag             has key 'tag'
+tag~value       has key 'tag' which contains 'value'
+~value          contains 'value' in any key
+tag=value       has key 'tag' which equals to 'value'
+tag>value       has key 'tag' with a value greater than 'value'
+tag<value       has key 'tag' with a value smaller than 'value'
+tag>=value      has key 'tag' with a value greater or equal to 'value'
+tag<=value      has key 'tag' with a value smaller or equal to 'value'
+
+.tag            same as above, but node is a data node
+.tag~value
+
+@tag            same as above, but node is a header node
+@tag~value
+
++attr           has a node with an attribute 'attr'
++attr~value     has  anode with an attribute 'attr' which contains 'value'
+
+.tag+attr       has a data node with a key 'tag' which has an attribute 'attr'
+.+attr          has a data node with any key and an attribute 'attr'
+```
+
+The general form of a filter expression (fex) is
+
+```
+fex = { key_qualifier? ~ key? ~ ( op ~ value )? }
+key_qualifier = { "@" | "." | "+" }
+op = { "=" | "~" | ">=" | ">" | "<=" | "<" }
+```

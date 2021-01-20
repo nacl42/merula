@@ -1,8 +1,4 @@
-use std::collections::HashMap;
-
-use crate::Key;
 use crate::Memo;
-use crate::Node;
 
 pub fn setup_memos() -> Vec<Memo> {
     let mut memos: Vec<Memo> = vec!();
