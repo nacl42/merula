@@ -8,9 +8,11 @@ value = @{ value_char* }
 
 operator = { "=" | "~" }
 
+key_op_value = { key ~ operator ~ value }
+
 fex = {
       SOI ~
-      key ~ operator ~ value
+      key_op_value | key
       ~ EOI
 }
 

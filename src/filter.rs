@@ -11,6 +11,7 @@ pub trait IntoPredicate {
 pub enum NodeFilter {
     HasKey(Key), // .key
     ContainsValue(String), // ~value
+    EqualsValue(String), // =value
     And(Box<NodeFilter>, Box<NodeFilter>)
         
     //GreaterThan(Key, Value), // >
@@ -39,6 +40,12 @@ impl IntoPredicate for NodeFilter {
                         Value::MultiLineText(s, _) => s.contains(&value),
                         _ => false
                     }
+                })
+            },
+            NodeFilter::EqualsValue(value) => {
+                let value = value.clone();
+                Box::new(move |node: &&Node| {
+                    &node.value.to_string() == &value
                 })
             },
             NodeFilter::And(c1, c2) => {

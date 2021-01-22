@@ -49,6 +49,10 @@ fn main() {
         .subcommand(
             App::new("test")
                 .about("preliminary test")
+        )
+        .subcommand(
+            App::new("test-fex")
+                .about("testing fex parser")
         );
 
     let matches = app.get_matches();
@@ -58,41 +62,28 @@ fn main() {
         // TODO: let mut db = Database::new()
         if let Some(input) = matches.value_of("input") {
             //init.logger(matches.occurences_of("verbose") as u8);
-            println!("loading input file '{}'", input);
+            //DEBUG println!("loading input file '{}'", input);
             let memos = parser::read_from_file(input, true).unwrap();
             // TODO: db.memos.extend(memos)
-            println!("==> {} memos", memos.len());
+            //DEBUG println!("==> {} memos", memos.len());
 
             // check if a filter clause has been supplied
             if let Some(fex) = matches.value_of("filter") {
-                println!("filter expression: '{}'", fex);
+                //DEBUG println!("filter expression: '{}'", fex);
                 // TODO: parse filter expression
-                // either by regular expression or by parser
-                //  key, .key, @key, ~value, +~value, @key~value
-                // [qualifier][key_expression][operator][value]
-                // 
-                let filter = match fex.contains("~") {
-                    true => {
-                        let fk = NodeFilter::HasKey("tag".to_string());
-                        let fv = NodeFilter::ContainsValue("database".to_string());
-                        (fk & fv).into()
-                    },
-                    false => {
-                        NodeFilter::ContainsValue(fex.to_string())
-                    }
-                };
-                println!("Filter = {:#?}", filter);
-                
-                for memo in memos.iter().filter(
-                    |&memo| memo.nodes().find(filter.predicate()).is_some()
-                ) {
-                    println!("@{} {}", memo.collection(), memo.title());
-                    for node in memo.data() {
-                        println!(".{} {}", node.key, node.value);
-                    }
-                        
+                if let Ok(filter) = fex::parse_fex(fex) {
+                    //DEBUG println!("Filter = {:#?}", filter);
+                    for memo in memos.iter().filter(
+                        |&memo| memo.nodes().find(filter.predicate()).is_some()
+                    ) {
+                        println!("@{} {}", memo.collection(), memo.title());
+                        for node in memo.data() {
+                            println!(".{} {}", node.key, node.value);
+                        }                        
+                    }   
+                } else {
+                    println!("couldn't parse filter expression!");
                 }
-                
             } else {
                 for memo in memos {
                     println!("@{} {}", memo.collection(), memo.title())
@@ -192,5 +183,9 @@ fn main() {
         }
         println!("{:#?}", index3);
 
+    }
+
+    if let Some(ref _matches) = matches.subcommand_matches("test-fex") {
+        println!("RESULT:\n{:#?}", fex::parse_fex("hallo~"));
     }
 }
