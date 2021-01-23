@@ -7,8 +7,8 @@ use pest::iterators::Pair;
 use crate::NodeFilter;
 
 #[derive(Parser)]
-#[grammar = "fex.pest"]
-pub struct FexParser;
+#[grammar = "mql.pest"]
+pub struct MqlParser;
 
 fn rule_key_op_value(pair: Pair<Rule>) -> Result<NodeFilter, ()> {
     let mut pairs = pair.into_inner();
@@ -31,16 +31,16 @@ fn rule_key(pair: Pair<Rule>) -> Result<NodeFilter, ()> {
     Ok(NodeFilter::HasKey(pair.as_str().to_string()))
 }
 
-pub fn parse_fex<'a>(input: &'a str) -> Result<NodeFilter, ()> {
-    let mut pair = FexParser::parse(Rule::fex, &input)
+pub fn parse_mql<'a>(input: &'a str) -> Result<NodeFilter, ()> {
+    let mut pair = MqlParser::parse(Rule::mql, &input)
         .expect("unsuccessful parse")
         .next().unwrap();
 
     //DEBUG println!("{:#?}", pair);
     
     match pair.as_rule() {
-        Rule::fex => {
-            //DEBUG println!("FEX RULE");
+        Rule::mql => {
+            //DEBUG println!("MQL RULE");
             pair = pair.into_inner().next().unwrap();
             match pair.as_rule() {
                 Rule::key_op_value => rule_key_op_value(pair),
@@ -58,26 +58,26 @@ mod tests {
     use super::*;
 
     #[test]
-    fn parse_fex() {
+    fn parse_mql() {
         let input = "name~ium";
-        //assert_eq(parse_fex(input), Ok(NodeFilter::))
-        let fex = FexParser::parse(Rule::fex, &input)
+        //assert_eq(parse_mql(input), Ok(NodeFilter::))
+        let mql = MqlParser::parse(Rule::mql, &input)
             .expect("unsuccessful parse")
             .next().unwrap();
 
         let input = "name";
-        let fex = FexParser::parse(Rule::fex, &input)
+        let mql = MqlParser::parse(Rule::mql, &input)
             .expect("unsuccessful parse")
             .next().unwrap();
 
         // let input = "~";
-        // let fex = FexParser::parse(Rule::fex, &input)
+        // let mql = MqlParser::parse(Rule::mql, &input)
         //     .expect("unsuccessful parse")
         //     .next().unwrap();
 
         // TODO: print output of test function
         
-        // for line in fex.into_inner() {
+        // for line in mql.into_inner() {
         //     match line.as_rule() {
         //         Rule:: => {
         //             // comments are currently ignored

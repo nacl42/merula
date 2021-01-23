@@ -10,7 +10,7 @@ operator = { "=" | "~" }
 
 key_op_value = { key ~ operator ~ value }
 
-fex = {
+mql = {
       SOI ~
       key_op_value | key
       ~ EOI

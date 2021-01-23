@@ -5,12 +5,26 @@
 //! production purposes.
 //!
 
+// TODO: allow quotes around filter values "description ~ 'the book'"
+// TODO: allow node index "email[0]"
+// TODO: date comparison: before (<<), after (>>), same time (==)
+// TODO: join multiple node filters:
+//   recutils notation: ((element ~ ium) && (amu > 5))
+//   alternative notation: element~ium,amu>5
+
+// TODO: command line option -p for selecting nodes
+//   -p element,amu => only print out nodes with key element or amu
+
+// TODO: allow debug output by setting --debug as option
+
+// TODO: define schema and transform values of new Memos by applying
+// transformation functions
+
 // TODO: filter by value ("url~github", "amu>5")
 // TODO: transform result set by applying a template to each resulting Memo
 // TODO: list all available keys for a result set (--keys)
 // TODO: filter by collection ("@app")
 // TODO: filter by data node (".url")
-
 
 #[macro_use] extern crate pest_derive;
 
@@ -27,7 +41,7 @@ pub mod value;
 pub mod sample;
 pub mod parser;
 pub mod filter;
-pub mod fex;
+pub mod mql;
 
 use memo::{Memo, MemoId};
 use node::Node;
@@ -51,8 +65,8 @@ fn main() {
                 .about("preliminary test")
         )
         .subcommand(
-            App::new("test-fex")
-                .about("testing fex parser")
+            App::new("test-mql")
+                .about("testing mql parser")
         );
 
     let matches = app.get_matches();
@@ -68,10 +82,10 @@ fn main() {
             //DEBUG println!("==> {} memos", memos.len());
 
             // check if a filter clause has been supplied
-            if let Some(fex) = matches.value_of("filter") {
-                //DEBUG println!("filter expression: '{}'", fex);
+            if let Some(mql) = matches.value_of("filter") {
+                //DEBUG println!("filter expression: '{}'", mql);
                 // TODO: parse filter expression
-                if let Ok(filter) = fex::parse_fex(fex) {
+                if let Ok(filter) = mql::parse_mql(mql) {
                     //DEBUG println!("Filter = {:#?}", filter);
                     for memo in memos.iter().filter(
                         |&memo| memo.nodes().find(filter.predicate()).is_some()
@@ -185,7 +199,7 @@ fn main() {
 
     }
 
-    if let Some(ref _matches) = matches.subcommand_matches("test-fex") {
-        println!("RESULT:\n{:#?}", fex::parse_fex("hallo~"));
+    if let Some(ref _matches) = matches.subcommand_matches("test-mql") {
+        println!("RESULT:\n{:#?}", mql::parse_mql("hallo~"));
     }
 }

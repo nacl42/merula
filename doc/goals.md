@@ -67,31 +67,26 @@ In the latter case, we could distinguish between these:
 either-memo-or-field
 ```
 
+Sample filter expressions:
 
-```
-[key][operator][value]
+| expression             | node filter                                            |
+| ---------------------- | ------------------------------------------------------ |
+| name                   | has key 'name'                                         |
+| name ~ value           | has key 'name' and value contains 'value'              |
+| name = value           | has key 'name' and value is equal to 'value'           |
+| age >= 18              | has key 'age' and value is greater or equal 18         |
+| age < 18               | has key 'age' and value is smaller than 18             |
+| birthday >> 2021-11-01 | has key 'birthday' which is later than 1st Nov 21      |
+| .name                  | has key 'name' and node is a data node                 |
+| @element               | has key 'element' and node is a header node            |
+| name[0]                | first name                                             |
+| name[-1]               | last name                                              |
+| name[*]                | any name index                                         |
+| name[0-1],[0:1],[0..1] | name 0 to 1                                            |
+| name[..-1]             | all but the last name                                  |
 
-tag             has key 'tag'
-tag~value       has key 'tag' which contains 'value'
-~value          contains 'value' in any key
-tag=value       has key 'tag' which equals to 'value'
-tag>value       has key 'tag' with a value greater than 'value'
-tag<value       has key 'tag' with a value smaller than 'value'
-tag>=value      has key 'tag' with a value greater or equal to 'value'
-tag<=value      has key 'tag' with a value smaller or equal to 'value'
-
-.tag            same as above, but node is a data node
-.tag~value
-
-@tag            same as above, but node is a header node
-@tag~value
-
-+attr           has a node with an attribute 'attr'
-+attr~value     has  anode with an attribute 'attr' which contains 'value'
-
-.tag+attr       has a data node with a key 'tag' which has an attribute 'attr'
-.+attr          has a data node with any key and an attribute 'attr'
-```
+Possible other filter expressions could include filtering for node
+attributes via + qualifier.
 
 The general form of a filter expression (fex) is
 
@@ -100,3 +95,8 @@ fex = { key_qualifier? ~ key? ~ ( op ~ value )? }
 key_qualifier = { "@" | "." | "+" }
 op = { "=" | "~" | ">=" | ">" | "<=" | "<" }
 ```
+
+Unresolved: How can we join multiple filters ?
+
+One memo, each condition must be satisfied at least for one node: ```name~ium,amu>50```
+
