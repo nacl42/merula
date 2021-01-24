@@ -1,5 +1,6 @@
 use crate::{Node, Key, Value};
 use std::ops::BitAnd;
+use std::convert::TryFrom;
 
 type Predicate = dyn FnMut(&&Node) -> bool;
 
@@ -12,6 +13,7 @@ pub enum NodeFilter {
     HasKey(Key), // .key
     ContainsValue(String), // ~value
     EqualsValue(String), // =value
+    LessThan(f32), // <value
     And(Box<NodeFilter>, Box<NodeFilter>)
         
     //GreaterThan(Key, Value), // >
@@ -46,6 +48,15 @@ impl IntoPredicate for NodeFilter {
                 let value = value.clone();
                 Box::new(move |node: &&Node| {
                     &node.value.to_string() == &value
+                })
+            },
+            NodeFilter::LessThan(value) => {
+                let value = value.clone();
+                Box::new(move |node: &&Node| {
+                    match f32::try_from(&node.value) {
+                        Ok(x) => x < value,
+                        Err(_) => false
+                    }
                 })
             },
             NodeFilter::And(c1, c2) => {

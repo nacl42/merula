@@ -19,6 +19,8 @@
 // TODO: Value::Date, Value::DateTime, Value::Time
 // TODO: Value::Ref(group, title), Value::RefById(id)
 
+use std::convert::TryFrom;
+
 pub type Key = String;
 
 /// A Value is an enum for the different types of values that a
@@ -123,5 +125,17 @@ impl From<f32> for Value {
 impl From<bool> for Value {
     fn from(b: bool) -> Value {
         Value::Bool(b)
+    }
+}
+
+impl <'a> TryFrom<&'a Value> for f32 {
+    type Error = &'static str;
+    
+    fn try_from(value: &'a Value) -> Result<Self, Self::Error> {
+        match value {
+            Value::Float(x) => Ok(x.clone()),
+            Value::Integer(x) => Ok(x.clone() as f32),
+            _ => Err("Value is neither Value::Float nor Value::Integer")
+        }
     }
 }
