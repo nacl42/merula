@@ -10,9 +10,6 @@
 //    part of Value and have two different versions (strict with
 //    type checking or non-strict with type conversion)
 
-// TODO: two levels of verbosity on list: default: only list headers,
-//   -v list all nodes
-
 // TODO: allow multiple conditions 'amu>5,amu<20'
 
 // TODO: allow quotes around filter values "description ~ 'the book'"
@@ -62,12 +59,12 @@ fn main() {
         .version(crate_version!())
         .author("nacl42 <code@sreblov.de>")
         .about("simple cli frontend to access merula files (.mr)")
-        .arg("-v --verbose... 'Sets the verbosity level'")
         .subcommand(
             App::new("list")
                 .about("list memos")
                 .arg("<input> 'sets an input file'")
                 .arg("--filter=[FILTER] 'sets a filter condition'")
+                .arg("-v --verbose... 'Sets the verbosity level'")
         )
         .subcommand(
             App::new("test")
@@ -84,7 +81,8 @@ fn main() {
         // read memos from .mr file into database
         // TODO: let mut db = Database::new()
         if let Some(input) = matches.value_of("input") {
-            //init.logger(matches.occurences_of("verbose") as u8);
+            let verbosity = matches.occurrences_of("verbose") as u8;
+            //init.logger(matches.occurrences_of("debug") as u8);
             //DEBUG println!("loading input file '{}'", input);
             let memos = parser::read_from_file(input, true).unwrap();
             // TODO: db.memos.extend(memos)
@@ -100,9 +98,11 @@ fn main() {
                         |&memo| memo.nodes().find(filter.predicate()).is_some()
                     ) {
                         println!("@{} {}", memo.collection(), memo.title());
-                        for node in memo.data() {
-                            println!(".{} {}", node.key, node.value);
-                        }                        
+                        if verbosity >= 1 {
+                            for node in memo.data() {
+                                println!(".{} {}", node.key, node.value);
+                            }
+                        }
                     }   
                 } else {
                     println!("couldn't parse filter expression!");
