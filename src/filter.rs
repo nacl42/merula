@@ -11,14 +11,11 @@ pub trait IntoPredicate {
 #[derive(Debug)]
 pub enum NodeFilter {
     HasKey(Key), // .key
-    ContainsValue(String), // ~value
-    EqualsValue(String), // =value
-    LessThan(f32), // <value
+    Contains(String), // ~ value
+    Equals(String), // = value
+    LessThan(f32), // < value
+    GreaterThan(f32), // > value
     And(Box<NodeFilter>, Box<NodeFilter>)
-        
-    //GreaterThan(Key, Value), // >
-    //LessThan(Key, Value), // <
-    //Equal(Key, Value), // =
 }
 
 impl From<(NodeFilter, NodeFilter)> for NodeFilter {
@@ -34,7 +31,7 @@ impl IntoPredicate for NodeFilter {
                 let key = key.clone();
                 Box::new(move |node: &&Node| { node.key == key })
             },
-            NodeFilter::ContainsValue(value) => {
+            NodeFilter::Contains(value) => {
                 let value = value.clone();
                 Box::new(move |node: &&Node| {
                     match &node.value {
@@ -44,7 +41,7 @@ impl IntoPredicate for NodeFilter {
                     }
                 })
             },
-            NodeFilter::EqualsValue(value) => {
+            NodeFilter::Equals(value) => {
                 let value = value.clone();
                 Box::new(move |node: &&Node| {
                     &node.value.to_string() == &value
@@ -61,6 +58,18 @@ impl IntoPredicate for NodeFilter {
                     }
                 })
             },
+            NodeFilter::GreaterThan(value) => {
+                let value = value.clone();
+                Box::new(move |node: &&Node| {
+                    //DEBUG println!("Testing node {} => {:#?}",
+                    //&node.value, f32::try_from(&node.value));
+                    match f32::try_from(&node.value) {
+                        Ok(x) => x > value,
+                        Err(_) => false
+                    }
+                })
+            },
+
             NodeFilter::And(c1, c2) => {
                 let mut p1 = c1.predicate();
                 let mut p2 = c2.predicate();

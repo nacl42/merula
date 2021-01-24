@@ -19,16 +19,25 @@ fn rule_key_op_value(pair: Pair<Rule>) -> Result<NodeFilter, ()> {
 
     match op {
         "~" => Ok(
-            NodeFilter::HasKey(key.into()) & NodeFilter::ContainsValue(value.into())
+            NodeFilter::HasKey(key.into()) & NodeFilter::Contains(value.into())
         ),
         "=" => Ok(
-            NodeFilter::HasKey(key.into()) & NodeFilter::EqualsValue(value.into())
+            NodeFilter::HasKey(key.into()) & NodeFilter::Equals(value.into())
         ),
         "<" => {
             match value.parse::<f32>() {
                 Ok(number) => Ok(
                     NodeFilter::HasKey(key.into()) &
                         NodeFilter::LessThan(number)
+                ),
+                Err(_) => Err(()) // TODO: pass on error message
+            }
+        },
+        ">" => {
+            match value.parse::<f32>() {
+                Ok(number) => Ok(
+                    NodeFilter::HasKey(key.into()) &
+                        NodeFilter::GreaterThan(number)
                 ),
                 Err(_) => Err(()) // TODO: pass on error message
             }

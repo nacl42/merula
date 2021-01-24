@@ -5,6 +5,13 @@
 //! production purposes.
 //!
 
+// TODO: mql: allow equals operator (=) for numbers as well
+//    maybe move functions such as equals, less_than, greater_than
+//    part of Value and have two different versions (strict with
+//    type checking or non-strict with type conversion)
+
+// TODO: allow multiple conditions 'amu>5,amu<20'
+
 // TODO: allow quotes around filter values "description ~ 'the book'"
 // TODO: allow node index "email[0]"
 // TODO: date comparison: before (<<), after (>>), same time (==)
@@ -20,7 +27,6 @@
 // TODO: define schema and transform values of new Memos by applying
 // transformation functions
 
-// TODO: filter by value ("url~github", "amu>5")
 // TODO: transform result set by applying a template to each resulting Memo
 // TODO: list all available keys for a result set (--keys)
 // TODO: filter by collection ("@app")
