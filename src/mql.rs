@@ -33,6 +33,15 @@ fn rule_key_op_value(pair: Pair<Rule>) -> Result<NodeFilter, ()> {
                 Err(_) => Err(()) // TODO: pass on error message
             }
         },
+        "<=" => {
+            match value.parse::<f32>() {
+                Ok(number) => Ok(
+                    NodeFilter::HasKey(key.into()) &
+                        NodeFilter::LessOrEqual(number)
+                ),
+                Err(_) => Err(()) // TODO: pass on error message
+            }
+        },
         ">" => {
             match value.parse::<f32>() {
                 Ok(number) => Ok(
@@ -42,6 +51,16 @@ fn rule_key_op_value(pair: Pair<Rule>) -> Result<NodeFilter, ()> {
                 Err(_) => Err(()) // TODO: pass on error message
             }
         },
+        ">=" => {
+            match value.parse::<f32>() {
+                Ok(number) => Ok(
+                    NodeFilter::HasKey(key.into()) &
+                        NodeFilter::GreaterOrEqual(number)
+                ),
+                Err(_) => Err(()) // TODO: pass on error message
+            }
+        },
+
         &_ => Err(())
     }
 }

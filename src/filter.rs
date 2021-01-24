@@ -14,7 +14,9 @@ pub enum NodeFilter {
     Contains(String), // ~ value
     Equals(String), // = value
     LessThan(f32), // < value
+    LessOrEqual(f32), // <= value
     GreaterThan(f32), // > value
+    GreaterOrEqual(f32), // >= value
     And(Box<NodeFilter>, Box<NodeFilter>)
 }
 
@@ -58,6 +60,17 @@ impl IntoPredicate for NodeFilter {
                     }
                 })
             },
+            NodeFilter::LessOrEqual(value) => {
+                let value = value.clone();
+                Box::new(move |node: &&Node| {
+                    //DEBUG println!("Testing node {} => {:#?}",
+                    //&node.value, f32::try_from(&node.value));
+                    match f32::try_from(&node.value) {
+                        Ok(x) => x <= value,
+                        Err(_) => false
+                    }
+                })
+            },
             NodeFilter::GreaterThan(value) => {
                 let value = value.clone();
                 Box::new(move |node: &&Node| {
@@ -69,7 +82,17 @@ impl IntoPredicate for NodeFilter {
                     }
                 })
             },
-
+            NodeFilter::GreaterOrEqual(value) => {
+                let value = value.clone();
+                Box::new(move |node: &&Node| {
+                    //DEBUG println!("Testing node {} => {:#?}",
+                    //&node.value, f32::try_from(&node.value));
+                    match f32::try_from(&node.value) {
+                        Ok(x) => x >= value,
+                        Err(_) => false
+                    }
+                })
+            },
             NodeFilter::And(c1, c2) => {
                 let mut p1 = c1.predicate();
                 let mut p2 = c2.predicate();

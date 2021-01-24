@@ -10,6 +10,9 @@
 //    part of Value and have two different versions (strict with
 //    type checking or non-strict with type conversion)
 
+// TODO: two levels of verbosity on list: default: only list headers,
+//   -v list all nodes
+
 // TODO: allow multiple conditions 'amu>5,amu<20'
 
 // TODO: allow quotes around filter values "description ~ 'the book'"
