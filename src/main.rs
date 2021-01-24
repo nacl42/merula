@@ -22,8 +22,6 @@
 // TODO: command line option -p for selecting nodes
 //   -p element,amu => only print out nodes with key element or amu
 
-// TODO: allow debug output by setting --debug as option
-
 // TODO: define schema and transform values of new Memos by applying
 // transformation functions
 
@@ -31,6 +29,13 @@
 // TODO: list all available keys for a result set (--keys)
 // TODO: filter by collection ("@app")
 // TODO: filter by data node (".url")
+
+// TODO: move filter into a Memo, so that we can apply it
+//   by selecting the filter:
+//
+//   @mr:filter sample
+//   .doc sample filter
+//   .mql number<5
 
 #[macro_use] extern crate pest_derive;
 
@@ -53,12 +58,41 @@ use memo::{Memo, MemoId};
 use node::Node;
 use value::{Value, Key};
 use filter::{NodeFilter, IntoPredicate};
+use simplelog::*;
+use log::*;
+
+fn init_logger(log_level: u8) {
+
+    let simple_log = SimpleLogger::new(LevelFilter::Info, Config::default());
+    
+    match log_level {
+        0 => {
+            // no verbose flag given
+            // => no logging
+        },
+        1 => {
+            // one verbose flag given
+            // => just print out the info statements on stdout
+            CombinedLogger::init(vec![simple_log]).unwrap();
+        },
+        _ => {
+            // at least two verbose flag given
+            // => additionally, write all debug output to stdout
+            let debug_log = TermLogger::new(
+                LevelFilter::Debug, Config::default(), TerminalMode::Stderr
+            );
+            CombinedLogger::init(vec![simple_log, debug_log]).unwrap();
+        }
+    }
+}
+
 
 fn main() {
     let app = App::new("merula")
         .version(crate_version!())
         .author("nacl42 <code@sreblov.de>")
         .about("simple cli frontend to access merula files (.mr)")
+        .arg("-d --debug... 'Sets the debug level'")
         .subcommand(
             App::new("list")
                 .about("list memos")
@@ -77,12 +111,15 @@ fn main() {
 
     let matches = app.get_matches();
 
+    init_logger(matches.occurrences_of("debug") as u8);
+    
     if let Some(ref matches) = matches.subcommand_matches("list") {
         // read memos from .mr file into database
         // TODO: let mut db = Database::new()
         if let Some(input) = matches.value_of("input") {
             let verbosity = matches.occurrences_of("verbose") as u8;
-            //init.logger(matches.occurrences_of("debug") as u8);
+
+            info!("loading put file '{}'", input);
             //DEBUG println!("loading input file '{}'", input);
             let memos = parser::read_from_file(input, true).unwrap();
             // TODO: db.memos.extend(memos)
