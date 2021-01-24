@@ -135,6 +135,12 @@ impl <'a> TryFrom<&'a Value> for f32 {
         match value {
             Value::Float(x) => Ok(x.clone()),
             Value::Integer(x) => Ok(x.clone() as f32),
+            Value::Text(text) => {
+                match text.parse::<f32>() {
+                    Ok(x) => Ok(x),
+                    _ => Err("Value::Text cannot be parsed as float")
+                }
+            },
             _ => Err("Value is neither Value::Float nor Value::Integer")
         }
     }

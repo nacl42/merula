@@ -53,6 +53,8 @@ impl IntoPredicate for NodeFilter {
             NodeFilter::LessThan(value) => {
                 let value = value.clone();
                 Box::new(move |node: &&Node| {
+                    //DEBUG println!("Testing node {} => {:#?}",
+                    //&node.value, f32::try_from(&node.value));
                     match f32::try_from(&node.value) {
                         Ok(x) => x < value,
                         Err(_) => false

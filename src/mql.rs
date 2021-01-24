@@ -6,6 +6,7 @@ use pest::iterators::Pair;
 
 use crate::NodeFilter;
 
+
 #[derive(Parser)]
 #[grammar = "mql.pest"]
 pub struct MqlParser;
@@ -23,6 +24,15 @@ fn rule_key_op_value(pair: Pair<Rule>) -> Result<NodeFilter, ()> {
         "=" => Ok(
             NodeFilter::HasKey(key.into()) & NodeFilter::EqualsValue(value.into())
         ),
+        "<" => {
+            match value.parse::<f32>() {
+                Ok(number) => Ok(
+                    NodeFilter::HasKey(key.into()) &
+                        NodeFilter::LessThan(number)
+                ),
+                Err(_) => Err(()) // TODO: pass on error message
+            }
+        },
         &_ => Err(())
     }
 }
