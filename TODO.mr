@@ -45,7 +45,13 @@ transformation functions
 EOF
 
 @TODO
-.doc transform result set by applying a template to each resulting Memo
+.doc<<EOF
+transform result set by applying a template to each resulting Memo
+
+implementation ideas:
+- tera
+EOF
+
 
 @TODO
 .doc list all available keys for a result set (--keys)
@@ -68,11 +74,17 @@ move filter into a Memo, so that we can apply it
 EOF
 
 @TODO
++status done
++finished 2021-01-24
 .doc<<EOF
 add coloring of ouput
 header nodes and data nodes full of colour
 EOF
-+status done
-+finished 2021-01-24
 
 
+
+@TODO
+.doc add ROADMAP.md file
+
+@TODO
+.doc write attributes when using -vv in list outpu
