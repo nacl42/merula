@@ -6,7 +6,7 @@ key = @{ key_char+ }
 value_char = { !NEWLINE ~ ANY }
 value = @{ value_char* }
 
-operator = { "=" | "~" | "<" }
+operator = { "=" | "~" | "<" | ">" }
 
 key_op_value = { key ~ operator ~ value }
 
