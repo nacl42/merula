@@ -145,3 +145,4 @@ impl <'a> TryFrom<&'a Value> for f32 {
         }
     }
 }
+

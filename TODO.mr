@@ -1,0 +1,76 @@
+
+@TODO
+.tag mql
+.doc<<EOF
+allow equals operator (=) for numbers as well
+maybe move functions such as equals, less_than, greater_than
+part of Value and have two different versions (strict with
+type checking or non-strict with type conversion)
+EOF
+
+@TODO
+.tag mql
+.doc allow multiple conditions 'amu>5,amu<20'
+
+@TODO
+.tag mql
+.doc allow quotes around filter values "description ~ 'the book'"
+
+@TODO
+.tag mql
+.doc allow node index "email[0]"
+
+@TODO
+.tag mql
+.doc date comparison: before (<<), after (>>), same time (==)
+
+@TODO
+.tag mql
+.doc<<EOF
+join multiple node filters:
+recutils notation: ((element ~ ium) && (amu > 5))
+alternative notation: element~ium,amu>5
+EOF
+
+@TODO
+.doc<<EOF
+command line option -p for selecting nodes
+ -p element,amu => only print out nodes with key element or amu
+EOF
+
+@TODO
+.doc<<EOF
+define schema and transform values of new Memos by applying
+transformation functions
+EOF
+
+@TODO
+.doc transform result set by applying a template to each resulting Memo
+
+@TODO
+.doc list all available keys for a result set (--keys)
+
+@TODO
+.doc filter by collection ("@app")
+
+@TODO
+.doc filter by data node (".url")
+
+@TODO
+.doc<<EOF
+move filter into a Memo, so that we can apply it
+  by selecting the filter:
+
+  @mr:filter sample
+  .doc sample filter
+  .mql number<5
+
+EOF
+
+@TODO
+.doc<<EOF
+add coloring of ouput
+header nodes and data nodes full of colour
+EOF
+
+

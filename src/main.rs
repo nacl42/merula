@@ -5,38 +5,6 @@
 //! production purposes.
 //!
 
-// TODO: mql: allow equals operator (=) for numbers as well
-//    maybe move functions such as equals, less_than, greater_than
-//    part of Value and have two different versions (strict with
-//    type checking or non-strict with type conversion)
-
-// TODO: allow multiple conditions 'amu>5,amu<20'
-
-// TODO: allow quotes around filter values "description ~ 'the book'"
-// TODO: allow node index "email[0]"
-// TODO: date comparison: before (<<), after (>>), same time (==)
-// TODO: join multiple node filters:
-//   recutils notation: ((element ~ ium) && (amu > 5))
-//   alternative notation: element~ium,amu>5
-
-// TODO: command line option -p for selecting nodes
-//   -p element,amu => only print out nodes with key element or amu
-
-// TODO: define schema and transform values of new Memos by applying
-// transformation functions
-
-// TODO: transform result set by applying a template to each resulting Memo
-// TODO: list all available keys for a result set (--keys)
-// TODO: filter by collection ("@app")
-// TODO: filter by data node (".url")
-
-// TODO: move filter into a Memo, so that we can apply it
-//   by selecting the filter:
-//
-//   @mr:filter sample
-//   .doc sample filter
-//   .mql number<5
-
 #[macro_use] extern crate pest_derive;
 
 #[allow(unused_imports)]
@@ -126,29 +94,30 @@ fn main() {
             //DEBUG println!("==> {} memos", memos.len());
 
             // check if a filter clause has been supplied
+            let mut memo_filter = NodeFilter::True;
+            
             if let Some(mql) = matches.value_of("filter") {
                 //DEBUG println!("filter expression: '{}'", mql);
                 // TODO: parse filter expression
+                
                 if let Ok(filter) = mql::parse_mql(mql) {
-                    //DEBUG println!("Filter = {:#?}", filter);
-                    for memo in memos.iter().filter(
-                        |&memo| memo.nodes().find(filter.predicate()).is_some()
-                    ) {
-                        println!("@{} {}", memo.collection(), memo.title());
-                        if verbosity >= 1 {
-                            for node in memo.data() {
-                                println!(".{} {}", node.key, node.value);
-                            }
-                        }
-                    }   
+                    memo_filter = filter;
                 } else {
                     println!("couldn't parse filter expression!");
                 }
-            } else {
-                for memo in memos {
-                    println!("@{} {}", memo.collection(), memo.title())
-                }
             }
+
+            //DEBUG println!("Filter = {:#?}", filter);
+            for memo in memos.iter().filter(
+                |&memo| memo.nodes().find(memo_filter.predicate()).is_some()
+            ) {
+                println!("@{} {}", memo.collection(), memo.title());
+                if verbosity >= 1 {
+                    for node in memo.data() {
+                        println!(".{} {}", node.key, node.value);
+                    }
+                }
+            }   
         }        
     }
 

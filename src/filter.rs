@@ -10,8 +10,10 @@ pub trait IntoPredicate {
 
 #[derive(Debug)]
 pub enum NodeFilter {
+    True, // always true (internal use)
     HasKey(Key), // .key
     Contains(String), // ~ value
+    XEquals(Value),
     Equals(String), // = value
     LessThan(f32), // < value
     LessOrEqual(f32), // <= value
@@ -29,6 +31,7 @@ impl From<(NodeFilter, NodeFilter)> for NodeFilter {
 impl IntoPredicate for NodeFilter {
     fn predicate(&self) -> Box<Predicate> {
         match self {
+            NodeFilter::True => Box::new(move |node: &&Node| true),
             NodeFilter::HasKey(key) => {
                 let key = key.clone();
                 Box::new(move |node: &&Node| { node.key == key })
@@ -42,6 +45,28 @@ impl IntoPredicate for NodeFilter {
                         _ => false
                     }
                 })
+            },
+            // TODO: experimental implementation of a comparison function
+            // converts the node value to the type of `value`
+            NodeFilter::XEquals(value) => {
+                let value = value.clone();
+                match value {
+                    Value::Float(x) => {
+                        Box::new(move |node: &&Node| {
+                            if let Ok(other) = f32::try_from(&node.value) {
+                                x == other
+                            } else {
+                                false
+                            }
+                        })
+                    },
+                    Value::Text(text) => {
+                        Box::new(move |node: &&Node| {
+                            text == node.value.to_string()                            
+                        }) 
+                    },
+                    _ => Box::new(move |node: &&Node| false)
+                }
             },
             NodeFilter::Equals(value) => {
                 let value = value.clone();
