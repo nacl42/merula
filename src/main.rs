@@ -28,6 +28,7 @@ use value::{Value, Key};
 use filter::{NodeFilter, IntoPredicate};
 use simplelog::*;
 use log::*;
+use colored::*;
 
 fn init_logger(log_level: u8) {
 
@@ -111,11 +112,19 @@ fn main() {
             for memo in memos.iter().filter(
                 |&memo| memo.nodes().find(memo_filter.predicate()).is_some()
             ) {
-                println!("@{} {}", memo.collection(), memo.title());
+                println!("{}{} {}",
+                         "@".red().bold(),
+                         memo.collection().red().bold(),
+                         memo.title().white().bold()
+                );
                 if verbosity >= 1 {
                     for node in memo.data() {
-                        println!(".{} {}", node.key, node.value);
+                        println!("{}{} {}",
+                                 ".".red(),
+                                 node.key.red(),
+                                 node.value.to_string().white());
                     }
+                    println!("");
                 }
             }   
         }        
