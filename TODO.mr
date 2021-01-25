@@ -2,7 +2,7 @@
 # TODO file for merula
 #
 
-@TODO
+@TODO extend equal comparison to perform type conversion
 .tag mql
 .doc<<EOF
 allow equals operator (=) for numbers as well
@@ -11,38 +11,36 @@ part of Value and have two different versions (strict with
 type checking or non-strict with type conversion)
 EOF
 
-@TODO
+@TODO allow to specify multiple conditions
 .tag mql
 .doc<<EOF
-allow multiple conditions
-
 But which notation would be best?
   'amu>5,amu<20'
   'amu>5 || amu >3'
   'amu>5 && ferromagnetic=true'
 EOF
 
-@TODO
+@TODO node index
 .tag mql
 .doc allow node index "email[0]"
 
-@TODO
+@TODO date comparison operators (<<, >>, ==)
 .tag mql
 .doc date comparison: before (<<), after (>>), same time (==)
 
-@TODO
+@TODO command line option for limiting result nodes
 .doc<<EOF
 command line option -p for selecting nodes
  -p element,amu => only print out nodes with key element or amu
 EOF
 
-@TODO
+@TODO implement schema
 .doc<<EOF
 define schema and transform values of new Memos by applying
 transformation functions
 EOF
 
-@TODO
+@TODO apply text template
 .short transform result set by applying a template to each resulting Memo
 .doc<<EOF
 implementation ideas:
@@ -52,16 +50,16 @@ implementation ideas:
 EOF
 
 
-@TODO
+@TODO list available keys
 .doc list all available keys for a result set (--keys)
 
-@TODO
+@TODO filter by collection
 .doc filter by collection ("@app")
 
-@TODO
+@TODO filter by data node
 .doc filter by data node (".url")
 
-@TODO
+@TODO define mql filter in a memo
 .doc<<EOF
 move filter into a Memo, so that we can apply it
   by selecting the filter:
@@ -72,17 +70,17 @@ move filter into a Memo, so that we can apply it
 
 EOF
 
-@TODO
+@TODO add ROADMAP file
 .doc add ROADMAP.md file
 
-@TODO
-.doc write attributes when using -vv in list outpu
+@TODO print attributes
+.doc write attributes when using -vv in list output
 
 #
 # --- finished tasks ---
 #
 
-@TODO
+@TODO add colour to output
 .status done
 .finished 2021-01-24
 .doc<<EOF
@@ -90,7 +88,7 @@ add coloring of ouput
 header nodes and data nodes full of colour
 EOF
 
-@TODO
+@TODO implement quoted values
 .status done
 .finished 2021-01-25
 .tag mql
