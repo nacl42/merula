@@ -1,3 +1,6 @@
+#
+# TODO file for merula
+#
 
 @TODO
 .tag mql
@@ -10,7 +13,14 @@ EOF
 
 @TODO
 .tag mql
-.doc allow multiple conditions 'amu>5,amu<20'
+.doc<<EOF
+allow multiple conditions
+
+But which notation would be best?
+  'amu>5,amu<20'
+  'amu>5 || amu >3'
+  'amu>5 && ferromagnetic=true'
+EOF
 
 @TODO
 .tag mql
@@ -19,14 +29,6 @@ EOF
 @TODO
 .tag mql
 .doc date comparison: before (<<), after (>>), same time (==)
-
-@TODO
-.tag mql
-.doc<<EOF
-join multiple node filters:
-recutils notation: ((element ~ ium) && (amu > 5))
-alternative notation: element~ium,amu>5
-EOF
 
 @TODO
 .doc<<EOF
@@ -41,11 +43,12 @@ transformation functions
 EOF
 
 @TODO
+.short transform result set by applying a template to each resulting Memo
 .doc<<EOF
-transform result set by applying a template to each resulting Memo
-
 implementation ideas:
 - tera
+- custom template engine (after all, where's the fun in using an
+  existing template engine?)
 EOF
 
 
