@@ -14,10 +14,6 @@ EOF
 
 @TODO
 .tag mql
-.doc allow quotes around filter values "description ~ 'the book'"
-
-@TODO
-.tag mql
 .doc allow node index "email[0]"
 
 @TODO
@@ -74,17 +70,25 @@ move filter into a Memo, so that we can apply it
 EOF
 
 @TODO
-+status done
-+finished 2021-01-24
+.doc add ROADMAP.md file
+
+@TODO
+.doc write attributes when using -vv in list outpu
+
+#
+# --- finished tasks ---
+#
+
+@TODO
+.status done
+.finished 2021-01-24
 .doc<<EOF
 add coloring of ouput
 header nodes and data nodes full of colour
 EOF
 
-
-
 @TODO
-.doc add ROADMAP.md file
-
-@TODO
-.doc write attributes when using -vv in list outpu
+.status done
+.finished 2021-01-25
+.tag mql
+.doc allow quotes around filter values "description ~ 'the book'"

@@ -3,12 +3,17 @@ WHITESPACE = _{ " " }
 key_char = { ASCII_ALPHANUMERIC | "_" | ":" | "/" | "."  | "-" }
 key = @{ key_char+ }
 
-value_char = { !NEWLINE ~ ANY }
-value = @{ value_char* }
-
 operator = { "=" | "~" | "<=" | "<" | ">=" | ">" }
 
-key_op_value = { key ~ operator ~ value }
+// unquoted value
+unquoted_value = @{ (!(" ") ~ ANY)* }
+
+// quoted value
+qvalue = @{ (!POP ~ ANY)* }
+quote_char = @{ "'" | "\"" }
+quoted_value = @{ PUSH(quote_char) ~ qvalue ~ POP}
+
+key_op_value = { key ~ operator ~ (quoted_value | unquoted_value) }
 
 mql = {
       SOI ~

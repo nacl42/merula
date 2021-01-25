@@ -88,27 +88,23 @@ fn main() {
         if let Some(input) = matches.value_of("input") {
             let verbosity = matches.occurrences_of("verbose") as u8;
 
-            info!("loading put file '{}'", input);
-            //DEBUG println!("loading input file '{}'", input);
+            debug!("loading input file '{}'", input);
+
             let memos = parser::read_from_file(input, true).unwrap();
-            // TODO: db.memos.extend(memos)
-            //DEBUG println!("==> {} memos", memos.len());
+            debug!("read {} memos", memos.len());
 
             // check if a filter clause has been supplied
             let mut memo_filter = NodeFilter::True;
-            
             if let Some(mql) = matches.value_of("filter") {
-                //DEBUG println!("filter expression: '{}'", mql);
-                // TODO: parse filter expression
-                
+                debug!("filter expression is: '{}'", mql);
                 if let Ok(filter) = mql::parse_mql(mql) {
+                    debug!("resulting filter = {:#?}", filter);
                     memo_filter = filter;
                 } else {
                     println!("couldn't parse filter expression!");
                 }
             }
-
-            //DEBUG println!("Filter = {:#?}", filter);
+            
             for memo in memos.iter().filter(
                 |&memo| memo.nodes().find(memo_filter.predicate()).is_some()
             ) {

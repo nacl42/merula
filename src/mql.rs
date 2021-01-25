@@ -5,7 +5,7 @@ use pest::Parser;
 use pest::iterators::Pair;
 
 use crate::NodeFilter;
-
+use log::*;
 
 #[derive(Parser)]
 #[grammar = "mql.pest"]
@@ -15,7 +15,16 @@ fn rule_key_op_value(pair: Pair<Rule>) -> Result<NodeFilter, ()> {
     let mut pairs = pair.into_inner();
     let key = pairs.next().unwrap().as_str();
     let op = pairs.next().unwrap().as_str();
-    let value = pairs.next().unwrap().as_str();
+
+    // for quoted values, remove quote characters
+    let value_pair = pairs.next().unwrap();
+    let value = match value_pair.as_rule() {
+        Rule::quoted_value => {
+            let value = value_pair.as_str();
+            &value[1..value.len() - 1]
+        },
+        _ => value_pair.as_str()
+    };
 
     match op {
         "~" => Ok(
