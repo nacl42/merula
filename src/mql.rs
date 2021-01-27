@@ -78,6 +78,17 @@ fn rule_key(pair: Pair<Rule>) -> Result<NodeFilter, ()> {
     Ok(NodeFilter::HasKey(pair.as_str().to_string()))
 }
 
+fn rule_expr(pair: Pair<Rule>) -> Result<NodeFilter, ()> {
+    //DEBUG println!("MQL RULE");
+    let mut pair = pair.into_inner().next().unwrap();
+    match pair.as_rule() {
+        Rule::key_op_value => rule_key_op_value(pair),
+        Rule::key => rule_key(pair),
+        _ => Err(())
+            
+    }
+}
+
 pub fn parse_mql<'a>(input: &'a str) -> Result<NodeFilter, ()> {
     let mut pair = MqlParser::parse(Rule::mql, &input)
         .expect("unsuccessful parse")
@@ -86,15 +97,7 @@ pub fn parse_mql<'a>(input: &'a str) -> Result<NodeFilter, ()> {
     //DEBUG println!("{:#?}", pair);
     
     match pair.as_rule() {
-        Rule::mql => {
-            //DEBUG println!("MQL RULE");
-            pair = pair.into_inner().next().unwrap();
-            match pair.as_rule() {
-                Rule::key_op_value => rule_key_op_value(pair),
-                Rule::key => rule_key(pair),
-                _ => Err(())
-            }
-        },
+        Rule::expr => rule_expr(pair),
         _ => Err(())
     }
 }

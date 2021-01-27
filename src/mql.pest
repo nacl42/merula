@@ -15,9 +15,7 @@ quoted_value = @{ PUSH(quote_char) ~ qvalue ~ POP}
 
 key_op_value = { key ~ operator ~ (quoted_value | unquoted_value) }
 
-mql = {
-      SOI ~
-      key_op_value | key
-      ~ EOI
-}
+expr = { key_op_value | key }
+
+mql = _{ SOI ~ expr ~ EOI }
 
