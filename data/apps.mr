@@ -5,6 +5,7 @@
 .tag, software, database, plain-text
 .doc Merula is a plain-text, flat file database
 .license gplv3
+.extension mr
 
 @app recutils
 .url https://www.gnu.org/software/recutils/
@@ -19,9 +20,10 @@ features provided by recutils.
 EOF
 .license gplv3
 .author Jose E. Marchesi
+.extension rec
 
 @app org-mode
-.url https://www.gnu.org/software/recutils/
+.url https://www.orgmode.org/
 .doc<<EOF
 A GNU Emacs major mode for convenient plain text markup — and
 much more. Org mode is for keeping notes, maintaining to-do lists,
@@ -29,3 +31,26 @@ planning projects, authoring documents, computational notebooks,
 literate programming and more — in a fast and effective plain text
 system.
 EOF
+.extension org
+
+@app notational velocity
+.url http://notational.net
+.doc<<EOF
+NOTATIONAL VELOCITY is an application that stores and retrieves notes.
+EOF
+.license gplv3
+.tag, software, note-taking
+.extension nv
+
+@app Zettelkasten
+.url http://www.zettelkasten.danielluedecke.de/
+.doc<<EOF
+Mit Hilfe dieses Programms können Sie die tägliche Arbeit mit
+(wissenschaftlichen) Texten erleichtern und wesentlich effektiver
+gestalten. Sowohl das Sammeln und Verwalten wichtiger Textstellen,
+Exzerpte und Gedanken als auch die anschließende Verwendung dieser
+Textsammlung zwecks Textproduktion werden durch den Zettelkasten
+erheblich vereinfacht.
+EOF
+.extension zkn3
+

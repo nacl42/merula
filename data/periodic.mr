@@ -7,51 +7,83 @@
 .name hydrogen
 .number 1
 .amu 1.008
+.electrons 1s^1
+.density 0.07
++state liquid, at melting point
 
 @element He
 .name helium
 .number 2
 .amu 4.002602
+.electrons 1s^2
+.density 0.145
++state liquid, at melting point
 
 @element Li
 .name lithium
 .number 3
 .amu 6.94
+.electrons [He] 2s^1
+.density 0.534
 
 @element Be
 .name beryllium
 .number 4
 .amu 9.0121831
+.electrons [He] 2s^2
+.density 1.85
 
 @element B
 .name boron
 .number 5
 .amu 10.81
+.electrons [He] 2s^2 2p^1
+.density 2.08
++state liquid, at melting point
 
 @element C
 .name carbon
 .number 6
 .amu 12.011
+.electrons [He] 2s^2 2p^2
+.density 1.8 - 2.1
++state amorphous
+.density 2.267
++state graphite
+.density 3.515
++state diamond
 
 @element N
 .name nitrogen
 .number 7
 .amu 14.007
+.electrons [He] 2s^2 2p^3
+.density 0.808
++state liquid, at boiling point
 
 @element O
 .name oxygen
 .number 8
 .amu 15.999
+.electrons [He] 2s^2 2p^4
+.density 1.141
++state liquid, at boiling point
 
 @element F
 .name fluorine
 .number 9
 .amu 18.998403163
+.electrons [He] 2s^2 2p^5
+.density 1.505
++state liquid, at boiling point
 
 @element Ne
 .name neon
 .number 10
 .amu 20.1797
+.electrons [He] 2s^2 2p^6
+.density 1.207
++state liquid, at boiling point
 
 @element Na
 .name sodium
@@ -133,18 +165,25 @@
 .number 26
 .amu 55.845
 .ferromagnetic true
+.electrons [Ar] 3d^6 4s^2
+.density 7.874
 
 @element Co
 .name cobalt
 .number 27
 .amu 58.933194
 .ferromagnetic true
+.electrons [Ar] 3d^7 4s^2
+.density 8.90
 
 @element Ni
 .name nickel
 .number 28
 .amu 58.6934
 .ferromagnetic true
+.electrons [Ar] 3d^8 4s^2
+.electrons [Ar] 3d^9 4s^1
+.density 8.908
 
 @element Cu
 .name copper
