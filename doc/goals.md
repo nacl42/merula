@@ -88,15 +88,31 @@ Sample filter expressions:
 Possible other filter expressions could include filtering for node
 attributes via + qualifier.
 
-The general form of a filter expression (fex) is
 
-```
-fex = { key_qualifier? ~ key? ~ ( op ~ value )? }
-key_qualifier = { "@" | "." | "+" }
-op = { "=" | "~" | ">=" | ">" | "<=" | "<" }
-```
+### Multiple Conditions
 
-Unresolved: How can we join multiple filters ?
+Suggestions for notation:
 
-One memo, each condition must be satisfied at least for one node: ```name~ium,amu>50```
+- Find all memos that match all of the given criteria:
+  ```name~ium,amu>50```
+- Find all memos that match any of the given criteria:
+  ```name~ium|amu>50```
+- Find all memos that match either the name and amu criteria or just the number:
+  ```name~ium,amu>50|number>10```
+- Find all memos with a specific attribute
+  ```+state~liquid```
+- Find all memos with a density greater than 1 given for the liquid state
+  ```.density>1 [+state~liquid]```
+
+With this approach, we don't need to parse recursively.
+We don't need to group expressions by parentheses.
+Just simple left-to-right parsing with ',' and '|' as separators.
+
+
+
+
+
+
+  
+
 
