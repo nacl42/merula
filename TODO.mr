@@ -2,6 +2,20 @@
 # TODO file for merula
 #
 
+@TODO filter by node type
+.doc<<EOF
+- filter by collection: ```@app```
+- filter by data node: ```.url```
+EOF
+
+@TODO allow to load multiple .mr files
+.doc<<EOF
+Useful for having a master file and a custom data file.
+Useful for having a schema file and a data file.
+EOF
+
+@TODO add some proper tests in the source code
+
 @TODO extend equal comparison to perform type conversion
 .tag mql
 .doc<<EOF
@@ -9,15 +23,6 @@ allow equals operator (=) for numbers as well
 maybe move functions such as equals, less_than, greater_than
 part of Value and have two different versions (strict with
 type checking or non-strict with type conversion)
-EOF
-
-@TODO allow to specify multiple conditions
-.tag mql
-.doc<<EOF
-But which notation would be best?
-  'amu>5,amu<20'
-  'amu>5 || amu >3'
-  'amu>5 && ferromagnetic=true'
 EOF
 
 @TODO node index
@@ -53,11 +58,6 @@ EOF
 @TODO list available keys
 .doc list all available keys for a result set (--keys)
 
-@TODO filter by collection
-.doc filter by collection ("@app")
-
-@TODO filter by data node
-.doc filter by data node (".url")
 
 @TODO define mql filter in a memo
 .doc<<EOF
@@ -67,7 +67,6 @@ move filter into a Memo, so that we can apply it
   @mr:filter sample
   .doc sample filter
   .mql number<5
-
 EOF
 
 @TODO add ROADMAP file
@@ -75,6 +74,7 @@ EOF
 
 @TODO print attributes
 .doc write attributes when using -vv in list output
+
 
 #
 # --- finished tasks ---
@@ -93,3 +93,14 @@ EOF
 .finished 2021-01-25
 .tag mql
 .doc allow quotes around filter values "description ~ 'the book'"
+
+@TODO allow to specify multiple conditions
+.state finished
+.finished 2021-01-29
+.tag mql
+.doc<<EOF
+But which notation would be best?
+  'amu>5,amu<20'
+  'amu>5 || amu >3'
+  'amu>5 && ferromagnetic=true'
+EOF
