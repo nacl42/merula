@@ -6,44 +6,60 @@
 @element H
 .name hydrogen
 .number 1
+.group 1
 .amu 1.008
 .electrons 1s^1
 .density 0.07
 +state liquid, at melting point
+.discovery Henry Cavendish
++date 1766
 
 @element He
 .name helium
 .number 2
+.group 18
 .amu 4.002602
 .electrons 1s^2
 .density 0.145
 +state liquid, at melting point
+.discovery, Pierre Janssen, Norman Lockyer
++date 1868
 
 @element Li
 .name lithium
 .number 3
+.group 1
 .amu 6.94
 .electrons [He] 2s^1
 .density 0.534
+.discovery Johan August Arfwedson
++date 1817
 
 @element Be
 .name beryllium
 .number 4
+.group 2
 .amu 9.0121831
 .electrons [He] 2s^2
 .density 1.85
+.discovery Louis Nicolas Vauquelin
++date 1798
 
 @element B
 .name boron
 .number 5
+.group 13
 .amu 10.81
 .electrons [He] 2s^2 2p^1
 .density 2.08
 +state liquid, at melting point
+.discovery, Joseph Louis Gay-Lussac, Louis Jaques Thénard
++date 1808-06-30
 
 @element C
 .name carbon
 .number 6
+.group 14
 .amu 12.011
 .electrons [He] 2s^2 2p^2
 .density 1.8 - 2.1
@@ -52,142 +68,270 @@
 +state graphite
 .density 3.515
 +state diamond
+.discovery Egyptians, Sumerians
++date 3750 BCE
 
 @element N
 .name nitrogen
 .number 7
+.group 15
 .amu 14.007
 .electrons [He] 2s^2 2p^3
 .density 0.808
 +state liquid, at boiling point
+.discovery Daniel Rutherford
++date 1772
 
 @element O
 .name oxygen
 .number 8
+.group 16
 .amu 15.999
 .electrons [He] 2s^2 2p^4
 .density 1.141
 +state liquid, at boiling point
+.discovery Carl Wilhelm Scheele
++date 1771
 
 @element F
 .name fluorine
 .number 9
+.group 17
 .amu 18.998403163
 .electrons [He] 2s^2 2p^5
 .density 1.505
 +state liquid, at boiling point
+.discovery André-Marie Ampère
++date 1810
 
 @element Ne
 .name neon
 .number 10
+.group 18
 .amu 20.1797
 .electrons [He] 2s^2 2p^6
 .density 1.207
 +state liquid, at boiling point
+.discovery, William Ramsay, Morris Travers
++date 1898
 
 @element Na
 .name sodium
 .number 11
+.group 1
 .amu 22.98976928
+.electrons [Ne] 3s^1
+.density 0.968
+.discovery Humphry Davy
++date 1807
 
 @element Mg
 .name magnesium
+.group 2
 .number 12
 .amu 24.305
+.electrons [Ne] 3s^2
+.density 1.738
++state near RT
+.discovery Joseph Black
++date 1755
 
 @element Al
 .name aluminum
 .number 13
+.group 13
 .amu 26.9815384
+.electrons [Ne] 3s^2 3p^1
+.density 2.70
++state near RT
+.discovery Hans Christian Ørsted
++date 1824
 
 @element Si
 .name silicon
 .number 14
+.group 14
 .amu 28.085
+.electrons [Ne] 3s^2 3p^2
+.density 2.3290
+.discovery Jöns Jacob Berzelius
++date 1823
 
 @element P
 .name phosphorous
 .number 15
+.group 15
 .amu 30.973761998
+.electrons [Ne] 3s^2 3p^3
+.density 1.823
++kind white
+.density 2.2 - 2.34
++kind red
+.density 2.36
++kind violet
+.density 2.69
++kind black
+.discovery Hennig Brand
++date 1669
 
 @element S
 .name sulfur
 .number 16
+.group 16
 .amu 32.06
+.electrons [Ne] 3s^2 3p^4
+.density 2.07
++kind alpha
+.density 1.96
++kind beta
+.density 1.92
++kind gamma
+.discovery Chinese
++date before 2000 BCE
 
 @element Cl
 .name chlorine
 .number 17
+.group 18
 .amu 35.45
+.electrons [Ne] 3s^2 3p^5
+.density 1.5625
++state liquid, at boiling point
+.discovery Carl Wilhelm Scheele
++date 1774
 
 @element Ar
 .name argon
 .number 18
+.group 18
 .amu 39.95
+.electrons [Ne] 3s^2 3p^6
+.density 1.3954
++state liquid, at boiling point
+.discovery, Lord Rayleigh, William Ramsay
++1894
 
 @element K
 .name potassium
 .number 19
+.group 1
 .amu 39.0983
+.electrons [Ar] 4s^1
+.density 0.89
++state near room temperature
+.density 0.828
++state when liquid, at melting point
+.discovery Humphry Davy
++date 1807
 
 @element Ca
 .name calcium
 .number 20
+.group 2
 .amu 40.078
+.electrons [Ar] 4s^2
+.density 1.55
++state near room temperature
+.density 1.378
++state when liquid, at melting point
+.discovery Humphry Davy
++date 1808
 
 @element Sc
 .name scandium
 .number 21
+.group 3
 .amu 44.955908
+.electrons [Ar] 3d^1 4s^2
+.discovery Lars Fredrik Nilson
++date 1879
+.density 2.985
++state near room temperature
+.density 2.80
++state when liquid, at melting point
 
 @element Ti
 .name titanium
 .number 22
+.group 4
 .amu 47.867
+.electrons [Ar] 3d^2 4s^2
+.discovery William Gregor
++date 1791
 
 @element V
 .name vanadium
 .number 23
+.group 5
 .amu 50.9415
+.electrons [Ar] 3d^3 4s^2
+.density 6.11
++state near room temperature
+.discovery Andrés Manuel del Río
++date 1801
 
 @element Cr
 .name chromium
 .number 24
+.group 6
 .amu 51.9961
+.electrons [Ar] 3d^5 4s^1
+.density 7.19
++state near room temperature
+.density 6.3
++state when liquid at melting point
 
 @element Mn
 .name manganese
 .number 25
+.group 7
 .amu 54.938043
+.electrons [Ar] 3d^5 4s^2
+.density 7.21
++state near room temperature
+.density 5.95
++state when liquid at melting point
+.discovery Carl Wilhelm Scheele
++date 1774
 
 @element Fe
 .name iron
 .number 26
+.group 8
 .amu 55.845
 .ferromagnetic true
 .electrons [Ar] 3d^6 4s^2
 .density 7.874
+.discovery
++date before 5000 BC
 
 @element Co
 .name cobalt
 .number 27
+.group 9
 .amu 58.933194
 .ferromagnetic true
 .electrons [Ar] 3d^7 4s^2
 .density 8.90
+.discovery Georg Brandt
++date 1735
 
 @element Ni
 .name nickel
 .number 28
+.group 10
 .amu 58.6934
 .ferromagnetic true
 .electrons [Ar] 3d^8 4s^2
 .electrons [Ar] 3d^9 4s^1
 .density 8.908
+.discovery Axel Fredrik Cronstedt
++date 1751
 
 @element Cu
 .name copper
 .number 29
+.group 11
 .amu 63.546
 
 @element Zn
