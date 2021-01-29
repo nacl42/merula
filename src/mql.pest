@@ -6,7 +6,7 @@ key = @{ key_char+ }
 operator = { "=" | "~" | "<=" | "<" | ">=" | ">" }
 
 // unquoted value
-unquoted_value = @{ (!(" ") ~ ANY)* }
+unquoted_value = @{ (!(" " | "," ) ~ ANY)* }
 
 // quoted value
 qvalue = @{ (!POP ~ ANY)* }
@@ -16,6 +16,7 @@ quoted_value = @{ PUSH(quote_char) ~ qvalue ~ POP}
 key_op_value = { key ~ operator ~ (quoted_value | unquoted_value) }
 
 expr = { key_op_value | key }
+more_expr = { "," ~ expr }
 
-mql = _{ SOI ~ expr ~ EOI }
+mql = _{ SOI ~ expr ~ more_expr* ~ EOI }
 

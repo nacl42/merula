@@ -25,7 +25,8 @@ pub mod mql;
 use memo::{Memo, MemoId};
 use node::Node;
 use value::{Value, Key};
-use filter::{NodeFilter, IntoPredicate};
+use filter::{NodeFilter, KeyFilter, ValueFilter, MemoFilter};
+use mql::parse_mql;
 use simplelog::*;
 use log::*;
 use colored::*;
@@ -81,33 +82,31 @@ fn main() {
     let matches = app.get_matches();
 
     init_logger(matches.occurrences_of("debug") as u8);
+
+    // --- SUBCOMMAND `list` ---
     
     if let Some(ref matches) = matches.subcommand_matches("list") {
         // read memos from .mr file into database
-        // TODO: let mut db = Database::new()
         if let Some(input) = matches.value_of("input") {
             let verbosity = matches.occurrences_of("verbose") as u8;
 
             debug!("loading input file '{}'", input);
-
             let memos = parser::read_from_file(input, true).unwrap();
             debug!("read {} memos", memos.len());
 
             // check if a filter clause has been supplied
-            let mut memo_filter = NodeFilter::True;
+            let mut memo_filter = MemoFilter::new();
             if let Some(mql) = matches.value_of("filter") {
                 debug!("filter expression is: '{}'", mql);
-                if let Ok(filter) = mql::parse_mql(mql) {
-                    debug!("resulting filter = {:#?}", filter);
+                if let Ok(filter) = parse_mql(mql) {
+                    debug!("resulting node filter = {:#?}", filter);
                     memo_filter = filter;
                 } else {
                     println!("couldn't parse filter expression!");
                 }
             }
-            
-            for memo in memos.iter().filter(
-                |&memo| memo.nodes().find(memo_filter.predicate()).is_some()
-            ) {
+
+            for memo in memos.iter().filter(|&memo| memo_filter.check_memo(memo)) {
                 println!("{}{} {}",
                          "@".red().bold(),
                          memo.collection().red().bold(),
@@ -125,6 +124,8 @@ fn main() {
             }   
         }        
     }
+
+    // --- SUBCOMMAND `test` ---
 
     if let Some(ref _matches) = matches.subcommand_matches("test") {
         fn section(title: &'static str) {
