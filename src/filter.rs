@@ -12,7 +12,6 @@ impl KeyFilter {
         match self {
             KeyFilter::True => true,
             KeyFilter::Equals(x) => key == x,
-            _ => false
         }
     }
 }

@@ -42,20 +42,12 @@ pub fn parse_mql<'a>(input: &'a str) -> Result<MemoFilter, String> {
 
 
 fn parse_expr(pair: Pair<Rule>) -> Result<NodeFilter, String> {
-    let mut pair = pair.into_inner().next().unwrap();
+    let pair = pair.into_inner().next().unwrap();
     match pair.as_rule() {
         Rule::key_op_value => parse_key_op_value(pair),
         Rule::key => parse_key(pair),
         _ => Err("".into())
     }
-}
-
-fn parse_more_expr(pair: Pair<Rule>, filter: NodeFilter)
-                  -> Result<NodeFilter, String>
-{
-    let pair = pair.into_inner().next().unwrap();
-    let new_filter = parse_expr(pair).unwrap();
-    Ok(new_filter)
 }
 
 
