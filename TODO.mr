@@ -12,6 +12,18 @@ EOF
 .doc<<EOF
 Useful for having a master file and a custom data file.
 Useful for having a schema file and a data file.
+
+Should common nodes be merged?
+EOF
+
+@TODO shorthand notation for attributes
+.doc<<EOF
+Example:
+ .discovery Cavendish {+date 1786}
+ .saturation 2.35 {+unit T}
+ .density 2.01 {+unit g/cm³m} {+state "liquid, at room temperature"}
+
+prerequisite for this is that the value is parsed by the regular parser!
 EOF
 
 @TODO add some proper tests in the source code
@@ -95,7 +107,7 @@ EOF
 .doc allow quotes around filter values "description ~ 'the book'"
 
 @TODO allow to specify multiple conditions
-.state finished
+.status done
 .finished 2021-01-29
 .tag mql
 .doc<<EOF
