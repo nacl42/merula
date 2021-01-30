@@ -103,7 +103,7 @@ fn main() {
                 let nf = NodeFilter::new()
                     .with_key(KeyFilter::Equals("mr:filter".into()))
                     .with_value(ValueFilter::Equals(filter_name.into()));
-                mf.add_filter(nf);
+                mf.add(nf);
                 if let Some(mql_memo) =
                     memos.iter().filter(|&memo| mf.check_memo(memo)).next()
                 {

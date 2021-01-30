@@ -134,7 +134,7 @@ impl MemoFilter {
         self
     }
 
-    pub fn add_filter(&mut self, nf: NodeFilter) {
+    pub fn add(&mut self, nf: NodeFilter) {
         self.node_filters.push(nf);
     }
 

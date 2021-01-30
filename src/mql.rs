@@ -22,13 +22,13 @@ pub fn parse_mql<'a>(input: &'a str) -> Result<MemoFilter, String> {
             Rule::expr => {
                 debug!("found filter expression: {}", pair.as_str());
                 let new_filter = parse_expr(pair).unwrap();
-                filter.add_filter(new_filter);
+                filter.add(new_filter);
             },
             Rule::more_expr => {
                 debug!("found another filter expression: {}", pair.as_str());
                 let pair = pair.into_inner().next().unwrap();
                 let new_filter = parse_expr(pair).unwrap();
-                filter.add_filter(new_filter);
+                filter.add(new_filter);
             }
             Rule::EOI => {},
             _ => {
