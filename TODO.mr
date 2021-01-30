@@ -8,11 +8,37 @@
 @mr:filter done
 .mql status=done
 
+@TODO case-insensitive search
+.doc<<EOF
+An expression such as author~tolkien should be case-insensitive
+EOF
+
+@TODO only print matching nodes
+.doc<<EOF
+only print matching nodes, e.g. for 'author~Tolkien' we would print
+
+@book The Lord of the Rings
+.author Tolkien
+
+What would be the command line option? --matching or -m
+EOF
+
+@TODO resolve usage of both --mql and --filter
+.doc<<EOF
+If both options, --mql and --filter, are provided, try to use the --filter,
+then refine the search with the given --mql
+EOF
 
 @TODO filter by node type
 .doc<<EOF
 - filter by collection: ```@app```
 - filter by data node: ```.url```
+EOF
+
+@TODO print statistics
+.doc<<EOF
+command 'stats' that counts the number of memos, the number of nodes,
+the number of distinct keys, ...
 EOF
 
 @TODO allow to load multiple .mr files
@@ -43,6 +69,13 @@ allow equals operator (=) for numbers as well
 maybe move functions such as equals, less_than, greater_than
 part of Value and have two different versions (strict with
 type checking or non-strict with type conversion)
+EOF
+
+@TODO parse multiline values without EOF delimiter
+.doc<<EOF
+It should be possible to define multiline values without
+the `<<EOF` syntax, i.e. if no separator is given, then the
+next node will be the delimiter.
 EOF
 
 @TODO node index
