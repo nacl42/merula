@@ -96,19 +96,9 @@ fn main() {
             let memos = parser::read_from_file(input, true).unwrap();
             debug!("read {} memos", memos.len());
 
-            // check if a mql filter clause has been supplied
             let mut memo_filter = MemoFilter::new();
-            if let Some(mql) = matches.value_of("mql") {
-                debug!("mql filter expression is: '{}'", mql);
-                if let Ok(filter) = parse_mql(mql) {
-                    debug!("resulting node filter = {:#?}", filter);
-                    memo_filter = filter;
-                } else {
-                    println!("couldn't parse filter expression!");
-                }
-            }
-
-            // alternatively, check if a pre-defined filter has been supplied
+            
+            // check if a pre-defined filter has been supplied
             if let Some(filter_name) = matches.value_of("filter") {
                 debug!("looking for pre-defined filter '{}'", filter_name);
                 let mut mf = MemoFilter::new();
@@ -137,6 +127,21 @@ fn main() {
                     std::process::exit(1);
                 }
             }
+
+            // check if a mql filter clause has been supplied
+            // any mql condition will be appended to the existing filter
+            // it is therefore possible to define both --filter (as base filter)
+            // and --mql (as refinement)
+            if let Some(mql) = matches.value_of("mql") {
+                debug!("mql filter expression is: '{}'", mql);
+                if let Ok(mql_filter) = parse_mql(mql) {
+                    debug!("resulting mql filter = {:#?}", mql_filter);
+                    memo_filter.extend(mql_filter)
+                } else {
+                    eprintln!("couldn't parse mql filter expression '{}'!", mql);
+                }
+            }
+            
             for memo in memos.iter().filter(|&memo| memo_filter.check_memo(memo)) {
                 println!("{}{} {}",
                          "@".red().bold(),

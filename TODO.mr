@@ -23,11 +23,6 @@ only print matching nodes, e.g. for 'author~Tolkien' we would print
 What would be the command line option? --matching or -m
 EOF
 
-@TODO resolve usage of both --mql and --filter
-.doc<<EOF
-If both options, --mql and --filter, are provided, try to use the --filter,
-then refine the search with the given --mql
-EOF
 
 @TODO filter by node type
 .doc<<EOF
@@ -172,4 +167,12 @@ include other .mr files with special command
 
 uses the path relative to the .mr file
 must check for cyclic dependencies!!!
+EOF
+
+@TODO resolve usage of both --mql and --filter
+.status done
+.finished 2021-01-30
+.doc<<EOF
+If both options, --mql and --filter, are provided, try to use the --filter,
+then refine the search with the given --mql
 EOF

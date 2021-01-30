@@ -138,6 +138,12 @@ impl MemoFilter {
         self.node_filters.push(nf);
     }
 
+    pub fn extend(&mut self, mf: MemoFilter){
+        for nf in mf.node_filters {
+            self.node_filters.push(nf)
+        }
+    }
+
     pub fn check_memo(&self, memo: &Memo) -> bool {
         self.node_filters.iter().all(
             |nf| memo.nodes().any(|node| nf.check_node(&node).unwrap_or(false))
