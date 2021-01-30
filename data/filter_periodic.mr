@@ -1,0 +1,13 @@
+@mr:filter ferromagnetic
+.mql ferromagnetic=true
+.doc only ferromagnetic elements
+
+@mr:filter medium-density
+.mql density>4, density<9
+
+@mr:filter noble gases
+.mql group=18
+.doc only noble gases such as He or Li
+
+@mr:filter test
+.mql doc

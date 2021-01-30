@@ -67,7 +67,8 @@ fn main() {
             App::new("list")
                 .about("list memos")
                 .arg("<input> 'sets an input file'")
-                .arg("--filter=[FILTER] 'sets a filter condition'")
+                .arg("--mql=[MQL] 'sets a mql expression'")
+                .arg("--filter=[FILTER] 'load an mql expression from a pre-defined filter'")
                 .arg("-v --verbose... 'Sets the verbosity level'")
         )
         .subcommand(
@@ -87,6 +88,7 @@ fn main() {
     
     if let Some(ref matches) = matches.subcommand_matches("list") {
         // read memos from .mr file into database
+        // TODO: matches.values_of("input") -> Vec<_>
         if let Some(input) = matches.value_of("input") {
             let verbosity = matches.occurrences_of("verbose") as u8;
 
@@ -94,15 +96,39 @@ fn main() {
             let memos = parser::read_from_file(input, true).unwrap();
             debug!("read {} memos", memos.len());
 
-            // check if a filter clause has been supplied
+            // check if a mql filter clause has been supplied
             let mut memo_filter = MemoFilter::new();
-            if let Some(mql) = matches.value_of("filter") {
-                debug!("filter expression is: '{}'", mql);
+            if let Some(mql) = matches.value_of("mql") {
+                debug!("mql filter expression is: '{}'", mql);
                 if let Ok(filter) = parse_mql(mql) {
                     debug!("resulting node filter = {:#?}", filter);
                     memo_filter = filter;
                 } else {
                     println!("couldn't parse filter expression!");
+                }
+            }
+
+            // alternatively, check if a pre-defined filter has been supplied
+            if let Some(filter_name) = matches.value_of("filter") {
+                debug!("looking for pre-defined filter '{}'", filter_name);
+                let mut mf = MemoFilter::new();
+                let nf = NodeFilter::new()
+                    .with_key(KeyFilter::Equals("mr:filter".into()))
+                    .with_value(ValueFilter::Equals(filter_name.into()));
+                mf.add_filter(nf);
+                if let Some(mql_memo) = memos.iter().filter(|&memo| mf.check_memo(memo)).next() {
+                    debug!("Resulting filter: {:#?}", mql_memo);
+                    if let Some(node) = mql_memo.nodes().filter(|&node| node.key == "mql").next() {
+                        debug!("Resulting node: {:#?}", node);
+                        let mql = node.value.to_string();
+                        debug!("Resulting mql: {}", mql);
+                        if let Ok(filter) = parse_mql(mql.as_str()) {
+                            debug!("resulting node filter = {:#?}", filter);
+                            memo_filter = filter;
+                        } else {
+                            println!("couldn't parse filter expression!");
+                        }
+                    }
                 }
             }
 

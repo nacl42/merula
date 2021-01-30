@@ -82,6 +82,16 @@ impl NodeFilter {
             value: None
         }
     }
+
+    pub fn with_key(mut self, key: KeyFilter) -> Self {
+        self.key = Some(key);
+        self            
+    }
+
+    pub fn with_value(mut self, value: ValueFilter) -> Self {
+        self.value = Some(value);
+        self
+    }
     
     pub fn check_node(&self, node: &Node) -> Option<bool> {
         match (&self.key, &self.value){

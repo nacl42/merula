@@ -2,6 +2,20 @@
 # TODO file for merula
 #
 
+@TODO define mql filter in a memo
+.doc<<EOF
+move filter into a Memo, so that we can apply it
+  by selecting the filter:
+
+  @mr:filter sample
+  .doc sample filter
+  .mql number<5
+
+FIRST switch command line option --filter to --mql
+SECOND use command line option --filter to specify mr:filter
+
+EOF
+
 @TODO filter by node type
 .doc<<EOF
 - filter by collection: ```@app```
@@ -69,17 +83,6 @@ EOF
 
 @TODO list available keys
 .doc list all available keys for a result set (--keys)
-
-
-@TODO define mql filter in a memo
-.doc<<EOF
-move filter into a Memo, so that we can apply it
-  by selecting the filter:
-
-  @mr:filter sample
-  .doc sample filter
-  .mql number<5
-EOF
 
 @TODO add ROADMAP file
 .doc add ROADMAP.md file
