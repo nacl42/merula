@@ -3,7 +3,7 @@
 # serves only as example file for merula
 # do not use for scientific production purposes!
 
-@mr:include filter-periodic.mr
+@mr:include filter_periodic.mr
 
 @element H
 .name hydrogen

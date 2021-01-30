@@ -13,15 +13,44 @@ use std::fs;
 use log::*;
 
 use crate::{Memo, Node, Value};
+use std::path::{Path, PathBuf};
 
+// TODO:
+// There are multiple issues with the code below.
+// - We are mixing filenames as &str with Path and PathBuf.
+// - We could accept anything that can be converted to a Path
+// - nested includes are not possible, instead we are simply limiting
+//   to one include
+
+fn determine_include_path(current_filename: &'_ str, include_filename: &'_ str) -> PathBuf {
+    let include_path = Path::new(current_filename);
+    if include_path.is_relative() {
+        // if given filename is relative, create complete
+        // file path from the current working directory
+        let cwd = Path::new(current_filename);
+        cwd.with_file_name(include_filename)
+    } else {
+        // if given filename is absolute, then use it
+        include_path.to_path_buf()
+    }
+}
 
 pub fn read_from_file(filename: &'_ str, drop_first: bool)
                       -> Result<Vec<Memo>, ()>
 {
+    read_from_file_internal(filename, drop_first, &mut vec!())
+}
 
+fn read_from_file_internal(filename: &'_ str, drop_first: bool,
+                           include_path_trail: &mut Vec<PathBuf>)
+                           -> Result<Vec<Memo>, ()>
+{
+    debug!("reading file {}", filename);
     let unparsed_file = fs::read_to_string(filename)
         .expect("cannot read mr file");
 
+    include_path_trail.push(Path::new(filename).to_path_buf());
+    
     let file = MemoParser::parse(Rule::file, &unparsed_file)
         .expect("unsuccessful parse")
         .next().unwrap();
@@ -42,6 +71,21 @@ pub fn read_from_file(filename: &'_ str, drop_first: bool)
                 let mut inner_rules = line.into_inner();
                 let key = inner_rules.next().unwrap().as_str();
                 let value = inner_rules.next().unwrap().as_str();
+                if key == "mr:include" {
+                    let include_path = determine_include_path(&filename, value);
+                    debug!("include path is '{:#?}'", include_path.to_str());
+                    // we could have an include path trail and check if the include
+                    // is in there. OR even simpler, we could just allow one include :-)
+                    debug!("trying to include {}", include_path.to_str().unwrap());
+                    if include_path_trail.len() < 2 {
+                        let included_memos = read_from_file_internal(include_path.to_str().unwrap(), false, include_path_trail).unwrap();
+                        info!("included {} memos from included file '{}'", included_memos.len(), include_path.to_str().unwrap());
+                        memos.extend(included_memos);
+                    } else {
+                        eprintln!("merula currently does not supporting nested includes");
+                    }
+                    
+                };
                 let new_memo = Memo::new(key, value);
                 memo.take().map(|m| memos.push(m));
                 memo = Some(new_memo);

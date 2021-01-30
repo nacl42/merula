@@ -8,16 +8,6 @@
 @mr:filter done
 .mql status=done
 
-@TODO include other .mr files from within a .mr file
-.status active
-.doc<<EOF
-include other .mr files with special command
-
-@mr:include filter_periodic.mr
-
-uses the path relative to the .mr file
-must check for cyclic dependencies!!!
-EOF
 
 @TODO filter by node type
 .doc<<EOF
@@ -138,4 +128,15 @@ move filter into a Memo, so that we can apply it
 FIRST switch command line option --filter to --mql
 SECOND use command line option --filter to specify mr:filter
 
+EOF
+
+@TODO include other .mr files from within a .mr file
+.status active
+.doc<<EOF
+include other .mr files with special command
+
+@mr:include filter_periodic.mr
+
+uses the path relative to the .mr file
+must check for cyclic dependencies!!!
 EOF
