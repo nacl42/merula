@@ -10,7 +10,7 @@
 
 @TODO case-insensitive search
 .doc<<EOF
-An expression such as author~tolkien should be case-insensitive
+An expression such as author~tolkien should be case-insensitive by default.
 EOF
 
 @TODO only print matching nodes
@@ -23,18 +23,12 @@ only print matching nodes, e.g. for 'author~Tolkien' we would print
 What would be the command line option? --matching or -m
 EOF
 
-
 @TODO filter by node type
 .doc<<EOF
 - filter by collection: ```@app```
 - filter by data node: ```.url```
 EOF
 
-@TODO print statistics
-.doc<<EOF
-command 'stats' that counts the number of memos, the number of nodes,
-the number of distinct keys, ...
-EOF
 
 @TODO allow to load multiple .mr files
 .status active
@@ -175,4 +169,12 @@ EOF
 .doc<<EOF
 If both options, --mql and --filter, are provided, try to use the --filter,
 then refine the search with the given --mql
+EOF
+
+@TODO print statistics
+.status done
+.finished 2021-01-30
+.doc<<EOF
+command 'stats' that counts the number of memos, the number of nodes,
+the number of distinct keys, ...
 EOF
