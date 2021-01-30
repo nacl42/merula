@@ -17,8 +17,8 @@ EOF
 .doc<<EOF
 only print matching nodes, e.g. for 'author~Tolkien' we would print
 
-@book The Lord of the Rings
-.author Tolkien
+ @book The Lord of the Rings
+ .author Tolkien
 
 What would be the command line option? --matching or -m
 EOF
@@ -37,6 +37,11 @@ Useful for having a master file and a custom data file.
 Useful for having a schema file and a data file.
 
 Should common nodes be merged?
+EOF
+
+@TODO add logo
+.doc<<EOF
+image of a blackbird (turdus  merula)
 EOF
 
 @TODO shorthand notation for attributes
