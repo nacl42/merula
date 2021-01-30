@@ -116,7 +116,9 @@ fn main() {
                     .with_key(KeyFilter::Equals("mr:filter".into()))
                     .with_value(ValueFilter::Equals(filter_name.into()));
                 mf.add_filter(nf);
-                if let Some(mql_memo) = memos.iter().filter(|&memo| mf.check_memo(memo)).next() {
+                if let Some(mql_memo) =
+                    memos.iter().filter(|&memo| mf.check_memo(memo)).next()
+                {
                     debug!("Resulting filter: {:#?}", mql_memo);
                     if let Some(node) = mql_memo.nodes().filter(|&node| node.key == "mql").next() {
                         debug!("Resulting node: {:#?}", node);
@@ -126,12 +128,15 @@ fn main() {
                             debug!("resulting node filter = {:#?}", filter);
                             memo_filter = filter;
                         } else {
-                            println!("couldn't parse filter expression!");
+                            eprintln!("couldn't parse filter expression!");
+                            std::process::exit(1);
                         }
                     }
+                } else {
+                    eprintln!("could not find pre-defined filter '{}'", filter_name);
+                    std::process::exit(1);
                 }
             }
-
             for memo in memos.iter().filter(|&memo| memo_filter.check_memo(memo)) {
                 println!("{}{} {}",
                          "@".red().bold(),
