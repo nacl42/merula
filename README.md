@@ -67,19 +67,27 @@ $ cargo run -- list data/periodic.mr --mql group=1 -v
 $ cargo run -- list data/periodic.mr --mql electrons~Ar
 
 # elements with a density of more than 5
-# as > is also the redirection parameter, we should quote the mql
-# expression
+# as > implies a redirection, we should quote the mql expression
 $ cargo run -- list data/periodic.mr --mql 'density>5'
 
 # elements with atomic number between 80 and 90
 $ cargo run -- list data/periodic.mr --mql 'number>=80,number<=90'
+
+# elements using a pre-defined filter (see periodic.mr, @mr:filter)
+$ cargo run -- list data/periodic.mr --filter ferromagnetic
+
+# add another condition to the pre-defined filter
+# again, remember to quote the condition as not to pipe the output...
+$ cargo run -- list data/periodic.mr --filter ferromagnetic --mql 'amu>58'
 ```
 
 
 ## Roadmap
 
 This is highly experimental software, which is used by the author and
-probably no one else. Even the subject itself is subject to change.
+probably no one else. Even the syntax itself is subject to change
+(even though I assume that I will stick to `@header`, `.key` and
+`+attribute`).
 
 You have been warned.
 
@@ -95,4 +103,4 @@ for the file format and for the command line utility. Speed is not a
 priority, but maybe later on when the format and commands are fixed.
 
 If you have any suggestions or feedback, you are welcome to do so via
-the guthub page.
+the github page.
