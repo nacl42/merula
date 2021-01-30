@@ -2,18 +2,21 @@
 # TODO file for merula
 #
 
-@TODO define mql filter in a memo
+@mr:filter active
+.mql status=active
+
+@mr:filter done
+.mql status=done
+
+@TODO include other .mr files from within a .mr file
+.status active
 .doc<<EOF
-move filter into a Memo, so that we can apply it
-  by selecting the filter:
+include other .mr files with special command
 
-  @mr:filter sample
-  .doc sample filter
-  .mql number<5
+@mr:include filter_periodic.mr
 
-FIRST switch command line option --filter to --mql
-SECOND use command line option --filter to specify mr:filter
-
+uses the path relative to the .mr file
+must check for cyclic dependencies!!!
 EOF
 
 @TODO filter by node type
@@ -23,6 +26,7 @@ EOF
 EOF
 
 @TODO allow to load multiple .mr files
+.status active
 .doc<<EOF
 Useful for having a master file and a custom data file.
 Useful for having a schema file and a data file.
@@ -118,4 +122,20 @@ But which notation would be best?
   'amu>5,amu<20'
   'amu>5 || amu >3'
   'amu>5 && ferromagnetic=true'
+EOF
+
+@TODO define mql filter in a memo
+.status done
+.finished 2021-01-30
+.doc<<EOF
+move filter into a Memo, so that we can apply it
+  by selecting the filter:
+
+  @mr:filter sample
+  .doc sample filter
+  .mql number<5
+
+FIRST switch command line option --filter to --mql
+SECOND use command line option --filter to specify mr:filter
+
 EOF
