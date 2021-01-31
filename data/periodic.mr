@@ -5,10 +5,16 @@
 
 @mr:include filter_periodic.mr
 
+@mr:schema element
+.doc element of the periodic table
+.require, number, group, period, amu
+
 @element H
 .name hydrogen
 .number 1
 .group 1
+.period 1
+.block s
 .amu 1.008
 .electrons 1s^1
 .density 0.07
@@ -20,6 +26,8 @@
 .name helium
 .number 2
 .group 18
+.block s
+.period 1
 .amu 4.002602
 .electrons 1s^2
 .density 0.145
@@ -31,6 +39,8 @@
 .name lithium
 .number 3
 .group 1
+.block s
+.period 2
 .amu 6.94
 .electrons [He] 2s^1
 .density 0.534
@@ -41,6 +51,8 @@
 .name beryllium
 .number 4
 .group 2
+.block s
+.period 2
 .amu 9.0121831
 .electrons [He] 2s^2
 .density 1.85
@@ -51,6 +63,7 @@
 .name boron
 .number 5
 .group 13
+.period 2
 .amu 10.81
 .electrons [He] 2s^2 2p^1
 .density 2.08
@@ -62,6 +75,7 @@
 .name carbon
 .number 6
 .group 14
+.period 2
 .amu 12.011
 .electrons [He] 2s^2 2p^2
 .density 1.8 - 2.1
@@ -77,6 +91,7 @@
 .name nitrogen
 .number 7
 .group 15
+.period 2
 .amu 14.007
 .electrons [He] 2s^2 2p^3
 .density 0.808
@@ -88,6 +103,7 @@
 .name oxygen
 .number 8
 .group 16
+.period 2
 .amu 15.999
 .electrons [He] 2s^2 2p^4
 .density 1.141
@@ -99,6 +115,7 @@
 .name fluorine
 .number 9
 .group 17
+.period 2
 .amu 18.998403163
 .electrons [He] 2s^2 2p^5
 .density 1.505
@@ -110,6 +127,7 @@
 .name neon
 .number 10
 .group 18
+.period 2
 .amu 20.1797
 .electrons [He] 2s^2 2p^6
 .density 1.207
@@ -121,6 +139,7 @@
 .name sodium
 .number 11
 .group 1
+.period 3
 .amu 22.98976928
 .electrons [Ne] 3s^1
 .density 0.968
@@ -130,6 +149,7 @@
 @element Mg
 .name magnesium
 .group 2
+.period 3
 .number 12
 .amu 24.305
 .electrons [Ne] 3s^2
@@ -142,6 +162,7 @@
 .name aluminum
 .number 13
 .group 13
+.period 3
 .amu 26.9815384
 .electrons [Ne] 3s^2 3p^1
 .density 2.70
@@ -153,6 +174,7 @@
 .name silicon
 .number 14
 .group 14
+.period 3
 .amu 28.085
 .electrons [Ne] 3s^2 3p^2
 .density 2.3290
@@ -163,6 +185,7 @@
 .name phosphorous
 .number 15
 .group 15
+.period 3
 .amu 30.973761998
 .electrons [Ne] 3s^2 3p^3
 .density 1.823
@@ -180,6 +203,7 @@
 .name sulfur
 .number 16
 .group 16
+.period 3
 .amu 32.06
 .electrons [Ne] 3s^2 3p^4
 .density 2.07
@@ -195,6 +219,7 @@
 .name chlorine
 .number 17
 .group 18
+.period 3
 .amu 35.45
 .electrons [Ne] 3s^2 3p^5
 .density 1.5625
@@ -206,6 +231,7 @@
 .name argon
 .number 18
 .group 18
+.period 3
 .amu 39.95
 .electrons [Ne] 3s^2 3p^6
 .density 1.3954
@@ -217,6 +243,8 @@
 .name potassium
 .number 19
 .group 1
+.period 4
+.block s
 .amu 39.0983
 .electrons [Ar] 4s^1
 .density 0.89
@@ -230,6 +258,8 @@
 .name calcium
 .number 20
 .group 2
+.period 4
+.block s
 .amu 40.078
 .electrons [Ar] 4s^2
 .density 1.55
@@ -243,6 +273,7 @@
 .name scandium
 .number 21
 .group 3
+.period 4
 .amu 44.955908
 .electrons [Ar] 3d^1 4s^2
 .discovery Lars Fredrik Nilson
@@ -256,8 +287,13 @@
 .name titanium
 .number 22
 .group 4
+.period 4
 .amu 47.867
 .electrons [Ar] 3d^2 4s^2
+.density 4.506
++state near RT
+.density 4.11
++state when liquid at melting point
 .discovery William Gregor
 +date 1791
 
@@ -265,6 +301,7 @@
 .name vanadium
 .number 23
 .group 5
+.period 4
 .amu 50.9415
 .electrons [Ar] 3d^3 4s^2
 .density 6.11
@@ -276,17 +313,20 @@
 .name chromium
 .number 24
 .group 6
+.period 4
 .amu 51.9961
 .electrons [Ar] 3d^5 4s^1
 .density 7.19
 +state near room temperature
 .density 6.3
 +state when liquid at melting point
-
+.discovery Louis Nicolas Vauquelin
++date 1794
 @element Mn
 .name manganese
 .number 25
 .group 7
+.period 4
 .amu 54.938043
 .electrons [Ar] 3d^5 4s^2
 .density 7.21
@@ -300,6 +340,7 @@
 .name iron
 .number 26
 .group 8
+.period 4
 .amu 55.845
 .ferromagnetic true
 .electrons [Ar] 3d^6 4s^2
@@ -311,6 +352,7 @@
 .name cobalt
 .number 27
 .group 9
+.period 4
 .amu 58.933194
 .ferromagnetic true
 .electrons [Ar] 3d^7 4s^2
@@ -322,6 +364,7 @@
 .name nickel
 .number 28
 .group 10
+.period 4
 .amu 58.6934
 .ferromagnetic true
 .electrons [Ar] 3d^8 4s^2
@@ -334,279 +377,496 @@
 .name copper
 .number 29
 .group 11
+.period 4
 .amu 63.546
+.density 8.96
+.electrons [Ar] 3d^10 4s^2
+.discovery Middle East
++date 9000 BC
 
 @element Zn
 .name zinc
 .number 30
+.group 12
+.period 4
 .amu 65.38
+.density 7.14
+.electrons [Ar] 3d^10 4s^2
+.discovery Indian Metallurgists
++date before 1000 BCE
+
 
 @element Ga
 .name gallium
 .number 31
+.group 13
+.period 4
 .amu 69.723
+.density 5.91
+.electrons [Ar] 3d^10 4s^2 4p^1
+.discovery Lecoq de Boisbaudran
++date 1875
+
 
 @element Ge
 .name germanium
 .number 32
+.group 14
+.period 4
 .amu 72.630
+.density 5.323
+.discovery Clemens Winkler
++state 1886
+
 
 @element As
 .name arsenic
 .number 33
+.group 15
 .amu 74.921595
+.period 4
+.electrons [Ar] 3d^10 4s^2 4p^3
+.density 5.727
+.discovery Arab alchemists
++date before AD 815
+
 
 @element Se
 .name selenium
 .number 34
+.group 16
+.period 4
 .amu 78.971
+.electrons [Ar] 3d^10 4s^2 4p^2
+.density 4.81
++kind gray
+.density 4.39
++kind alpha
+.density 4.28
++kind vitreous
+.discovery Jöns Jacob Berzelius
++date 1817
+
 
 @element Br
 .name bromine
 .number 35
+.group 17
+.period 4
 .amu 79.904
+.density 3.1028
++state liquid
++compound Br_2
+.discovery, Antoine Jérôme Balard, Carl Jacob Löwig
++date 1825
+
 
 @element Kr
 .name krypton
 .number 36
+.group 18
+.period 4
 .amu 83.798
+.electrons [Ar] 3d^10 4s^2 4p^6
+.density 2.413
++state liquid at boiling point
+.discovery, William Ramsay, Morris Travers
++date 1898
 
 @element Rb
 .name rubidium
 .number 37
+.group 1
+.period 5
 .amu 85.4678
+.electrons [Kr] 5s^1
+.density 1.532
+
 
 @element Sr
 .name strontium
 .number 38
+.group 2
+.period 5
 .amu 87.62
+.electrons [Kr] 5s^2
+.density 2.64
+
 
 @element Y
 .name yttrium
 .number 39
+.group 3
+.period 5
 .amu 88.90584
+.electrons [Kr] 4d^1 5s^2
 
 @element Zr
 .name zirconium
 .number 40
+.group 4
+.period 5
 .amu 91.224
 
 @element Nb
 .name niobium
 .number 41
+.group 5
+.period 5
 .amu 92.90637
 
 @element Mo
 .name molybdenum
 .number 42
+.group 6
+.period 5
 .amu 95.95
 
 @element Tc
 .name technetium
 .number 43
+.group 7
+.period 5
 .amu 97
 
 @element Ru
 .name ruthenium
 .number 44
+.group 8
+.period 5
 .amu 101.07
 
 @element Rh
 .name rhodium
 .number 45
+.group 9
+.period 5
 .amu 102.90549
 
 @element Pd
 .name palladium
 .number 46
+.group 10
+.period 5
 .amu 106.42
 
 @element Ag
 .name silver
 .number 47
+.group 11
+.period 5
 .amu 107.86862
 
 @element Cd
 .name cadmium
 .number 48
+.group 12
+.period 5
 .amu 112.414
 
 @element In
 .name indium
 .number 49
+.group 13
+.period 5
 .amu 114.818
 
 @element Sn
 .name tin
 .number 50
+.group 14
+.period 5
 .amu 118.710
 
 @element Sb
 .name antimony
 .number 51
+.group 15
+.period 5
 .amu 121.760
 
 @element Te
 .name tellurium
 .number 52
+.group 16
+.period 5
 .amu 127.60
 
 @element I
 .name iodine
 .number 53
+.group 17
+.period 5
 .amu 126.90447
 
 @element Xe
 .name xenon
 .number 54
+.group 18
+.period 5
 .amu 131.293
 
 @element Cs
 .name caesium
 .number 55
+.group 1
+.period 6
 .amu 132.90545196
 
 @element Ba
 .name barium
 .number 56
+.group 2
+.period 6
 .amu 137.327
 
 @element La
 .name lanthanum
 .number 57
+.group -
+.period 6
+.block f
 .amu 138.90547
+.density 6.262
+.electrons [Xe] 5d^1 6s^2
 
 @element Ce
 .name cerium
 .number 58
+.group -
+.period 6
+.block f
 .amu 140.116
+.density 6.770
+.electrons [Xe] 4f^1 5d^1 6s^2
 
 @element Pr
 .name praseodymium
 .number 59
+.group -
+.period 6
+.block f
 .amu 140.90766
+.density 6.77
+.electrons [Xe] 4f^3 6s^2
 
 @element Nd
 .name neodymium
 .number 60
+.group -
+.period 6
+.block f
 .amu 144.242
+.density 7.01
+.electrons [Xe] 4f^4 6s^2
 
 @element Pm
 .name promethium
 .number 61
+.group -
+.period 6
+.block f
+.radioactive true
 .amu 145
+.density 7.26
+.electrons [Xe] 4f^5 6s^2
 
 @element Sm
 .name samarium
 .number 62
+.group -
+.period 6
+.block f
 .amu 150.36
+.electrons [Xe] 4f^6 6s^2
+.density 7.52
 
 @element Eu
 .name europium
 .number 63
+.group -
+.period 6
+.block f
 .amu 151.964
+.electrons [Xe] 4f^7 6s^2
+.density 5.264
 
 @element Gd
 .name gadolinium
 .number 64
+.group -
+.period 6
+.block f
 .amu 157.25
+.electrons [Xe] 4f^7 5d^1 6s^2
+.density 7.90
 
 @element Tb
 .name terbium
 .number 65
+.group -
+.period 6
+.block f
 .amu 158.925354
+.electrons [Xe] 4f^9 6s^2
+.density 8.23
 
 @element Dy
 .name dysprosium
 .number 66
+.group -
+.period 6
+.block f
 .amu 162.500
+.density 8.540
+.electrons [Xe] 4f^10 6s^2
 
 @element Ho
 .name holmium
 .number 67
+.group -
+.period 6
+.block f
 .amu 164.930328
+.electrons [Xe] 4f^11 6s^2
+.density 8.79
 
 @element Er
 .name erbium
 .number 68
+.group -
+.period 6
+.block f
 .amu 167.259
+.electrons [Xe] 4f^12 6s^2
+.density 9.066
 
 @element Tm
 .name thulium
 .number 69
+.group -
+.period 6
+.block f
 .amu 168.934218
+.electrons [Xe] 4f^13 6s^2
+.density 9.32
 
 @element Yb
 .name ytterbium
 .number 70
+.group -
+.period 6
+.block f
 .amu 173.045
+.electrons [Xe] 4f^14 6s^2
+.density 6.90
 
 @element Lu
 .name lutetium
 .number 71
+.group 3
+.period 6
 .amu 174.9668
 
 @element Hf
 .name hafnium
 .number 72
+.group 4
+.period 6
 .amu 178.486
 
 @element Ta
 .name tantalum
 .number 73
+.group 5
+.period 6
 .amu 180.94788
 
 @element W
 .name tungsten
 .number 74
+.group 6
+.period 6
 .amu 183.84
 
 @element Re
 .name rhenium
 .number 75
+.group 7
+.period 6
 .amu 186.207
 
 @element Os
 .name osmium
 .number 76
+.group 8
+.period 6
 .amu 190.23
 
 @element Ir
 .name iridium
 .number 77
+.group 9
+.period 6
 .amu 192.217
 
 @element Pt
 .name platinum
 .number 78
+.group 10
+.period 6
 .amu 195.084
 
 @element Au
 .name gold
 .number 79
+.group 11
+.period 6
 .amu 196.966570
 
 @element Hg
 .name mercury
 .number 80
+.group 12
+.period 6
 .amu 200.592
 
 @element Tl
 .name thallium
 .number 81
+.group 13
+.period 6
 .amu 204.38
 
 @element Pb
 .name lead
 .number 82
+.group 14
+.period 6
 .amu 207.2
 
 @element Bi
 .name bismuth
 .number 83
+.group 15
+.period 6
 .amu 208.98040
 
 @element Po
 .name polonium
 .number 84
+.group 16
+.period 6
 .amu 209
+
+@element At
+.name astatine
+.number 85
+.group 17
+.period 6
+
+@element Rn
+.name radon
+.number 86
+.group 18
+.period 6
