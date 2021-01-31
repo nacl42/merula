@@ -8,6 +8,15 @@
 @mr:filter done
 .mql status=done
 
+
+@TODO filter by node type
+.status active
+.doc<<EOF
+- filter by collection: ```@app```
+- filter by data node: ```.url```
+EOF
+
+
 @TODO case-insensitive search
 .doc<<EOF
 An expression such as author~tolkien should be case-insensitive by default.
@@ -23,15 +32,8 @@ only print matching nodes, e.g. for 'author~Tolkien' we would print
 What would be the command line option? --matching or -m
 EOF
 
-@TODO filter by node type
-.doc<<EOF
-- filter by collection: ```@app```
-- filter by data node: ```.url```
-EOF
-
-
 @TODO allow to load multiple .mr files
-.status active
+.status inactive
 .doc<<EOF
 Useful for having a master file and a custom data file.
 Useful for having a schema file and a data file.
@@ -157,16 +159,7 @@ SECOND use command line option --filter to specify mr:filter
 
 EOF
 
-@TODO include other .mr files from within a .mr file
-.status active
-.doc<<EOF
-include other .mr files with special command
 
-@mr:include filter_periodic.mr
-
-uses the path relative to the .mr file
-must check for cyclic dependencies!!!
-EOF
 
 @TODO resolve usage of both --mql and --filter
 .status done
@@ -182,4 +175,19 @@ EOF
 .doc<<EOF
 command 'stats' that counts the number of memos, the number of nodes,
 the number of distinct keys, ...
+EOF
+
+@TODO include other .mr files from within a .mr file
+.status done
+.date 2021-01-30
+.doc<<EOF
+include other .mr files with special command
+
+@mr:include filter_periodic.mr
+
+uses the path relative to the .mr file
+must check for cyclic dependencies!!!
+
+The current implementation avoids the cyclic dependency problem by
+not allowing nested includes at all.
 EOF
