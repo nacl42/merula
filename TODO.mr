@@ -8,14 +8,29 @@
 @mr:filter done
 .mql status=done
 
-
-@TODO filter by node type
-.status active
+@TODO node index
+.tag mql
+.doc allow node index "email[0]"
 .doc<<EOF
-- filter by collection: ```@app```
-- filter by data node: ```.url```
-EOF
+This seems difficult with the current design of the MemoFilter.
 
+We currently pass the number of the node, which is 0 for the header
+node and 1..n for the data nodes.
+
+We would need to keep track of data node numbers
+ ... or store the node numbers in the structure
+ ... or save nodes as multimap, which would mean we do not preserve
+     node order
+
+On the other hand, if we are not concerned about saving the data again
+(read-only format), then this could be possible.
+
+This would be a major redesign, so careful consideration is required.
+Maybe try out in a different branch!
+
+for 'email[0]' we would only need to count if email matches.
+
+EOF
 
 @TODO case-insensitive search
 .doc<<EOF
@@ -44,6 +59,8 @@ EOF
 @TODO add logo
 .doc<<EOF
 image of a blackbird (turdus  merula)
+
+or even rename to merlin ?
 EOF
 
 @TODO shorthand notation for attributes
@@ -73,10 +90,6 @@ It should be possible to define multiline values without
 the `<<EOF` syntax, i.e. if no separator is given, then the
 next node will be the delimiter.
 EOF
-
-@TODO node index
-.tag mql
-.doc allow node index "email[0]"
 
 @TODO date comparison operators (<<, >>, ==)
 .tag mql
@@ -190,4 +203,12 @@ must check for cyclic dependencies!!!
 
 The current implementation avoids the cyclic dependency problem by
 not allowing nested includes at all.
+EOF
+
+@TODO filter by node type
+.status done
+.finished 2021-02-06
+.doc<<EOF
+- filter by collection: ```@app```
+- filter by data node: ```.url```
 EOF
