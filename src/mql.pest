@@ -1,22 +1,36 @@
+// reminder on pest grammar:
+// _{ } => silent: rule won't appear in a parse result
+// ${ } => compount atomic: no whitespace, inner tokens as normal
+// @{ } => atomic: no whitespace, no inner tokens
+
+// In general, when writing a parser with choices, put the longest or
+// most specific choice first, and the shortest or most general choice
+// last.
+
 WHITESPACE = _{ " " }
 
-key_char = { ASCII_ALPHANUMERIC | "_" | ":" | "/" | "."  | "-" }
-key = @{ key_char+ }
+alpha = { 'a'..'z' | 'A'..'Z' }
+digit = { '0'..'9' }
+
+prefix = { ("@"|".") }
+
+// a key may contain special characters, but it must not start with one
+key_char = { alpha | digit | "_" | ":" | "/" | "."  | "-" }
+key = @{ alpha ~ key_char* }
+
+// unquoted value
+unquoted_value = @{ (!(" " | ",") ~ ANY)* }
+
+// quoted value
+inner_value = @{ (!POP ~ ANY)* }
+quote_char = _{ "'" | "\"" }
+quoted_value = _{ PUSH(quote_char) ~ inner_value ~ POP}
+
+// value can either be quoted or unquoted
+value = { quoted_value | unquoted_value }
 
 operator = { "=" | "~" | "<=" | "<" | ">=" | ">" }
 
-// unquoted value
-unquoted_value = @{ (!(" " | "," ) ~ ANY)* }
+condition = ${ prefix? ~ key ~ (operator ~ value)? }
 
-// quoted value
-qvalue = @{ (!POP ~ ANY)* }
-quote_char = @{ "'" | "\"" }
-quoted_value = @{ PUSH(quote_char) ~ qvalue ~ POP}
-
-key_op_value = { key ~ operator ~ (quoted_value | unquoted_value) }
-
-expr = { key_op_value | key }
-more_expr = { "," ~ expr }
-
-mql = _{ SOI ~ expr ~ more_expr* ~ EOI }
-
+mql = _{ SOI ~ condition ~ ("," ~ condition)* ~ EOI }

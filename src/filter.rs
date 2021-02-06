@@ -2,6 +2,13 @@ use crate::{Memo, Node, Key, Value};
 use std::convert::TryFrom;
 
 #[derive(Debug)]
+pub enum KindFilter {
+    Any,
+    Header,
+    Data
+}
+
+#[derive(Debug)]
 pub enum KeyFilter {
     True,
     Equals(String)
@@ -71,6 +78,7 @@ impl ValueFilter {
 
 #[derive(Debug)]
 pub struct NodeFilter {
+    pub kind: Option<KindFilter>,
     pub key: Option<KeyFilter>,
     pub value: Option<ValueFilter>
 }
@@ -78,11 +86,17 @@ pub struct NodeFilter {
 impl NodeFilter {
     pub fn new() -> Self {
         NodeFilter {
+            kind: None,
             key: None,
             value: None
         }
     }
 
+    pub fn with_kind(mut self, kind: KindFilter) -> Self {
+        self.kind = Some(kind);
+        self
+    }
+    
     pub fn with_key(mut self, key: KeyFilter) -> Self {
         self.key = Some(key);
         self            
@@ -100,6 +114,15 @@ impl NodeFilter {
             (Some(key), Some(value)) => Some(key.check(&node.key) && value.check(&node.value)),
             (None, Some(value)) => Some(value.check(&node.value))
         }
+    }
+
+    pub fn check_node_n(&self, node: &Node, n: usize) -> Option<bool> {
+        match self.kind {
+            Some(KindFilter::Header) if n > 0 => return Some(false),
+            Some(KindFilter::Data) if n == 0 => return Some(false),
+            _ => {}
+        }
+        self.check_node(node)    
     }
     
     pub fn check_key(&self, key: &Key) -> Option<bool> {
@@ -145,8 +168,18 @@ impl MemoFilter {
     }
 
     pub fn check_memo(&self, memo: &Memo) -> bool {
+        // two options to check for node kind:
+        // (1) store information about node kind in the memo Node when
+        //     inserting a Node
+        // (2) do two checks,, one for the header node, one for the data nodes
+        //     In this case, we would need to store them separate.
+        //     HOWEVER, this would be silly for KindFilter::Any, which could
+        //     be either
+        // (3) pass additional information to check function !
+        //     nodes().enumerate()
         self.node_filters.iter().all(
-            |nf| memo.nodes().any(|node| nf.check_node(&node).unwrap_or(false))
+            |nf| memo.nodes().enumerate().any(
+                |(n, node)| nf.check_node_n(&node, n).unwrap_or(false))
         )
     }
 }
