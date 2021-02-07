@@ -12,8 +12,6 @@ use clap::{App, crate_version, Arg};
 #[allow(unused_imports)]
 use clap_generate::{generate, generators::Bash};
 
-use std::collections::hash_map::{HashMap};
-
 pub mod memo;
 pub mod node;
 pub mod value;
@@ -22,7 +20,7 @@ pub mod parser;
 pub mod filter;
 pub mod mql;
 
-use memo::{Memo, MemoId};
+use memo::{Memo};
 use node::Node;
 use value::{Value, Key};
 use filter::{NodeFilter, KeyFilter, ValueFilter, MemoFilter, KindFilter};
@@ -164,7 +162,7 @@ fn main() {
     if let Some(ref matches) = matches.subcommand_matches("stats") {
         // read memos from .mr file into database
         if let Some(input) = matches.value_of("input") {
-            let verbosity = matches.occurrences_of("verbose") as u8;
+            //let verbosity = matches.occurrences_of("verbose") as u8;
 
             debug!("loading input file '{}'", input);
             let memos = parser::read_from_file(input, true).unwrap();
