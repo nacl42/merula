@@ -152,6 +152,23 @@ impl NodeFilter {
             _ => None
         }
     }
+
+    pub fn check_memo(&self, memo: &Memo) -> bool {
+        match self.kind {
+            Some(KindFilter::Data) => {
+                memo.data().filter(|node| self.check_node(node).unwrap_or(false))
+                    .next().is_some()
+
+            },
+            Some(KindFilter::Header) => {
+                self.check_node(memo.header()).unwrap_or(false)
+            },
+            _ => {
+                memo.nodes().filter(|node| self.check_node(node).unwrap_or(false))
+                    .next().is_some()
+            }
+        }        
+    }        
 }
 
 #[derive(Debug)]
@@ -182,24 +199,7 @@ impl MemoFilter {
     }
 
     pub fn check_memo(&self, memo: &Memo) -> bool {
-        // for each node filter (self.node_filters), check all nodes
-        // of the given memo and make sure that the filter matches
-        // at least for one node
-
-        // only returns true if this holds true for every node filter!
-
-        self.node_filters.iter().all(
-            |nf| memo.nodes().enumerate().any(
-                |(n, node)| nf.check_node_n(&node, n).unwrap_or(false)
-            )
-        )
-    }
-
-    pub fn check_memo_new(&self, memo: &Memo) -> bool {
-        let result = false;
-
-        // INSERT CODE HERE
-        
-        result
+        self.node_filters.iter()
+            .all(|nf: &NodeFilter| nf.check_memo(&memo))
     }
 }
