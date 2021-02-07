@@ -182,18 +182,24 @@ impl MemoFilter {
     }
 
     pub fn check_memo(&self, memo: &Memo) -> bool {
-        // two options to check for node kind:
-        // (1) store information about node kind in the memo Node when
-        //     inserting a Node
-        // (2) do two checks,, one for the header node, one for the data nodes
-        //     In this case, we would need to store them separate.
-        //     HOWEVER, this would be silly for KindFilter::Any, which could
-        //     be either
-        // (3) pass additional information to check function !
-        //     nodes().enumerate()
+        // for each node filter (self.node_filters), check all nodes
+        // of the given memo and make sure that the filter matches
+        // at least for one node
+
+        // only returns true if this holds true for every node filter!
+
         self.node_filters.iter().all(
             |nf| memo.nodes().enumerate().any(
-                |(n, node)| nf.check_node_n(&node, n).unwrap_or(false))
+                |(n, node)| nf.check_node_n(&node, n).unwrap_or(false)
+            )
         )
+    }
+
+    pub fn check_memo_new(&self, memo: &Memo) -> bool {
+        let result = false;
+
+        // INSERT CODE HERE
+        
+        result
     }
 }
