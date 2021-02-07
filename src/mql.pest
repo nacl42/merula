@@ -31,7 +31,16 @@ value = { quoted_value | unquoted_value }
 
 operator = { "=" | "~" | "<=" | "<" | ">=" | ">" }
 
-condition = ${ prefix? ~ key? ~ (operator ~ value)? }
+index = { digit+ }
+index_from = _{ index }
+index_to = _{ index }
+index_single = { "[" ~ index ~ "]" }
+index_range = { "[" ~ index_from? ~ ":" ~ index_to? ~ "]" }
+index_expr = _{ index_single | index_range }
+
+c1 = _{ prefix? ~ key? ~ (operator ~ value)? }
+c2 = _{ prefix? ~ key? ~ index_expr ~ (operator ~ value)? }
+condition = ${ c2 | c1 }
 
 
 mql = _{ SOI ~ condition ~ ("," ~ condition)* ~ EOI }

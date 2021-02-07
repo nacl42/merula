@@ -24,6 +24,13 @@ impl KeyFilter {
 }
 
 #[derive(Debug)]
+pub enum IndexFilter {
+    Any,
+    Single(usize),
+    Range(usize, usize), // from, to
+}
+
+#[derive(Debug)]
 pub enum ValueFilter {
     True,
     Equals(String),
@@ -80,6 +87,7 @@ impl ValueFilter {
 pub struct NodeFilter {
     pub kind: Option<KindFilter>,
     pub key: Option<KeyFilter>,
+    pub index: Option<IndexFilter>,
     pub value: Option<ValueFilter>
 }
 
@@ -88,6 +96,7 @@ impl NodeFilter {
         NodeFilter {
             kind: None,
             key: None,
+            index: None,
             value: None
         }
     }
@@ -100,6 +109,11 @@ impl NodeFilter {
     pub fn with_key(mut self, key: KeyFilter) -> Self {
         self.key = Some(key);
         self            
+    }
+
+    pub fn with_index(mut self, index: IndexFilter) -> Self {
+        self.index = Some(index);
+        self
     }
 
     pub fn with_value(mut self, value: ValueFilter) -> Self {
