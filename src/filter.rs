@@ -30,6 +30,15 @@ pub enum IndexFilter {
     Range(usize, usize), // from, to
 }
 
+impl IndexFilter {
+    pub fn check(&self, index: usize) -> bool {
+        match self {
+            IndexFilter::Single(n) => n == &index,
+            IndexFilter::Range(from, to) => (from >= &index) && (&index <= to),
+            _ => false
+        }
+    }
+}
 #[derive(Debug)]
 pub enum ValueFilter {
     True,
@@ -120,6 +129,13 @@ impl NodeFilter {
         self.value = Some(value);
         self
     }
+
+    pub fn check_index(&self, index: usize) -> Option<bool> {
+        match &self.index {
+            Some(filter) => Some(filter.check(index)),
+            _ => None
+        }
+    }
     
     pub fn check_node(&self, node: &Node) -> Option<bool> {
         match (&self.key, &self.value){
@@ -154,6 +170,11 @@ impl NodeFilter {
     }
 
     pub fn check_memo(&self, memo: &Memo) -> bool {
+        // TODO: check for index if available
+        // for header, only index 0 makes sense
+        // for data and all nodes, we have to filter by keys first
+        // then enumerate over all matches and apply the index filter
+        // finally, we apply the value filter
         match self.kind {
             Some(KindFilter::Data) => {
                 memo.data().filter(|node| self.check_node(node).unwrap_or(false))
@@ -164,8 +185,13 @@ impl NodeFilter {
                 self.check_node(memo.header()).unwrap_or(false)
             },
             _ => {
-                memo.nodes().filter(|node| self.check_node(node).unwrap_or(false))
-                    .next().is_some()
+                memo.nodes().filter(
+                    |node| self.check_key(&node.key).unwrap_or(false)
+                ).enumerate().filter(
+                    |(n, _node)| self.check_index(*n).unwrap_or(true)
+                ).filter(
+                    |(n, node)| self.check_value(&node.value).unwrap_or(true)
+                ).next().is_some()
             }
         }        
     }        
