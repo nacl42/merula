@@ -63,7 +63,7 @@ fn parse_condition(pair: Pair<Rule>) -> ParseResult<NodeFilter>
                     match pair.as_rule() {
                         Rule::index => {
                             if let Ok(index) = pair.as_str().parse::<usize>() {
-                                nf.index = Some(IndexFilter::Single(index))
+                                nf.index = IndexFilter::Single(index)
                             }
                         },
                         _ => {},

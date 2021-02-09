@@ -97,7 +97,7 @@ impl ValueFilter {
 pub struct NodeFilter {
     pub node_type: NodeType,
     pub key: Option<KeyFilter>,
-    pub index: Option<IndexFilter>,
+    pub index: IndexFilter,
     pub value: Option<ValueFilter>
 }
 
@@ -106,7 +106,7 @@ impl Default for NodeFilter {
         NodeFilter {
             node_type: NodeType::Any,
             key: None,
-            index: None,
+            index: IndexFilter::Any,
             value: None
         }
     }
@@ -125,20 +125,13 @@ impl NodeFilter {
     }
 
     pub fn with_index(mut self, index: IndexFilter) -> Self {
-        self.index = Some(index);
+        self.index = index;
         self
     }
 
     pub fn with_value(mut self, value: ValueFilter) -> Self {
         self.value = Some(value);
         self
-    }
-
-    pub fn check_index(&self, index: usize) -> Option<bool> {
-        match &self.index {
-            Some(filter) => Some(filter.check(index)),
-            _ => None
-        }
     }
     
     pub fn check_node(&self, node: &Node) -> Option<bool> {
@@ -175,7 +168,7 @@ impl NodeFilter {
             |node| self.check_key(&node.key).unwrap_or(true)
         ).enumerate().filter(
             // (3) check for node index among selected keys
-            |(n, _node)| self.check_index(*n).unwrap_or(true)
+            |(n, _node)| self.index.check(*n)
         ).filter(
             // (4) check for node value
             |(_n, node)| self.check_value(&node.value).unwrap_or(true)
@@ -195,7 +188,7 @@ impl NodeFilter {
             move |node| self.check_key(&node.key).unwrap_or(true)
         ).enumerate().filter(
             // (3) check for node index among selected keys
-            move |(n, _node)| self.check_index(*n).unwrap_or(true)
+            move |(n, _node)| self.index.check(*n)
         ).filter(
             // (4) check for node value
             move |(_n, node)| self.check_value(&node.value).unwrap_or(true)
