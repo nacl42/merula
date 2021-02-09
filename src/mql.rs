@@ -6,12 +6,10 @@ use pest::iterators::Pair;
 use crate::filter::{
     MemoFilter,
     NodeFilter,
-    KindFilter, IndexFilter, KeyFilter, ValueFilter
+    PrefixFilter, IndexFilter, KeyFilter, ValueFilter
 };
 
 use log::*;
-
-use std::convert::TryFrom;
 
 #[derive(Parser)]
 #[grammar = "mql.pest"]
@@ -49,9 +47,9 @@ fn parse_condition(pair: Pair<Rule>) -> ParseResult<NodeFilter>
     for pair in pair.into_inner() {
         match pair.as_rule() {
             Rule::prefix => {
-                nf.kind = match pair.as_str() {
-                    "@" => Some(KindFilter::Header),
-                    "." => Some(KindFilter::Data),
+                nf.prefix = match pair.as_str() {
+                    "@" => Some(PrefixFilter::Header),
+                    "." => Some(PrefixFilter::Data),
                     _ => None
                 };
             },

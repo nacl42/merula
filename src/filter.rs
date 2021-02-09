@@ -1,8 +1,11 @@
 use crate::{Memo, Node, Key, Value};
 use std::convert::TryFrom;
 
+// TODO: implement step-by-step filter for header and data nodes
+// TODO: maybe try to return std::iter::Slice<'_, &Node> in memo.data()
+
 #[derive(Debug)]
-pub enum KindFilter {
+pub enum PrefixFilter {
     Any,
     Header,
     Data
@@ -94,7 +97,7 @@ impl ValueFilter {
 
 #[derive(Debug)]
 pub struct NodeFilter {
-    pub kind: Option<KindFilter>,
+    pub prefix: Option<PrefixFilter>,
     pub key: Option<KeyFilter>,
     pub index: Option<IndexFilter>,
     pub value: Option<ValueFilter>
@@ -103,15 +106,15 @@ pub struct NodeFilter {
 impl NodeFilter {
     pub fn new() -> Self {
         NodeFilter {
-            kind: None,
+            prefix: None,
             key: None,
             index: None,
             value: None
         }
     }
 
-    pub fn with_kind(mut self, kind: KindFilter) -> Self {
-        self.kind = Some(kind);
+    pub fn with_prefix(mut self, prefix: PrefixFilter) -> Self {
+        self.prefix = Some(prefix);
         self
     }
     
@@ -147,9 +150,9 @@ impl NodeFilter {
     }
 
     pub fn check_node_n(&self, node: &Node, n: usize) -> Option<bool> {
-        match self.kind {
-            Some(KindFilter::Header) if n > 0 => return Some(false),
-            Some(KindFilter::Data) if n == 0 => return Some(false),
+        match self.prefix {
+            Some(PrefixFilter::Header) if n > 0 => return Some(false),
+            Some(PrefixFilter::Data) if n == 0 => return Some(false),
             _ => {}
         }
         self.check_node(node)    
@@ -175,13 +178,13 @@ impl NodeFilter {
         // for data and all nodes, we have to filter by keys first
         // then enumerate over all matches and apply the index filter
         // finally, we apply the value filter
-        match self.kind {
-            Some(KindFilter::Data) => {
+        match self.prefix {
+            Some(PrefixFilter::Data) => {
                 memo.data().filter(|node| self.check_node(node).unwrap_or(false))
                     .next().is_some()
 
             },
-            Some(KindFilter::Header) => {
+            Some(PrefixFilter::Header) => {
                 self.check_node(memo.header()).unwrap_or(false)
             },
             _ => {
@@ -190,7 +193,7 @@ impl NodeFilter {
                 ).enumerate().filter(
                     |(n, _node)| self.check_index(*n).unwrap_or(true)
                 ).filter(
-                    |(n, node)| self.check_value(&node.value).unwrap_or(true)
+                    |(_n, node)| self.check_value(&node.value).unwrap_or(true)
                 ).next().is_some()
             }
         }        

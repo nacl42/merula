@@ -23,7 +23,7 @@ pub mod mql;
 use memo::{Memo};
 use node::Node;
 use value::{Value, Key};
-use filter::{NodeFilter, KeyFilter, ValueFilter, MemoFilter, KindFilter};
+use filter::{NodeFilter, KeyFilter, ValueFilter, MemoFilter};
 use mql::parse_mql;
 use simplelog::*;
 use log::*;
