@@ -3,22 +3,17 @@ use crate::memo::NodeType;
 
 use std::convert::TryFrom;
 
-// TODO: maybe get rid of Option<KeyFilter> and use KeyFilter::True
-// as default. What would be the 'correct' default? Always True?
-
-// TODO: get rid of with_... constructs
-// use Default instead and init by calling { custom_filter ..Default::default()}
 
 #[derive(Debug, PartialEq)]
 pub enum KeyFilter {
-    True,
+    Any,
     Equals(String)
 }
 
 impl KeyFilter {
     pub fn check(&self, key: &Key) -> bool {
         match self {
-            KeyFilter::True => true,
+            KeyFilter::Any => true,
             KeyFilter::Equals(x) => key == x,
         }
     }
@@ -34,15 +29,15 @@ pub enum IndexFilter {
 impl IndexFilter {
     pub fn check(&self, index: usize) -> bool {
         match self {
+            IndexFilter::Any => true,
             IndexFilter::Single(n) => n == &index,
             IndexFilter::Range(from, to) => (from >= &index) && (&index <= to),
-            _ => false
         }
     }
 }
 #[derive(Debug, PartialEq)]
 pub enum ValueFilter {
-    True,
+    Any,
     Equals(String),
     Contains(String),
     LessThan(f32),
@@ -55,7 +50,7 @@ pub enum ValueFilter {
 impl ValueFilter {
     pub fn check(&self, value: &Value) -> bool {
         match self {
-            ValueFilter::True => true,
+            ValueFilter::Any => true,
             ValueFilter::Equals(x) => &value.to_string() == x,
             ValueFilter::Contains(x) => {
                 match &value {
@@ -96,18 +91,18 @@ impl ValueFilter {
 #[derive(Debug)]
 pub struct NodeFilter {
     pub node_type: NodeType,
-    pub key: Option<KeyFilter>,
+    pub key: KeyFilter,
     pub index: IndexFilter,
-    pub value: Option<ValueFilter>
+    pub value: ValueFilter
 }
 
 impl Default for NodeFilter {
     fn default() -> Self {
         NodeFilter {
             node_type: NodeType::Any,
-            key: None,
+            key: KeyFilter::Any,
             index: IndexFilter::Any,
-            value: None
+            value: ValueFilter::Any
         }
     }
 }
@@ -120,7 +115,7 @@ impl NodeFilter {
     }
     
     pub fn with_key(mut self, key: KeyFilter) -> Self {
-        self.key = Some(key);
+        self.key = key;
         self            
     }
 
@@ -128,33 +123,10 @@ impl NodeFilter {
         self.index = index;
         self
     }
-
-    pub fn with_value(mut self, value: ValueFilter) -> Self {
-        self.value = Some(value);
-        self
-    }
     
-    pub fn check_node(&self, node: &Node) -> Option<bool> {
-        match (&self.key, &self.value){
-            (None, None) => None,
-            (Some(key), None) => Some(key.check(&node.key)),
-            (Some(key), Some(value)) => Some(key.check(&node.key) && value.check(&node.value)),
-            (None, Some(value)) => Some(value.check(&node.value))
-        }
-    }
-
-    pub fn check_key(&self, key: &Key) -> Option<bool> {
-        match &self.key {
-            Some(filter) => Some(filter.check(key)),
-            _ => None
-        }
-    }
-
-    pub fn check_value(&self, value: &Value) -> Option<bool> {
-        match &self.value {
-            Some(filter) => Some(filter.check(value)),
-            _ => None
-        }
+    pub fn with_value(mut self, value: ValueFilter) -> Self {
+        self.value = value;
+        self
     }
 
     pub fn check_memo(&self, memo: &Memo) -> bool {
@@ -165,13 +137,13 @@ impl NodeFilter {
         
         nodes.filter(
             // (2) check for node key name
-            |node| self.check_key(&node.key).unwrap_or(true)
+            |node| self.key.check(&node.key)
         ).enumerate().filter(
             // (3) check for node index among selected keys
             |(n, _node)| self.index.check(*n)
         ).filter(
             // (4) check for node value
-            |(_n, node)| self.check_value(&node.value).unwrap_or(true)
+            |(_n, node)| self.value.check(&node.value)
         )
         // (5) return true if there is at least one match
             .next().is_some()
@@ -185,13 +157,13 @@ impl NodeFilter {
         
         nodes.filter(
             // (2) check for node key name
-            move |node| self.check_key(&node.key).unwrap_or(true)
+            move |node| self.key.check(&node.key)
         ).enumerate().filter(
             // (3) check for node index among selected keys
             move |(n, _node)| self.index.check(*n)
         ).filter(
             // (4) check for node value
-            move |(_n, node)| self.check_value(&node.value).unwrap_or(true)
+            move |(_n, node)| self.value.check(&node.value)
         ).map(
             move |(_n, node)| node
         )
@@ -252,15 +224,15 @@ mod tests {
         let memo = sample_memo();
 
         let mut nf = NodeFilter::default();
-        nf.key = Some(KeyFilter::Equals("author".into()));
+        nf.key = KeyFilter::Equals("author".into());
         assert_eq!(nf.check_memo(&memo), true);
 
         let mut nf = NodeFilter::default();
-        nf.key = Some(KeyFilter::Equals("character".into()));
+        nf.key = KeyFilter::Equals("character".into());
         assert_eq!(nf.check_memo(&memo), true);
 
         let mut nf = NodeFilter::default();
-        nf.key = Some(KeyFilter::Equals("tag".into()));
+        nf.key = KeyFilter::Equals("tag".into());
         assert_eq!(nf.check_memo(&memo), false);
     }
 
@@ -271,13 +243,13 @@ mod tests {
         // NOTE: Testing is a little awkward, we might want to make up
         // a better and shorter notation
         let mut nf = NodeFilter::default();
-        nf.key = Some(KeyFilter::Equals("author".into()));
+        nf.key = KeyFilter::Equals("author".into());
         let mut nodes = nf.select(&memo);
         assert_eq!(nodes.next().unwrap().value, Value::Text("J. R. R. Tolkien".into()));
         assert_eq!(nodes.next().is_none(), true);
 
         let mut nf = NodeFilter::default();
-        nf.key = Some(KeyFilter::Equals("character".into()));
+        nf.key = KeyFilter::Equals("character".into());
         let mut nodes = nf.select(&memo);
         assert_eq!(nodes.next().unwrap().value, Value::Text("Bilbo Baggins".into()));
         assert_eq!(nodes.next().unwrap().value, Value::Text("Samweis Gamdschie".into()));
@@ -293,9 +265,9 @@ mod tests {
             ..Default::default()
         };
         assert_eq!(nf.node_type, NodeType::Header);
-        assert_eq!(nf.key, None);
-        assert_eq!(nf.value, None);
-        assert_eq!(nf.index, None);
+        assert_eq!(nf.key, KeyFilter::Any);
+        assert_eq!(nf.value, ValueFilter::Any);
+        assert_eq!(nf.index, IndexFilter::Any);
     }
 }
 

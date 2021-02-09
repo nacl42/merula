@@ -56,7 +56,7 @@ fn parse_condition(pair: Pair<Rule>) -> ParseResult<NodeFilter>
                 };
             },
             Rule::key => {
-                nf.key = Some(KeyFilter::Equals(pair.as_str().into()));
+                nf.key = KeyFilter::Equals(pair.as_str().into());
             },
             Rule::index_single => {
                 for pair in pair.into_inner() {
@@ -91,33 +91,33 @@ fn parse_condition(pair: Pair<Rule>) -> ParseResult<NodeFilter>
     debug!("operator = {:?}", operator);
     debug!("value = {:?}", value);
     let value_filter = match (operator, value) {
-        (Some("="), Some(s)) => Some(ValueFilter::Equals(s.into())),
-        (Some("~"), Some(s)) => Some(ValueFilter::Contains(s.into())),
+        (Some("="), Some(s)) => ValueFilter::Equals(s.into()),
+        (Some("~"), Some(s)) => ValueFilter::Contains(s.into()),
         (Some(">"), Some(s)) => {
             match s.parse::<f32>() {
-                Ok(value_f32) => Some(ValueFilter::MoreThan(value_f32)),
-                _ => None
+                Ok(value_f32) => ValueFilter::MoreThan(value_f32),
+                _ => ValueFilter::Any
             }
         },
         (Some("<"), Some(s)) => {
             match s.parse::<f32>() {
-                Ok(value_f32) => Some(ValueFilter::LessThan(value_f32)),
-                _ => None
+                Ok(value_f32) => ValueFilter::LessThan(value_f32),
+                _ => ValueFilter::Any
             }
         },
         (Some(">="), Some(s)) => {
             match s.parse::<f32>() {
-                Ok(value_f32) => Some(ValueFilter::AtLeast(value_f32)),
-                _ => None
+                Ok(value_f32) => ValueFilter::AtLeast(value_f32),
+                _ => ValueFilter::Any
             }
         },
         (Some("<="), Some(s)) => {
             match s.parse::<f32>() {
-                Ok(value_f32) => Some(ValueFilter::AtMost(value_f32)),
-                _ => None
+                Ok(value_f32) => ValueFilter::AtMost(value_f32),
+                _ => ValueFilter::Any
             }
         },
-        _ => None
+        _ => ValueFilter::Any
     };
     debug!("value-filter = {:?}", value_filter);
 
