@@ -98,7 +98,7 @@ fn main() {
             if let Some(filter_name) = matches.value_of("filter") {
                 debug!("looking for pre-defined filter '{}'", filter_name);
                 let mut mf = MemoFilter::new();
-                let nf = NodeFilter::new()
+                let nf = NodeFilter::default()
                     .with_key(KeyFilter::Equals("mr:filter".into()))
                     .with_value(ValueFilter::Equals(filter_name.into()));
                 mf.add(nf);

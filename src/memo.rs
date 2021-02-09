@@ -181,6 +181,16 @@ impl std::fmt::Display for Memo {
 }
 
 
+/// The NodeType is determined by the position inside the Memo.
+/// It is therefore defined in `memo.rs` and not in `node.rs`.
+#[derive(Debug, Copy, Clone, PartialEq)]
+pub enum NodeType {
+    Header,
+    Data,
+    Any
+}
+
+
 #[cfg(test)]
 mod tests {
 
@@ -235,12 +245,3 @@ mod tests {
     }
 }
 
-
-/// The NodeType is determined by the position inside the Memo.
-/// It is therefore defined in `memo.rs` and not in `node.rs`.
-#[derive(Debug, Copy, Clone)]
-pub enum NodeType {
-    Header,
-    Data,
-    Any
-}

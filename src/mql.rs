@@ -41,7 +41,7 @@ pub fn parse_mql(input: &'_ str) -> ParseResult<MemoFilter>
 
 fn parse_condition(pair: Pair<Rule>) -> ParseResult<NodeFilter>
 {
-    let mut nf = NodeFilter::new();
+    let mut nf = NodeFilter::default();
 
     let mut operator: Option<&str> = None;
     let mut value: Option<&str> = None;

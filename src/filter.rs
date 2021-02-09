@@ -9,7 +9,7 @@ use std::convert::TryFrom;
 // TODO: get rid of with_... constructs
 // use Default instead and init by calling { custom_filter ..Default::default()}
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum KeyFilter {
     True,
     Equals(String)
@@ -24,7 +24,7 @@ impl KeyFilter {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum IndexFilter {
     Any,
     Single(usize),
@@ -40,7 +40,7 @@ impl IndexFilter {
         }
     }
 }
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum ValueFilter {
     True,
     Equals(String),
@@ -101,8 +101,8 @@ pub struct NodeFilter {
     pub value: Option<ValueFilter>
 }
 
-impl NodeFilter {
-    pub fn new() -> Self {
+impl Default for NodeFilter {
+    fn default() -> Self {
         NodeFilter {
             node_type: NodeType::Any,
             key: None,
@@ -110,6 +110,9 @@ impl NodeFilter {
             value: None
         }
     }
+}
+
+impl NodeFilter {
 
     pub fn with_node_type(mut self, node_type: NodeType) -> Self {
         self.node_type = node_type;
@@ -255,15 +258,15 @@ mod tests {
     fn test_key_filter() {
         let memo = sample_memo();
 
-        let mut nf = NodeFilter::new();
+        let mut nf = NodeFilter::default();
         nf.key = Some(KeyFilter::Equals("author".into()));
         assert_eq!(nf.check_memo(&memo), true);
 
-        let mut nf = NodeFilter::new();
+        let mut nf = NodeFilter::default();
         nf.key = Some(KeyFilter::Equals("character".into()));
         assert_eq!(nf.check_memo(&memo), true);
 
-        let mut nf = NodeFilter::new();
+        let mut nf = NodeFilter::default();
         nf.key = Some(KeyFilter::Equals("tag".into()));
         assert_eq!(nf.check_memo(&memo), false);
     }
@@ -274,13 +277,13 @@ mod tests {
 
         // NOTE: Testing is a little awkward, we might want to make up
         // a better and shorter notation
-        let mut nf = NodeFilter::new();
+        let mut nf = NodeFilter::default();
         nf.key = Some(KeyFilter::Equals("author".into()));
         let mut nodes = nf.select(&memo);
         assert_eq!(nodes.next().unwrap().value, Value::Text("J. R. R. Tolkien".into()));
         assert_eq!(nodes.next().is_none(), true);
 
-        let mut nf = NodeFilter::new();
+        let mut nf = NodeFilter::default();
         nf.key = Some(KeyFilter::Equals("character".into()));
         let mut nodes = nf.select(&memo);
         assert_eq!(nodes.next().unwrap().value, Value::Text("Bilbo Baggins".into()));
@@ -288,6 +291,18 @@ mod tests {
         assert_eq!(nodes.next().unwrap().value, Value::Text("Aragorn".into()));
         assert_eq!(nodes.next().unwrap().value, Value::Text("Gandalf".into()));
         assert_eq!(nodes.next().is_none(), true);
+    }
+
+    #[test]
+    fn test_default_node_filter() {
+        let nf = NodeFilter {
+            node_type: NodeType::Header,
+            ..Default::default()
+        };
+        assert_eq!(nf.node_type, NodeType::Header);
+        assert_eq!(nf.key, None);
+        assert_eq!(nf.value, None);
+        assert_eq!(nf.index, None);
     }
 }
 
