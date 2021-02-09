@@ -3,6 +3,11 @@ use crate::memo::NodeType;
 
 use std::convert::TryFrom;
 
+// TODO: maybe get rid of Option<KeyFilter> and use KeyFilter::True
+// as default. What would be the 'correct' default? Always True?
+
+// TODO: get rid of with_... constructs
+// use Default instead and init by calling { custom_filter ..Default::default()}
 
 #[derive(Debug)]
 pub enum KeyFilter {
@@ -174,7 +179,27 @@ impl NodeFilter {
         )
         // (5) return true if there is at least one match
             .next().is_some()
-    }        
+    }
+
+    pub fn select<'a>(&'a self, memo: &'a Memo) -> impl Iterator<Item=&'a Node> {
+        // stepwise selection and filtering
+
+        // (1) check for node type is done by selection of nodes
+        let nodes = memo.node_iterator(self.node_type);
+        
+        nodes.filter(
+            // (2) check for node key name
+            move |node| self.check_key(&node.key).unwrap_or(true)
+        ).enumerate().filter(
+            // (3) check for node index among selected keys
+            move |(n, _node)| self.check_index(*n).unwrap_or(true)
+        ).filter(
+            // (4) check for node value
+            move |(_n, node)| self.check_value(&node.value).unwrap_or(true)
+        ).map(
+            move |(_n, node)| node
+        )
+    }
 }
 
 #[derive(Debug)]
@@ -204,8 +229,65 @@ impl MemoFilter {
         }
     }
 
-    pub fn check_memo(&self, memo: &Memo) -> bool {
+    pub fn check(&self, memo: &Memo) -> bool {
         self.node_filters.iter()
             .all(|nf: &NodeFilter| nf.check_memo(&memo))
     }
 }
+
+
+#[cfg(test)]
+mod tests {
+    use crate::filter::*;
+    use crate::{Memo, Value};
+
+    fn sample_memo() -> Memo {
+        let mut memo = Memo::new("book", "The Lord of the Rings");
+        memo.push(("author", "J. R. R. Tolkien"));
+        memo.push(("character", "Bilbo Baggins"));
+        memo.push(("character", "Samweis Gamdschie"));
+        memo.push(("character", "Aragorn"));
+        memo.push(("character", "Gandalf"));
+        memo
+    }
+
+    #[test]
+    fn test_key_filter() {
+        let memo = sample_memo();
+
+        let mut nf = NodeFilter::new();
+        nf.key = Some(KeyFilter::Equals("author".into()));
+        assert_eq!(nf.check_memo(&memo), true);
+
+        let mut nf = NodeFilter::new();
+        nf.key = Some(KeyFilter::Equals("character".into()));
+        assert_eq!(nf.check_memo(&memo), true);
+
+        let mut nf = NodeFilter::new();
+        nf.key = Some(KeyFilter::Equals("tag".into()));
+        assert_eq!(nf.check_memo(&memo), false);
+    }
+
+    #[test]
+    fn test_select() {
+        let memo = sample_memo();
+
+        // NOTE: Testing is a little awkward, we might want to make up
+        // a better and shorter notation
+        let mut nf = NodeFilter::new();
+        nf.key = Some(KeyFilter::Equals("author".into()));
+        let mut nodes = nf.select(&memo);
+        assert_eq!(nodes.next().unwrap().value, Value::Text("J. R. R. Tolkien".into()));
+        assert_eq!(nodes.next().is_none(), true);
+
+        let mut nf = NodeFilter::new();
+        nf.key = Some(KeyFilter::Equals("character".into()));
+        let mut nodes = nf.select(&memo);
+        assert_eq!(nodes.next().unwrap().value, Value::Text("Bilbo Baggins".into()));
+        assert_eq!(nodes.next().unwrap().value, Value::Text("Samweis Gamdschie".into()));
+        assert_eq!(nodes.next().unwrap().value, Value::Text("Aragorn".into()));
+        assert_eq!(nodes.next().unwrap().value, Value::Text("Gandalf".into()));
+        assert_eq!(nodes.next().is_none(), true);
+    }
+}
+

@@ -103,7 +103,7 @@ fn main() {
                     .with_value(ValueFilter::Equals(filter_name.into()));
                 mf.add(nf);
                 if let Some(mql_memo) =
-                    memos.iter().filter(|&memo| mf.check_memo(memo)).next()
+                    memos.iter().filter(|&memo| mf.check(memo)).next()
                 {
                     debug!("Resulting filter: {:#?}", mql_memo);
                     if let Some(node) = mql_memo.nodes().filter(|&node| node.key == "mql").next() {
@@ -138,7 +138,7 @@ fn main() {
                 }
             }
             
-            for memo in memos.iter().filter(|&memo| memo_filter.check_memo(memo)) {
+            for memo in memos.iter().filter(|&memo| memo_filter.check(memo)) {
                 println!("{}{} {}",
                          "@".red().bold(),
                          memo.collection().red().bold(),
