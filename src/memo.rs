@@ -237,8 +237,8 @@ mod tests {
 
 
 /// The NodeType is determined by the position inside the Memo.
-// It is therefore defined in memo.rs and not in node.rs.
-#[derive(Debug)]
+/// It is therefore defined in `memo.rs` and not in `node.rs`.
+#[derive(Debug, Copy, Clone)]
 pub enum NodeType {
     Header,
     Data,

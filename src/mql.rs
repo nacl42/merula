@@ -6,8 +6,10 @@ use pest::iterators::Pair;
 use crate::filter::{
     MemoFilter,
     NodeFilter,
-    PrefixFilter, IndexFilter, KeyFilter, ValueFilter
+    IndexFilter, KeyFilter, ValueFilter
 };
+
+use crate::memo::NodeType;
 
 use log::*;
 
@@ -47,10 +49,10 @@ fn parse_condition(pair: Pair<Rule>) -> ParseResult<NodeFilter>
     for pair in pair.into_inner() {
         match pair.as_rule() {
             Rule::prefix => {
-                nf.prefix = match pair.as_str() {
-                    "@" => Some(PrefixFilter::Header),
-                    "." => Some(PrefixFilter::Data),
-                    _ => None
+                nf.node_type = match pair.as_str() {
+                    "@" => NodeType::Header,
+                    "." => NodeType::Data,
+                    _ => NodeType::Any
                 };
             },
             Rule::key => {

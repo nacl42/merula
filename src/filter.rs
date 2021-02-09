@@ -3,12 +3,6 @@ use crate::memo::NodeType;
 
 use std::convert::TryFrom;
 
-#[derive(Debug, Copy, Clone)]
-pub enum PrefixFilter {
-    Any,
-    Header,
-    Data
-}
 
 #[derive(Debug)]
 pub enum KeyFilter {
@@ -96,7 +90,7 @@ impl ValueFilter {
 
 #[derive(Debug)]
 pub struct NodeFilter {
-    pub prefix: Option<PrefixFilter>,
+    pub node_type: NodeType,
     pub key: Option<KeyFilter>,
     pub index: Option<IndexFilter>,
     pub value: Option<ValueFilter>
@@ -105,15 +99,15 @@ pub struct NodeFilter {
 impl NodeFilter {
     pub fn new() -> Self {
         NodeFilter {
-            prefix: None,
+            node_type: NodeType::Any,
             key: None,
             index: None,
             value: None
         }
     }
 
-    pub fn with_prefix(mut self, prefix: PrefixFilter) -> Self {
-        self.prefix = Some(prefix);
+    pub fn with_node_type(mut self, node_type: NodeType) -> Self {
+        self.node_type = node_type;
         self
     }
     
@@ -148,15 +142,6 @@ impl NodeFilter {
         }
     }
 
-    pub fn check_node_n(&self, node: &Node, n: usize) -> Option<bool> {
-        match self.prefix {
-            Some(PrefixFilter::Header) if n > 0 => return Some(false),
-            Some(PrefixFilter::Data) if n == 0 => return Some(false),
-            _ => {}
-        }
-        self.check_node(node)    
-    }
-    
     pub fn check_key(&self, key: &Key) -> Option<bool> {
         match &self.key {
             Some(filter) => Some(filter.check(key)),
@@ -174,14 +159,8 @@ impl NodeFilter {
     pub fn check_memo(&self, memo: &Memo) -> bool {
         // stepwise selection and filtering
 
-        // (1) check for prefix is done by selection of nodes
-        let node_type = match self.prefix.unwrap_or(PrefixFilter::Any) {
-            PrefixFilter::Data => NodeType::Data,
-            PrefixFilter::Header => NodeType::Header,
-            PrefixFilter::Any => NodeType::Any
-        };
-        
-        let nodes = memo.node_iterator(node_type);
+        // (1) check for node type is done by selection of nodes
+        let nodes = memo.node_iterator(self.node_type);
         
         nodes.filter(
             // (2) check for node key name
