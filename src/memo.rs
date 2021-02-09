@@ -107,6 +107,19 @@ impl Memo {
         &self.nodes[self.nodes.len() - 1]
     }
 
+    /// Returns boxed iterator over any given NodeType.
+    /// Useful for functions that need to iterate over any
+    /// of these types, but have to decide at runtime over which.
+    pub fn node_iterator(&self, node_type: NodeType)
+                         -> Box<dyn Iterator<Item=&Node> + '_>
+    {
+        match node_type {
+            NodeType::Any => Box::new(self.nodes.iter()),
+            NodeType::Data => Box::new(self.nodes.iter().skip(1)),
+            NodeType::Header => Box::new(self.nodes.iter().take(1))
+        }
+    }
+
     /// Returns mutable reference to last inserted data node.
     pub fn last_mut(&mut self) -> &mut Node {
         let index = self.nodes.len() - 1;
@@ -222,3 +235,12 @@ mod tests {
     }
 }
 
+
+/// The NodeType is determined by the position inside the Memo.
+// It is therefore defined in memo.rs and not in node.rs.
+#[derive(Debug)]
+pub enum NodeType {
+    Header,
+    Data,
+    Any
+}

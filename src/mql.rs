@@ -120,7 +120,7 @@ fn parse_condition(pair: Pair<Rule>) -> ParseResult<NodeFilter>
     debug!("value-filter = {:?}", value_filter);
 
     nf.value = value_filter;
-    println!("filter: \n{:#?}", nf); // TESTING
+    debug!("filter: \n{:#?}", nf); // TESTING
 
     Ok(nf)
 }

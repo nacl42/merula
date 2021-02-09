@@ -1,10 +1,9 @@
 use crate::{Memo, Node, Key, Value};
+use crate::memo::NodeType;
+
 use std::convert::TryFrom;
 
-// TODO: implement step-by-step filter for header and data nodes
-// TODO: maybe try to return std::iter::Slice<'_, &Node> in memo.data()
-
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 pub enum PrefixFilter {
     Any,
     Header,
@@ -173,30 +172,29 @@ impl NodeFilter {
     }
 
     pub fn check_memo(&self, memo: &Memo) -> bool {
-        // TODO: check for index if available
-        // for header, only index 0 makes sense
-        // for data and all nodes, we have to filter by keys first
-        // then enumerate over all matches and apply the index filter
-        // finally, we apply the value filter
-        match self.prefix {
-            Some(PrefixFilter::Data) => {
-                memo.data().filter(|node| self.check_node(node).unwrap_or(false))
-                    .next().is_some()
+        // stepwise selection and filtering
 
-            },
-            Some(PrefixFilter::Header) => {
-                self.check_node(memo.header()).unwrap_or(false)
-            },
-            _ => {
-                memo.nodes().filter(
-                    |node| self.check_key(&node.key).unwrap_or(false)
-                ).enumerate().filter(
-                    |(n, _node)| self.check_index(*n).unwrap_or(true)
-                ).filter(
-                    |(_n, node)| self.check_value(&node.value).unwrap_or(true)
-                ).next().is_some()
-            }
-        }        
+        // (1) check for prefix is done by selection of nodes
+        let node_type = match self.prefix.unwrap_or(PrefixFilter::Any) {
+            PrefixFilter::Data => NodeType::Data,
+            PrefixFilter::Header => NodeType::Header,
+            PrefixFilter::Any => NodeType::Any
+        };
+        
+        let nodes = memo.node_iterator(node_type);
+        
+        nodes.filter(
+            // (2) check for node key name
+            |node| self.check_key(&node.key).unwrap_or(true)
+        ).enumerate().filter(
+            // (3) check for node index among selected keys
+            |(n, _node)| self.check_index(*n).unwrap_or(true)
+        ).filter(
+            // (4) check for node value
+            |(_n, node)| self.check_value(&node.value).unwrap_or(true)
+        )
+        // (5) return true if there is at least one match
+            .next().is_some()
     }        
 }
 

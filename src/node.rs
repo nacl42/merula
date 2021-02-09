@@ -6,6 +6,7 @@
 use std::collections::HashMap;
 use crate::value::{Key, Value};
 
+
 /// A Node consists of key, a value and a map of attributes.
 #[derive(Debug)]
 pub struct Node {
