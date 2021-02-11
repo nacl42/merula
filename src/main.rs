@@ -20,7 +20,7 @@ pub mod parser;
 pub mod filter;
 pub mod mql;
 
-use memo::{Memo};
+use memo::{Memo, NodeType};
 use node::Node;
 use value::{Value, Key};
 use filter::{NodeFilter, KeyFilter, ValueFilter, MemoFilter};
@@ -139,19 +139,37 @@ fn main() {
             }
             
             for memo in memos.iter().filter(|&memo| memo_filter.check(memo)) {
+                // always print header
                 println!("{}{} {}",
                          "@".red().bold(),
                          memo.collection().red().bold(),
                          memo.title().white().bold()
                 );
-                if verbosity >= 1 {
-                    for node in memo.data() {
-                        println!("{}{} {}",
-                                 ".".red(),
-                                 node.key.red(),
-                                 node.value.to_string().white());
-                    }
-                    println!("");
+
+                match verbosity {
+                    1 => {
+                        // print only matching nodes
+                        // currently, this includes the header node as well
+                        for idx in memo_filter.select_indices(&memo) {
+                            let node = memo.get_by_index(idx).unwrap();
+                            println!("{}{} {}",
+                                     ".".red(),
+                                     node.key.red(),
+                                     node.value.to_string().white());
+                        }
+                        println!("");
+                    },
+                    2 => {
+                        // print all nodes
+                        for node in memo.data() {
+                            println!("{}{} {}",
+                                     ".".red(),
+                                     node.key.red(),
+                                     node.value.to_string().white());
+                        }
+                        println!("");
+                    },
+                    _ => {}
                 }
             }   
         }        

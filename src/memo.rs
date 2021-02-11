@@ -120,6 +120,16 @@ impl Memo {
         }
     }
 
+    pub fn enumerate_nodes(&self, node_type: NodeType)
+                               -> Box<dyn Iterator<Item=(usize, &Node)> + '_>
+    {
+        match node_type {
+            NodeType::Any => Box::new(self.nodes.iter().enumerate()),
+            NodeType::Data => Box::new(self.nodes.iter().enumerate().skip(1)),
+            NodeType::Header => Box::new(self.nodes.iter().enumerate().take(1))
+        }        
+    }
+
     /// Returns mutable reference to last inserted data node.
     pub fn last_mut(&mut self) -> &mut Node {
         let index = self.nodes.len() - 1;
@@ -132,6 +142,11 @@ impl Memo {
         self.nodes.iter().find(|n| n.key == key)
     }
 
+    /// Returns reference to node with the given index.
+    pub fn get_by_index(&self, idx: usize) -> Option<&Node> {
+        self.nodes.get(idx)
+    }
+    
     /// Returns vector to references to all data nodes matching the
     /// given key.
     pub fn get_vec<K: Into<Key>>(&self, key: K) -> Vec<&Node> {

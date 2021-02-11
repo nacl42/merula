@@ -2,7 +2,7 @@ use crate::{Memo, Node, Key, Value};
 use crate::memo::NodeType;
 
 use std::convert::TryFrom;
-
+use std::collections::HashSet;
 
 #[derive(Debug, PartialEq)]
 pub enum KeyFilter {
@@ -129,6 +129,9 @@ impl NodeFilter {
         self
     }
 
+    /// Returns true if all nodes of a given memo match the
+    /// NodeFilter. Because we have full access to all nodes of the
+    /// given Memo, we can check for the index and for the node type.
     pub fn check_memo(&self, memo: &Memo) -> bool {
         // stepwise selection and filtering
 
@@ -168,6 +171,26 @@ impl NodeFilter {
             move |(_n, node)| node
         )
     }
+
+    pub fn select_indices<'a>(&'a self, memo: &'a Memo) -> impl Iterator<Item=usize> + 'a {
+        // stepwise selection and filtering
+
+        // (1) check for node type is done by enumerate_nodes method
+        let nodes = memo.enumerate_nodes(self.node_type);
+        
+        nodes.filter(
+            // (2) check for node key name
+            move |(_idx, node)| self.key.check(&node.key)
+        ).enumerate().filter(
+            // (3) check for node index among selected keys
+            move |(n, (_idx, node))| self.index.check(*n)
+        ).filter(
+            // (4) check for node value
+            move |(_n, (_idx, node))| self.value.check(&node.value)
+        ).map(
+            move |(_n, (idx, _node))| idx
+        )        
+    }
 }
 
 #[derive(Debug)]
@@ -200,6 +223,17 @@ impl MemoFilter {
     pub fn check(&self, memo: &Memo) -> bool {
         self.node_filters.iter()
             .all(|nf: &NodeFilter| nf.check_memo(&memo))
+    }
+
+    pub fn select_indices<'a>(&'a self, memo: &'a Memo) -> impl Iterator<Item=usize> + 'a
+    {
+        // all `node_filters` are OR'ed together, i.e. if any of the
+        // conditions holds true, then the node index is returned
+        self.node_filters.iter()
+            .map(|nf| nf.select_indices(&memo).collect::<HashSet<usize>>())
+            .fold(HashSet::<usize>::new(), |mut acc, indices|
+                  { acc.union(&indices).map(|idx| *idx).collect::<HashSet<usize>>() }
+            ).into_iter()
     }
 }
 
@@ -256,6 +290,27 @@ mod tests {
         assert_eq!(nodes.next().unwrap().value, Value::Text("Aragorn".into()));
         assert_eq!(nodes.next().unwrap().value, Value::Text("Gandalf".into()));
         assert_eq!(nodes.next().is_none(), true);
+    }
+
+    #[test]
+    fn test_select_indices() {
+        let memo = sample_memo();
+
+        let nf = NodeFilter::default()
+            .with_key(KeyFilter::Equals("author".into()));
+        let indices = nf.select_indices(&memo).collect::<Vec<usize>>();
+        assert_eq!(indices, [1]);
+
+        let nf = NodeFilter::default()
+            .with_key(KeyFilter::Equals("character".into()));
+        let indices = nf.select_indices(&memo).collect::<Vec<usize>>();
+        assert_eq!(indices, [2, 3, 4, 5]);
+
+        let nf = NodeFilter::default()
+            .with_node_type(NodeType::Data)
+            .with_key(KeyFilter::Equals("author".into()));
+        let indices = nf.select_indices(&memo).collect::<Vec<usize>>();
+        assert_eq!(indices, [1]);
     }
 
     #[test]

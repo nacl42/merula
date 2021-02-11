@@ -8,36 +8,20 @@
 @mr:filter done
 .mql status=done
 
-@TODO node index
-.tag mql
-.doc allow node index "email[0]"
+@TODO consider to include node type in Node struct
+.status active
 .doc<<EOF
-This seems difficult with the current design of the MemoFilter.
+Extend struct Node to include NodeType.
+Header or Data.
 
-We currently pass the number of the node, which is 0 for the header
-node and 1..n for the data nodes.
+This would allow us to use the NodeType on any field w/o context.
 
-We would need to keep track of data node numbers
- ... or store the node numbers in the structure
- ... or save nodes as multimap, which would mean we do not preserve
-     node order
+We still could not filter for header/data node.
 
-On the other hand, if we are not concerned about saving the data again
-(read-only format), then this could be possible.
-
-This would be a major redesign, so careful consideration is required.
-Maybe try out in a different branch!
-
-for 'email[0]' we would only need to count if email matches.
-
-EOF
-
-@TODO case-insensitive search
-.doc<<EOF
-An expression such as author~tolkien should be case-insensitive by default.
 EOF
 
 @TODO only print matching nodes
+.status active
 .doc<<EOF
 only print matching nodes, e.g. for 'author~Tolkien' we would print
 
@@ -46,6 +30,13 @@ only print matching nodes, e.g. for 'author~Tolkien' we would print
 
 What would be the command line option? --matching or -m
 EOF
+
+
+@TODO case-insensitive search
+.doc<<EOF
+An expression such as author~tolkien should be case-insensitive by default.
+EOF
+
 
 @TODO allow to load multiple .mr files
 .status inactive
@@ -74,6 +65,7 @@ prerequisite for this is that the value is parsed by the regular parser!
 EOF
 
 @TODO add some proper tests in the source code
+.status active
 
 @TODO extend equal comparison to perform type conversion
 .tag mql
@@ -211,4 +203,30 @@ EOF
 .doc<<EOF
 - filter by collection: ```@app```
 - filter by data node: ```.url```
+EOF
+
+@TODO node index
+.status done
+.finished 2021-02-09
+.tag mql
+.doc allow node index "email[0]"
+.doc<<EOF
+This seems difficult with the current design of the MemoFilter.
+
+We currently pass the number of the node, which is 0 for the header
+node and 1..n for the data nodes.
+
+We would need to keep track of data node numbers
+ ... or store the node numbers in the structure
+ ... or save nodes as multimap, which would mean we do not preserve
+     node order
+
+On the other hand, if we are not concerned about saving the data again
+(read-only format), then this could be possible.
+
+This would be a major redesign, so careful consideration is required.
+Maybe try out in a different branch!
+
+for 'email[0]' we would only need to count if email matches.
+
 EOF
