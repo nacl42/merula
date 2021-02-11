@@ -8,29 +8,6 @@
 @mr:filter done
 .mql status=done
 
-@TODO consider to include node type in Node struct
-.status active
-.doc<<EOF
-Extend struct Node to include NodeType.
-Header or Data.
-
-This would allow us to use the NodeType on any field w/o context.
-
-We still could not filter for header/data node.
-
-EOF
-
-@TODO only print matching nodes
-.status active
-.doc<<EOF
-only print matching nodes, e.g. for 'author~Tolkien' we would print
-
- @book The Lord of the Rings
- .author Tolkien
-
-What would be the command line option? --matching or -m
-EOF
-
 
 @TODO case-insensitive search
 .doc<<EOF
@@ -229,4 +206,29 @@ Maybe try out in a different branch!
 
 for 'email[0]' we would only need to count if email matches.
 
+EOF
+
+@TODO consider to include node type in Node struct
+.status discarded
+.doc<<EOF
+Extend struct Node to include NodeType.
+Header or Data.
+
+This would allow us to use the NodeType on any field w/o context.
+
+We still could not filter for header/data node.
+
+EOF
+
+
+@TODO only print matching nodes
+.status done
+.finished 2021-02-11
+.doc<<EOF
+only print matching nodes, e.g. for 'author~Tolkien' we would print
+
+ @book The Lord of the Rings
+ .author Tolkien
+
+What would be the command line option? -v
 EOF
