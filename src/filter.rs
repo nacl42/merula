@@ -31,7 +31,8 @@ impl IndexFilter {
         match self {
             IndexFilter::Any => true,
             IndexFilter::Single(n) => n == &index,
-            IndexFilter::Range(from, to) => (from >= &index) && (&index <= to),
+            IndexFilter::Range(from, to) =>
+                (from <= &index) & (&index <= to),
         }
     }
 }
@@ -157,7 +158,7 @@ impl NodeFilter {
 
         // (1) check for node type is done by selection of nodes
         let nodes = memo.node_iterator(self.node_type);
-        
+
         nodes.filter(
             // (2) check for node key name
             move |node| self.key.check(&node.key)
@@ -183,7 +184,7 @@ impl NodeFilter {
             move |(_idx, node)| self.key.check(&node.key)
         ).enumerate().filter(
             // (3) check for node index among selected keys
-            move |(n, (_idx, node))| self.index.check(*n)
+            move |(n, (_idx, _node))| self.index.check(*n)
         ).filter(
             // (4) check for node value
             move |(_n, (_idx, node))| self.value.check(&node.value)
@@ -231,7 +232,7 @@ impl MemoFilter {
         // conditions holds true, then the node index is returned
         self.node_filters.iter()
             .map(|nf| nf.select_indices(&memo).collect::<HashSet<usize>>())
-            .fold(HashSet::<usize>::new(), |mut acc, indices|
+            .fold(HashSet::<usize>::new(), |acc, indices|
                   { acc.union(&indices).map(|idx| *idx).collect::<HashSet<usize>>() }
             ).into_iter()
     }
@@ -323,6 +324,20 @@ mod tests {
         assert_eq!(nf.key, KeyFilter::Any);
         assert_eq!(nf.value, ValueFilter::Any);
         assert_eq!(nf.index, IndexFilter::Any);
+    }
+
+    #[test]
+    fn test_index_range() {
+        let filter = IndexFilter::Range(2, 5);
+        assert_eq!(filter.check(0), false);
+        assert_eq!(filter.check(1), false);
+        assert_eq!(filter.check(2), true);
+        assert_eq!(filter.check(3), true);
+        assert_eq!(filter.check(4), true);
+        assert_eq!(filter.check(5), true);
+        assert_eq!(filter.check(6), false);
+        
+        
     }
 }
 

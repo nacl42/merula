@@ -32,11 +32,11 @@ value = { quoted_value | unquoted_value }
 operator = { "=" | "~" | "<=" | "<" | ">=" | ">" }
 
 index = { digit+ }
-index_from = _{ index }
-index_to = _{ index }
+index_from = { index }
+index_to = { index }
 index_single = { "[" ~ index ~ "]" }
-index_range = { "[" ~ index_from? ~ ":" ~ index_to? ~ "]" }
-index_expr = _{ index_single | index_range }
+index_range = { "[" ~ index_from ~ ":" ~ index_to ~ "]" }
+index_expr = _{ index_range | index_single }
 
 c1 = _{ prefix? ~ key? ~ (operator ~ value)? }
 c2 = _{ prefix? ~ key? ~ index_expr ~ (operator ~ value)? }
