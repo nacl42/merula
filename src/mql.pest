@@ -9,12 +9,13 @@
 
 WHITESPACE = _{ " " }
 
-alpha = { 'a'..'z' | 'A'..'Z' }
+alpha = _{ LETTER }
 digit = { '0'..'9' }
 
 prefix = { ("@"|".") }
 
 // a key may contain special characters, but it must not start with one
+// key key_char should be kept in sync with memo.pest
 key_char = { alpha | digit | "_" | ":" | "/" | "."  | "-" }
 key = @{ alpha ~ key_char* }
 

@@ -237,7 +237,7 @@
 .density 1.3954
 +state liquid, at boiling point
 .discovery, Lord Rayleigh, William Ramsay
-+1894
++date 1894
 
 @element K
 .name potassium

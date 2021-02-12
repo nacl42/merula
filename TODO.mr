@@ -16,6 +16,8 @@ the `<<EOF` syntax, i.e. if no separator is given, then the
 next node will be the delimiter.
 EOF
 
+@TODO merge mql.pest and memo.pest
+
 @TODO index range
 .status active
 .doc<<EOF
@@ -31,15 +33,6 @@ This condition does not require the nodes to exist...
 for a selector that would be ok, for a filter it is questionable
 EOF
 
-@TODO more chars for key
-.doc<<EOF
-Currently, we only support a..z|A..Z for keys, however I would like to
-have more characters, such as Umlaute.
-
-  @Stück should be allowed
-
-=> look at predefined groups in pest parser
-EOF
 
 @TODO case-insensitive search
 .doc<<EOF
@@ -256,4 +249,16 @@ only print matching nodes, e.g. for 'author~Tolkien' we would print
  .author Tolkien
 
 What would be the command line option? -v
+EOF
+
+@TODO more chars for key
+.status done
+.finished 2021-02-12
+.doc<<EOF
+Currently, we only support a..z|A..Z for keys, however I would like to
+have more characters, such as Umlaute.
+
+  @Stück should be allowed
+
+=> look at predefined groups in pest parser
 EOF

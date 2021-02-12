@@ -204,8 +204,17 @@ mod tests {
     #[test]
     fn parse_key() {
         let rule = Rule::key;
-        let ok = ["foo", "bar", "foo123", "mr:filter"];
+        let ok = ["foo", "bar", "foo123", "mr:filter",
+                  "Glück", "Überraschung"];
         let err = ["@foo", ".abc"];
+        assert_eq!(check_ok_err(rule, &ok, &err), (None, None));
+    }
+
+    #[test]
+    fn parse_alpha() {
+        let rule = Rule::key;
+        let ok = ["a", "b", "c", "ü", "ä"];
+        let err = ["1", "2", "_"];
         assert_eq!(check_ok_err(rule, &ok, &err), (None, None));
     }
 

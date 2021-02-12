@@ -20,7 +20,7 @@ pub mod parser;
 pub mod filter;
 pub mod mql;
 
-use memo::{Memo, NodeType};
+use memo::{Memo};
 use node::Node;
 use value::{Value, Key};
 use filter::{NodeFilter, KeyFilter, ValueFilter, MemoFilter};
@@ -150,12 +150,18 @@ fn main() {
                     1 => {
                         // print only matching nodes
                         // currently, this includes the header node as well
+                        
                         for idx in memo_filter.select_indices(&memo) {
-                            let node = memo.get_by_index(idx).unwrap();
-                            println!("{}{} {}",
-                                     ".".red(),
-                                     node.key.red(),
-                                     node.value.to_string().white());
+                            // skip header node, as it is already printed above
+                            // actually, this code relies on an implementation detail, i.e.
+                            // that the header node has index 0
+                            if idx > 0 {
+                                let node = memo.get_by_index(idx).unwrap();
+                                println!("{}{} {}",
+                                         ".".red(),
+                                         node.key.red(),
+                                         node.value.to_string().white());
+                            }
                         }
                         println!("");
                     },

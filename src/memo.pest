@@ -1,8 +1,11 @@
 WHITESPACE = _{ " " }
 
+alpha = _{ LETTER }
+digit = { '0'..'9' }
+
 // key key_char should be kept in sync with mql.pest
-key_char = { ASCII_ALPHANUMERIC | "_" | ":" | "/" | "."  | "-" }
-key = @{ key_char+ }
+key_char = { alpha | digit | "_" | ":" | "/" | "."  | "-" }
+key = @{ alpha ~ key_char* }
 
 value_char = { !NEWLINE ~ ANY }
 value = @{ value_char* }
