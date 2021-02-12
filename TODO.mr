@@ -8,6 +8,38 @@
 @mr:filter done
 .mql status=done
 
+@TODO parse multiline values without EOF delimiter
+.status active
+.doc<<EOF
+It should be possible to define multiline values without
+the `<<EOF` syntax, i.e. if no separator is given, then the
+next node will be the delimiter.
+EOF
+
+@TODO index range
+.status active
+.doc<<EOF
+mql 'tag[0:1]~s' currently means:
+- filter for all nodes with name 'tag'
+- filter out nodes 0 to 1
+- filter out values containing s
+
+which means:
+if there is only one node 0, then that is ok as well
+This condition does not require the nodes to exist...
+
+for a selector that would be ok, for a filter it is questionable
+EOF
+
+@TODO more chars for key
+.doc<<EOF
+Currently, we only support a..z|A..Z for keys, however I would like to
+have more characters, such as Umlaute.
+
+  @Stück should be allowed
+
+=> look at predefined groups in pest parser
+EOF
 
 @TODO case-insensitive search
 .doc<<EOF
@@ -51,13 +83,6 @@ allow equals operator (=) for numbers as well
 maybe move functions such as equals, less_than, greater_than
 part of Value and have two different versions (strict with
 type checking or non-strict with type conversion)
-EOF
-
-@TODO parse multiline values without EOF delimiter
-.doc<<EOF
-It should be possible to define multiline values without
-the `<<EOF` syntax, i.e. if no separator is given, then the
-next node will be the delimiter.
 EOF
 
 @TODO date comparison operators (<<, >>, ==)
