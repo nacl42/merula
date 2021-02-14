@@ -8,12 +8,25 @@
 @mr:filter done
 .mql status=done
 
+@TODO add ROADMAP file
+@TODO add CHANGELOG file
+
+@TODO add tests for parsing memo strings and files
+.status active
+.doc<<EOF
+First, we need to shorten the setup of a Memo in the source code, so that we can write the tests more efficently.
+Second, we need to add all kinds of tests, especially for values.
+When done, we can consider to rewrite the parser.
+Long-term-goal: Include attributes in the short-hand notation (inline attributes).
+EOF
+
 @TODO parse multiline values without EOF delimiter
 .status active
 .doc<<EOF
 It should be possible to define multiline values without
 the `<<EOF` syntax, i.e. if no separator is given, then the
 next node will be the delimiter.
+(with the blank lines until the next memo removed).
 EOF
 
 @TODO merge mql.pest and memo.pest
@@ -58,12 +71,35 @@ EOF
 
 @TODO shorthand notation for attributes
 .doc<<EOF
-Example:
+
+Long notation:
+ .discovery Cavendish
+ +date 1786
+ .saturation 2.35 T
+ +unit T
+ .density 2.01
+ +unit g/cm³
+ +state liquid, at room temperature
+ 
+Short notation:
  .discovery Cavendish {+date 1786}
  .saturation 2.35 {+unit T}
- .density 2.01 {+unit g/cm³m} {+state "liquid, at room temperature"}
+ .density 2.01 {+unit g/cm³} {+state "liquid, at room temperature"}
 
-prerequisite for this is that the value is parsed by the regular parser!
+Prerequisite for this is a complete rewrite of the parser, which
+includes sub-parsing the value.
+
+Valid MQL expressions could be:
+
+- ```discovery{+date}``` to filter for any discovery node that contains
+the `date` attributes
+- ```saturation{+unit=T}``` to filter for any saturation value with the unit Tesla.
+- ```density{+state~liquid}>2.0``` to filter for any density node with a value greater than 2.0 and a state attribute that contains the substring `liquid`
+- ```density{+unit="g/cm³",+state~liquid}``` to filter for any density node that has two conditions on the attributes.
+
+Alternatively, the attribute notation could be shorter, just {date} or
+{unit=T}.
+
 EOF
 
 @TODO add some proper tests in the source code
