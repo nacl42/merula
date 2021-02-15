@@ -29,7 +29,6 @@ pub type MemoId = u64;
 #[derive(Debug)]
 pub struct Memo {
     nodes: Vec<Node>,
-    attrs: HashMap<Key, Value>
 }
 
 impl Memo {
@@ -45,7 +44,6 @@ impl Memo {
     {
         Memo {
             nodes: vec![Node::new(collection, title)],
-            attrs: HashMap::new()
         }
     }
 
@@ -260,3 +258,10 @@ mod tests {
     }
 }
 
+
+impl PartialEq for Memo {
+    fn eq(&self, other: &Self) -> bool {
+        self.nodes.iter().zip(other.nodes.iter())
+            .all(|(n1, n2)| n1 == n2)        
+    }
+}

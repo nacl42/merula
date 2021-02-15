@@ -168,4 +168,13 @@ mod tests {
         let result = MemoParser::parse(Rule::header, &".foo");
         assert!(result.is_err());
     }
+
+    #[test]
+    fn parse_memo_1() {
+        let input = "@book The Lord of the Rings";
+        let output = Memo::new("book", "The Lord of the Rings");
+        let result = MemoParser::parse(Rule::header, &input).unwrap();
+        //assert_eq!(result, output);
+        // TODO: read from string or string buffer        
+    }
 }

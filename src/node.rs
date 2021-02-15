@@ -8,7 +8,7 @@ use crate::value::{Key, Value};
 
 
 /// A Node consists of key, a value and a map of attributes.
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct Node {
     pub key: Key,
     pub value: Value,
