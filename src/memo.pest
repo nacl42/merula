@@ -27,11 +27,19 @@ multiline_node = {
       POP
 }
 
-// multiline data node without separator
-ml_value = @{ (NEWLINE ~ !prefix_char ~ value)+ }
-ml_data_node_nosep = { "." ~ key ~ "<<" ~ ml_value }
+// ml = multiline node
 prefix_char = @{ "." | "@" } // TODO: attributes 
-     
+value_ml = @{ value? ~ (NEWLINE ~ !prefix_char ~ value)* }
+value_eof_inner = { !(POP ~ value ~ NEWLINE)* }
+value_eof = { "<<" ~ PUSH(eof) ~ NEWLINE ~ value_eof_inner}
+
+data_node_ml = { "." ~ key ~ (value_eof | value_ml) }
+header_node_ml = { "@" ~ key ~ (value_eof | value_ml) }
+
+//data_node = { "." ~ key ~ value }
+//header_node = { "@"}
+
+
 
 file = {
       SOI ~

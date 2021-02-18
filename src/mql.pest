@@ -1,6 +1,6 @@
 // reminder on pest grammar:
 // _{ } => silent: rule won't appear in a parse result
-// ${ } => compount atomic: no whitespace, inner tokens as normal
+// ${ } => compound atomic: no whitespace, inner tokens as normal
 // @{ } => atomic: no whitespace, no inner tokens
 
 // In general, when writing a parser with choices, put the longest or
