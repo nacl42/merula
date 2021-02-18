@@ -27,9 +27,9 @@ multiline_node = {
       POP
 }
 
-// multiline node without separator
+// multiline data node without separator
 ml_value = @{ (NEWLINE ~ !prefix_char ~ value)+ }
-ml_node_nosep = { prefix_char ~ key ~ "<<" ~ ml_value }
+ml_data_node_nosep = { "." ~ key ~ "<<" ~ ml_value }
 prefix_char = @{ "." | "@" } // TODO: attributes 
      
 

@@ -4,6 +4,7 @@
 //!
 
 use pest::Parser;
+use pest::iterators::Pair;
 
 #[derive(Parser)]
 #[grammar = "memo.pest"]
@@ -151,6 +152,14 @@ fn read_from_file_internal(filename: &'_ str, drop_first: bool,
     Ok(memos)
 }
 
+pub fn rule_ml_data_node_nosep(pair: Pair<Rule>) -> Result<Node, ()> {
+    let mut inner = pair.into_inner();
+    let key = inner.next().unwrap().as_str();
+    let value = inner.next().unwrap().as_str().trim();
+
+    Ok(Node::new(key, value))
+}
+
 
 #[cfg(test)]
 mod tests {
@@ -172,24 +181,36 @@ mod tests {
     // TODO: convert test function into a parsing function
     // that creates a Node from an input
     #[test]
-    fn parse_ml_node_nosep() {
+    fn parse_ml_data_node_nosep() {
         let input = r#".doc<<
-        This is a very interesting book, you know!
-        "#;
-        let result = MemoParser::parse(Rule::ml_node_nosep, &input);
+This is a very interesting book, you know!
+.foo"#;
+        let result = MemoParser::parse(Rule::ml_data_node_nosep, &input);
         assert_eq!(result.is_ok(), true);
 
         let mut pair = result.unwrap().next().unwrap();
         let mut inner = pair.into_inner();
-
-        let prefix = inner.next().unwrap().as_str();
-        assert_eq!(prefix, ".");
 
         let key = inner.next().unwrap().as_str();
         assert_eq!(key, "doc");
 
         let value = inner.next().unwrap().as_str().trim();
         assert_eq!(value, "This is a very interesting book, you know!");
+    }
+
+    #[test]
+    fn test_rule_ml_data_node_nosep() {
+        let input = r#".doc<<
+This is a very interesting book, you know!
+Why not?
+.foo"#;
+        let result = MemoParser::parse(Rule::ml_data_node_nosep, &input);
+        assert_eq!(result.is_ok(), true);
+
+        let pair = result.unwrap().next().unwrap();
+        let node = rule_ml_data_node_nosep(pair);
+        let expected = Node::new("doc", "This is a very interesting book, you know!\nWhy not?");
+        assert_eq!(node, Ok(expected))
     }
 
     #[test]
