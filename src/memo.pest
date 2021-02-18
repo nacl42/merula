@@ -27,6 +27,12 @@ multiline_node = {
       POP
 }
 
+// multiline node without separator
+ml_value = @{ (NEWLINE ~ !prefix_char ~ value)+ }
+ml_node_nosep = { prefix_char ~ key ~ "<<" ~ ml_value }
+prefix_char = @{ "." | "@" } // TODO: attributes 
+     
+
 file = {
       SOI ~
       ((comment | header | multiline_node | multivalue_node | node | attr )? ~ NEWLINE)* ~

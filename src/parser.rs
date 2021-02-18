@@ -169,7 +169,31 @@ mod tests {
         assert!(result.is_err());
     }
 
+    // TODO: convert test function into a parsing function
+    // that creates a Node from an input
     #[test]
+    fn parse_ml_node_nosep() {
+        let input = r#".doc<<
+        This is a very interesting book, you know!
+        "#;
+        let result = MemoParser::parse(Rule::ml_node_nosep, &input);
+        assert_eq!(result.is_ok(), true);
+
+        let mut pair = result.unwrap().next().unwrap();
+        let mut inner = pair.into_inner();
+
+        let prefix = inner.next().unwrap().as_str();
+        assert_eq!(prefix, ".");
+
+        let key = inner.next().unwrap().as_str();
+        assert_eq!(key, "doc");
+
+        let value = inner.next().unwrap().as_str().trim();
+        assert_eq!(value, "This is a very interesting book, you know!");
+    }
+
+    #[test]
+    #[ignore]
     fn parse_memo_1() {
         let input = "@book The Lord of the Rings";
         let output = Memo::new("book", "The Lord of the Rings");
