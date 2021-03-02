@@ -179,8 +179,7 @@ mod tests {
     }
 
     #[test]
-    #[ignore]
-    fn test_rule_data_eof() {
+    fn test_rule_data_node_eof() {
         // example 1
         let input = r#".cities<<EOF
 Frankfurt
@@ -188,7 +187,7 @@ Berlin
 Paris
 EOF
 .foo"#;
-        let result = MemoParser::parse(Rule::data_node_ml, &input);
+        let result = MemoParser::parse(Rule::multiline_node, &input);
         assert_eq!(result.is_ok(), true);
 
         let pair = result.unwrap().next().unwrap();
@@ -197,12 +196,11 @@ EOF
         let key = inner.next().unwrap().as_str();
         assert_eq!(key, "cities");
 
-        //let inner_value = inner.next().unwrap().into_inner();
-        //let pair = inner_value.unwrap().next().unwrap();
+        let eof = inner.next().unwrap().as_str();
+        assert_eq!(eof, "EOF");
 
-        //let value = inner.next().unwrap().as_str().trim();
-        //
-        assert_eq!(value, "Hi, you!\nThis is a very interesting book, you know!");        
+        let value = inner.next().unwrap().as_str();
+        assert_eq!(value, "Frankfurt\nBerlin\nParis");
     }
     
     #[test]
