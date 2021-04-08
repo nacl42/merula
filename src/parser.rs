@@ -152,12 +152,76 @@ fn read_from_file_internal(filename: &'_ str, drop_first: bool,
     Ok(memos)
 }
 
-pub fn rule_ml_data_node_nosep(pair: Pair<Rule>) -> Result<Node, ()> {
+
+pub fn rule_data_node_ml(pair: Pair<Rule>) -> Result<Node, ()> {
+    // data_node_ml = { "." ~ key ~ value_ml }
     let mut inner = pair.into_inner();
     let key = inner.next().unwrap().as_str();
     let value = inner.next().unwrap().as_str().trim();
-
     Ok(Node::new(key, value))
+}
+
+pub fn rule_data_node_eof(pair: Pair<Rule>) -> Result<Node, ()> {
+    // data_node_eof = { "." ~ key ~ "<<" ~ PUSH(eof) ~ NEWLINE ~ value_eof ~ POP }
+    let mut inner = pair.into_inner();
+    let key = inner.next().unwrap().as_str();
+    let eof = inner.next().unwrap().as_str();
+    let value_eof = inner.next().unwrap().as_str().trim();
+    Ok(Node::new(key, value_eof))
+}
+
+pub fn rule_header_node_ml(pair: Pair<Rule>) -> Result<Node, ()> {
+    // header_node_ml = { "@" ~ key ~ value_ml }
+    let mut inner = pair.into_inner();
+    let key = inner.next().unwrap().as_str();
+    let value = inner.next().unwrap().as_str().trim();
+    Ok(Node::new(key, value))
+}
+
+pub fn rule_header_node_eof(pair: Pair<Rule>) -> Result<Node, ()> {
+    // header_node_eof = { "@" ~ key ~ "<<" ~ PUSH(eof) ~ NEWLINE ~ value_eof ~ POP }
+    let mut inner = pair.into_inner();
+    let key = inner.next().unwrap().as_str();
+    let eof = inner.next().unwrap().as_str();
+    let value_eof = inner.next().unwrap().as_str().trim();
+    Ok(Node::new(key, value_eof))
+}
+
+pub fn rule_header_node(pair: Pair<Rule>) -> Result<Node, ()> {
+    // header_node = @{ header_node_eof | header_node_ml }
+    let mut inner = pair.into_inner().next().unwrap();
+    match inner.as_rule() {
+        Rule::header_node_eof => rule_header_node_eof(inner),
+        Rule::header_node_ml => rule_header_node_ml(inner),
+        _ => Err(())
+    }
+}
+
+pub fn rule_data_node(pair: Pair<Rule>) -> Result<Node, ()> {
+    // data_node = @{ data_node_eof | data_node_ml }
+    match pair.as_rule() {
+        Rule::data_node_eof => rule_data_node_eof(pair),
+        Rule::data_node_ml => rule_data_node_ml(pair),
+        _ => Err(())
+    }
+}
+
+pub fn rule_memo(pair: Pair<Rule>) -> Result<Memo, ()> {
+    // memo = { header_node ~ (NEWLINE ~ data_node)* }
+    let mut inner = pair.clone().into_inner();
+    let p = inner.next().unwrap();
+    
+    if let Ok(header) = rule_header_node(p) {
+        let mut memo = Memo::new(header.key, header.value);
+        for data_pair in inner {
+            if let Ok(data) = rule_data_node(data_pair) {
+                memo.push(data);
+            }
+        }
+        Ok(memo)
+    } else {
+        Err(())
+    }
 }
 
 
@@ -179,89 +243,74 @@ mod tests {
     }
 
     #[test]
-    fn test_rule_data_node_eof() {
-        // example 1
-        let input = r#".cities<<EOF
-Frankfurt
-Berlin
-Paris
-EOF
-.foo"#;
-        let result = MemoParser::parse(Rule::multiline_node, &input);
-        assert_eq!(result.is_ok(), true);
-
-        let pair = result.unwrap().next().unwrap();
-        let mut inner = pair.into_inner();
-
-        let key = inner.next().unwrap().as_str();
-        assert_eq!(key, "cities");
-
-        let eof = inner.next().unwrap().as_str();
-        assert_eq!(eof, "EOF");
-
-        let value = inner.next().unwrap().as_str();
-        assert_eq!(value, "Frankfurt\nBerlin\nParis");
+    fn test_fn_rule_data_node_eof() {
+        let input = ".color<<EOF\nblue\nEOF";
+        let result = MemoParser::parse(Rule::data_node_eof, &input);
+        let node = rule_data_node_eof(result.unwrap().next().unwrap());
+        assert_eq!(node, Ok(Node::new("color", "blue")));        
     }
-    
+
     #[test]
-    fn test_rule_data_node_ml() {
-        // example 1
-        let input = r#".doc Hi, you!
-This is a very interesting book, you know!
-.foo"#;
-        let result = MemoParser::parse(Rule::data_node_ml, &input);
-        assert_eq!(result.is_ok(), true);
-
-        let pair = result.unwrap().next().unwrap();
-        let mut inner = pair.into_inner();
-
-        let key = inner.next().unwrap().as_str();
-        assert_eq!(key, "doc");
-
-        let value = inner.next().unwrap().as_str().trim();
-        assert_eq!(value, "Hi, you!\nThis is a very interesting book, you know!");
-
-        // example 2: ignore first newline
-        let input = r#".ingredients
-Rice
-Mushrooms
-Soy Sauce
-.foo"#;
-        let result = MemoParser::parse(Rule::data_node_ml, &input);
-        assert_eq!(result.is_ok(), true);
-
-        let pair = result.unwrap().next().unwrap();
-        let mut inner = pair.into_inner();
-
-        let key = inner.next().unwrap().as_str();
-        assert_eq!(key, "ingredients");
-
-        let value = inner.next().unwrap().as_str().trim();
-        assert_eq!(value, "Rice\nMushrooms\nSoy Sauce");
-
-        // example 3: single line
-        let input = ".character Sam Gamdschie";
-
-        let result = MemoParser::parse(Rule::data_node_ml, &input);
-        assert_eq!(result.is_ok(), true);
-
-        let pair = result.unwrap().next().unwrap();
-        let mut inner = pair.into_inner();
-
-        let key = inner.next().unwrap().as_str();
-        assert_eq!(key, "character");
-
-        let value = inner.next().unwrap().as_str().trim();
-        assert_eq!(value, "Sam Gamdschie");
+    fn test_fn_rule_header_node_eof() {
+        let input = "@color<<EOF\nblue\nEOF";
+        let result = MemoParser::parse(Rule::header_node_eof, &input);
+        let node = rule_header_node_eof(result.unwrap().next().unwrap());
+        assert_eq!(node, Ok(Node::new("color", "blue")));        
     }
-    
+
     #[test]
-    #[ignore]
-    fn parse_memo_1() {
+    fn test_fn_rule_data_node_ml() {
+        let input = r#".color blue"#;
+        let result = MemoParser::parse(Rule::data_node_ml, &input);
+        let node = rule_data_node_ml(result.unwrap().next().unwrap());
+        assert_eq!(node, Ok(Node::new("color", "blue")));
+
+        let input = ".colors blue\nred";
+        let result = MemoParser::parse(Rule::data_node_ml, &input);
+        let node = rule_data_node_ml(result.unwrap().next().unwrap());
+        assert_eq!(node, Ok(Node::new("colors", "blue\nred")));
+
+    }
+
+    #[test]
+    fn test_fn_rule_header_node_ml() {
+        let input = r#"@color blue"#;
+        let result = MemoParser::parse(Rule::header_node_ml, &input);
+        let node = rule_header_node_ml(result.unwrap().next().unwrap());
+        assert_eq!(node, Ok(Node::new("color", "blue")));
+
+        let input = "@colors blue\nred";
+        let result = MemoParser::parse(Rule::header_node_ml, &input);
+        let node = rule_header_node_ml(result.unwrap().next().unwrap());
+        assert_eq!(node, Ok(Node::new("colors", "blue\nred")));
+    }
+
+
+    #[test]
+    fn test_fn_rule_memo() {
         let input = "@book The Lord of the Rings";
-        let output = Memo::new("book", "The Lord of the Rings");
-        let result = MemoParser::parse(Rule::header, &input).unwrap();
-        //assert_eq!(result, output);
-        // TODO: read from string or string buffer        
+        let result = MemoParser::parse(Rule::memo, &input);
+        let memo = rule_memo(result.unwrap().next().unwrap());
+        assert_eq!(
+            memo,
+            Ok(
+                Memo::new("book", "The Lord of the Rings")
+                    .with(("author", "Tolkien"))
+            )
+        );
+
+        // TODO: Memo does not compare data nodes properly!!!
+
+        let input = "@book The Lord of the Rings\n.author Tolkien";
+        let result = MemoParser::parse(Rule::memo, &input);
+        let memo = rule_memo(result.unwrap().next().unwrap());
+        assert_eq!(
+            memo,
+            Ok(
+                Memo::new("book", "The Lord of the Rings")
+                    .with(("author", "Tolkien"))
+            )
+        );
+        
     }
 }
