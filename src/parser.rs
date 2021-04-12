@@ -292,11 +292,11 @@ mod tests {
         let result = MemoParser::parse(Rule::memo, &input);
         let memo = rule_memo(result.unwrap().next().unwrap());
         assert_eq!(
-            memo,
             Ok(
                 Memo::new("book", "The Lord of the Rings")
                     .with(("author", "Tolkien"))
-            )
+            ),
+            memo
         );
 
         // TODO: Memo does not compare data nodes properly!!!
