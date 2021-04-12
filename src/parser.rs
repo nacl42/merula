@@ -128,8 +128,7 @@ fn read_from_file_internal(filename: &'_ str, drop_first: bool,
                 let mut inner_rules = line.into_inner();
                 let key = inner_rules.next().unwrap().as_str();
                 let eof = inner_rules.next().unwrap().as_str();
-                let mut text = inner_rules.next().unwrap().as_str()
-                    .to_string();
+                let mut text = inner_rules.next().unwrap().as_str().to_string();
                 // pop() removes the last newline, as it is included
                 // in the current parsing rule from memo.pest
                 if text.len() > 0 {
@@ -179,8 +178,8 @@ pub fn rule_header_node(pair: Pair<Rule>) -> Result<Node, ()> {
     }
 }
 
-pub fn rule_data_nodes_ml(pair: Pair<Rule>) -> Result<Vec<Node>, ()> {
-    // data_nodes_ml = { "." ~ key ~ sep ~ value_ml }
+pub fn rule_data_multinode_ml(pair: Pair<Rule>) -> Result<Vec<Node>, ()> {
+    // data_multinode_ml = { "." ~ key ~ sep ~ value_ml }
     let mut nodes = Vec::new();
     let mut inner = pair.into_inner();
     let key = inner.next().unwrap().as_str();
@@ -199,8 +198,8 @@ pub fn rule_data_nodes_ml(pair: Pair<Rule>) -> Result<Vec<Node>, ()> {
     Ok(nodes)
 }
 
-pub fn rule_data_nodes_eof(pair: Pair<Rule>) -> Result<Vec<Node>, ()> {
-    // data_nodes_eof = { "." ~ key ~ sep ~ "<<" ~ PUSH(eof) ~ NEWLINE ~ value_eof ~ POP }
+pub fn rule_data_multinode_eof(pair: Pair<Rule>) -> Result<Vec<Node>, ()> {
+    // data_multinode_eof = { "." ~ key ~ sep ~ "<<" ~ PUSH(eof) ~ NEWLINE ~ value_eof ~ POP }
     let mut nodes = Vec::new();
     let mut inner = pair.into_inner();
     let key = inner.next().unwrap().as_str();
@@ -249,6 +248,17 @@ pub fn rule_data_node(pair: Pair<Rule>) -> Result<Node, ()> {
     }
 }
 
+pub fn rule_data_multinode(pair: Pair<Rule>) -> Result<Vec<Node>, ()> {
+    // data_multinode = { data_multinode_eof | data_multinode_ml }
+    let inner = pair.into_inner().next().unwrap();
+    match inner.as_rule() {
+        Rule::data_multinode_eof => rule_data_multinode_eof(inner),
+        Rule::data_multinode_ml => rule_data_multinode_ml(inner),
+        _ => Err(())
+    }
+    
+}
+
 pub fn rule_memo(pair: Pair<Rule>) -> Result<Memo, ()> {
     // memo = { header_node ~ (NEWLINE ~ data_node)* }
     let mut inner = pair.clone().into_inner();
@@ -257,8 +267,16 @@ pub fn rule_memo(pair: Pair<Rule>) -> Result<Memo, ()> {
     if let Ok(header) = rule_header_node(p) {
         let mut memo = Memo::new(header.key, header.value);
         for data_pair in inner {
-            if let Ok(data) = rule_data_node(data_pair) {
-                memo.push(data);
+            match data_pair.as_rule() {
+                Rule::data_node => {
+                    memo.push(rule_data_node(data_pair).unwrap());
+                }
+                Rule::data_multinode => {
+                    for node in rule_data_multinode(data_pair).unwrap() {
+                        memo.push(node)
+                    }
+                },
+                _ => {}
             }
         }
         Ok(memo)
@@ -302,33 +320,38 @@ mod tests {
     }
 
     #[test]
-    fn test_fn_rule_data_nodes_ml() {
+    fn test_fn_rule_data_multinode_ml() {
         let input = ".color, blue, red";
-        let result = MemoParser::parse(Rule::data_nodes_ml, &input);
-        let nodes = rule_data_nodes_ml(result.unwrap().next().unwrap());
+        let result = MemoParser::parse(Rule::data_multinode_ml, &input);
+        let nodes = rule_data_multinode_ml(result.unwrap().next().unwrap());
         let expected = vec!(Node::new("color", "blue"), Node::new("color", "red"));
         assert_eq!(nodes, Ok(expected));
 
         let input = ".color|\nblue\nred";
-        let result = MemoParser::parse(Rule::data_nodes_ml, &input);
-        let nodes = rule_data_nodes_ml(result.unwrap().next().unwrap());
+        let result = MemoParser::parse(Rule::data_multinode_ml, &input);
+        let nodes = rule_data_multinode_ml(result.unwrap().next().unwrap());
         let expected = vec!(Node::new("color", "blue"), Node::new("color", "red"));
         assert_eq!(nodes, Ok(expected));
     }
 
     #[test]
-    fn test_fn_rule_data_nodes_eof() {
+    fn test_fn_rule_data_multinode_eof() {
         let input = ".color,<<EOF\nblue, red\nEOF";
-        let result = MemoParser::parse(Rule::data_nodes_eof, &input);
-        let nodes = rule_data_nodes_eof(result.unwrap().next().unwrap());
+        let result = MemoParser::parse(Rule::data_multinode_eof, &input);
+        let nodes = rule_data_multinode_eof(result.unwrap().next().unwrap());
         let expected = vec!(Node::new("color", "blue"), Node::new("color", "red"));
         assert_eq!(nodes, Ok(expected));
 
         let input = ".color|<<EOF\nblue\nred\nEOF";
-        let result = MemoParser::parse(Rule::data_nodes_eof, &input);
-        let nodes = rule_data_nodes_eof(result.unwrap().next().unwrap());
+        let result = MemoParser::parse(Rule::data_multinode_eof, &input);
+        let nodes = rule_data_multinode_eof(result.unwrap().next().unwrap());
         let expected = vec!(Node::new("color", "blue"), Node::new("color", "red"));
         assert_eq!(nodes, Ok(expected));
+    }
+
+    #[test]
+    fn test_fn_rule_data_multinode() {
+        // TODO
     }
     
     #[test]
@@ -380,6 +403,15 @@ mod tests {
         let memo = rule_memo(result.unwrap().next().unwrap());
         let expect = Memo::new("book", "The Lord of the Rings")
             .with(("author", "Tolkien"));
+        assert_eq!(memo, Ok(expect));
+
+        let input = "@book The Lord of the Rings\n.author Tolkien\n.character, Frodo,Samweis";
+        let result = MemoParser::parse(Rule::memo, &input);
+        let memo = rule_memo(result.unwrap().next().unwrap());
+        let expect = Memo::new("book", "The Lord of the Rings")
+            .with(("author", "Tolkien"))
+            .with(("character", "Frodo"))
+            .with(("character", "Samweis"));
         assert_eq!(memo, Ok(expect));
     }
 }

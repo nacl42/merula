@@ -27,23 +27,23 @@ multiline_node = {
       POP
 }
 
-
 // data and header node, implicit multiline
 prefix_char = @{ "." | "@" } // TODO: attributes 
 value_ml = @{ value? ~ (NEWLINE ~ !prefix_char ~ value)* }
 data_node_ml = { "." ~ key ~ value_ml }
-data_nodes_ml = { "." ~ key ~ sep ~ value_ml }
+data_multinode_ml = { "." ~ key ~ sep ~ value_ml }
 header_node_ml = { "@" ~ key ~ value_ml }
 
 // data and header, explicit multiline, i.e. with separator
 value_eof = { (!POP ~ value ~ NEWLINE)* }
 header_node_eof = { "@" ~ key ~ "<<" ~ PUSH(eof) ~ NEWLINE ~ value_eof ~ POP }
 data_node_eof = { "." ~ key ~ "<<" ~ PUSH(eof) ~ NEWLINE ~ value_eof ~ POP }
-data_nodes_eof = { "." ~ key ~ sep ~ "<<" ~ PUSH(eof) ~ NEWLINE ~ value_eof ~ POP }
+data_multinode_eof = { "." ~ key ~ sep ~ "<<" ~ PUSH(eof) ~ NEWLINE ~ value_eof ~ POP }
 
 header_node = { header_node_eof | header_node_ml }
 data_node = { data_node_eof | data_node_ml }
-memo = { header_node ~ (NEWLINE ~ data_node)* }
+data_multinode = { data_multinode_eof | data_multinode_ml }
+memo = { header_node ~ (NEWLINE ~ (data_multinode|data_node))* }
 
 
 file = {
