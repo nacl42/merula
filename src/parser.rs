@@ -199,6 +199,29 @@ pub fn rule_data_nodes_ml(pair: Pair<Rule>) -> Result<Vec<Node>, ()> {
     Ok(nodes)
 }
 
+pub fn rule_data_nodes_eof(pair: Pair<Rule>) -> Result<Vec<Node>, ()> {
+    // data_nodes_eof = { "." ~ key ~ sep ~ "<<" ~ PUSH(eof) ~ NEWLINE ~ value_eof ~ POP }
+    let mut nodes = Vec::new();
+    let mut inner = pair.into_inner();
+    let key = inner.next().unwrap().as_str();
+    let sep = match inner.next().unwrap().as_str() {
+        "|" => "\n",
+        x => x
+    };
+    let _eof = inner.next().unwrap().as_str();
+    let values = inner.next().unwrap().as_str().trim();
+    // split value by given separator, each value is trimmed
+    for value in values.split(sep) {
+        let value = value.trim();
+        if value.len() > 0 {
+            nodes.push(Node::new(key, value.trim()));
+        }
+    }
+    Ok(nodes)
+}
+
+
+
 pub fn rule_data_node_ml(pair: Pair<Rule>) -> Result<Node, ()> {
     // data_node_ml = { "." ~ key ~ value_ml }
     let mut inner = pair.into_inner();
@@ -295,7 +318,17 @@ mod tests {
 
     #[test]
     fn test_fn_rule_data_nodes_eof() {
-        // TODO
+        let input = ".color,<<EOF\nblue, red\nEOF";
+        let result = MemoParser::parse(Rule::data_nodes_eof, &input);
+        let nodes = rule_data_nodes_eof(result.unwrap().next().unwrap());
+        let expected = vec!(Node::new("color", "blue"), Node::new("color", "red"));
+        assert_eq!(nodes, Ok(expected));
+
+        let input = ".color|<<EOF\nblue\nred\nEOF";
+        let result = MemoParser::parse(Rule::data_nodes_eof, &input);
+        let nodes = rule_data_nodes_eof(result.unwrap().next().unwrap());
+        let expected = vec!(Node::new("color", "blue"), Node::new("color", "red"));
+        assert_eq!(nodes, Ok(expected));
     }
     
     #[test]
