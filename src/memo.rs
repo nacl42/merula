@@ -19,7 +19,6 @@ use crate::value::{Key, Value};
 use crate::node::Node;
 
 use std::hash::{Hash, Hasher};
-use std::collections::HashMap;
 use std::collections::hash_map::DefaultHasher;
 
 pub type MemoId = u64;
@@ -262,7 +261,7 @@ mod tests {
         let mut memo1 = Memo::new("book", "The Lord of the Rings")
             .with(Node::new("author", "J.R.R. Tolkien"));
 
-        let mut memo2 = Memo::new("book", "The Lord of the Rings")
+        let memo2 = Memo::new("book", "The Lord of the Rings")
             .with(Node::new("author", "J.R.R. Tolkien"));
 
         assert_eq!(memo1, memo2);

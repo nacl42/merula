@@ -32,6 +32,7 @@ multiline_node = {
 prefix_char = @{ "." | "@" } // TODO: attributes 
 value_ml = @{ value? ~ (NEWLINE ~ !prefix_char ~ value)* }
 data_node_ml = { "." ~ key ~ value_ml }
+data_nodes_ml = { "." ~ key ~ sep ~ value_ml }
 header_node_ml = { "@" ~ key ~ value_ml }
 
 // data and header, explicit multiline, i.e. with separator

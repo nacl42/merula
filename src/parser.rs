@@ -164,19 +164,39 @@ pub fn rule_header_node_eof(pair: Pair<Rule>) -> Result<Node, ()> {
     // header_node_eof = { "@" ~ key ~ "<<" ~ PUSH(eof) ~ NEWLINE ~ value_eof ~ POP }
     let mut inner = pair.into_inner();
     let key = inner.next().unwrap().as_str();
-    let eof = inner.next().unwrap().as_str();
+    let _eof = inner.next().unwrap().as_str();
     let value_eof = inner.next().unwrap().as_str().trim();
     Ok(Node::new(key, value_eof))
 }
 
 pub fn rule_header_node(pair: Pair<Rule>) -> Result<Node, ()> {
     // header_node = @{ header_node_eof | header_node_ml }
-    let mut inner = pair.into_inner().next().unwrap();
+    let inner = pair.into_inner().next().unwrap();
     match inner.as_rule() {
         Rule::header_node_eof => rule_header_node_eof(inner),
         Rule::header_node_ml => rule_header_node_ml(inner),
         _ => Err(())
     }
+}
+
+pub fn rule_data_nodes_ml(pair: Pair<Rule>) -> Result<Vec<Node>, ()> {
+    // data_nodes_ml = { "." ~ key ~ sep ~ value_ml }
+    let mut nodes = Vec::new();
+    let mut inner = pair.into_inner();
+    let key = inner.next().unwrap().as_str();
+    let sep = match inner.next().unwrap().as_str() {
+        "|" => "\n",
+        x => x
+    };
+    let values = inner.next().unwrap().as_str();
+    // split value by given separator, each value is trimmed
+    for value in values.split(sep) {
+        let value = value.trim();
+        if value.len() > 0 {
+            nodes.push(Node::new(key, value.trim()));
+        }
+    }
+    Ok(nodes)
 }
 
 pub fn rule_data_node_ml(pair: Pair<Rule>) -> Result<Node, ()> {
@@ -191,7 +211,7 @@ pub fn rule_data_node_eof(pair: Pair<Rule>) -> Result<Node, ()> {
     // data_node_eof = { "." ~ key ~ "<<" ~ PUSH(eof) ~ NEWLINE ~ value_eof ~ POP }
     let mut inner = pair.into_inner();
     let key = inner.next().unwrap().as_str();
-    let eof = inner.next().unwrap().as_str();
+    let _eof = inner.next().unwrap().as_str();
     let value_eof = inner.next().unwrap().as_str().trim();
     Ok(Node::new(key, value_eof))
 }
@@ -256,6 +276,26 @@ mod tests {
         let result = MemoParser::parse(Rule::data_node, &input);
         let node = rule_data_node(result.unwrap().next().unwrap());
         assert_eq!(node, Ok(Node::new("color", "blue")));
+    }
+
+    #[test]
+    fn test_fn_rule_data_nodes_ml() {
+        let input = ".color, blue, red";
+        let result = MemoParser::parse(Rule::data_nodes_ml, &input);
+        let nodes = rule_data_nodes_ml(result.unwrap().next().unwrap());
+        let expected = vec!(Node::new("color", "blue"), Node::new("color", "red"));
+        assert_eq!(nodes, Ok(expected));
+
+        let input = ".color|\nblue\nred";
+        let result = MemoParser::parse(Rule::data_nodes_ml, &input);
+        let nodes = rule_data_nodes_ml(result.unwrap().next().unwrap());
+        let expected = vec!(Node::new("color", "blue"), Node::new("color", "red"));
+        assert_eq!(nodes, Ok(expected));
+    }
+
+    #[test]
+    fn test_fn_rule_data_nodes_eof() {
+        // TODO
     }
     
     #[test]
