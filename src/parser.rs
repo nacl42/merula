@@ -152,24 +152,6 @@ fn read_from_file_internal(filename: &'_ str, drop_first: bool,
     Ok(memos)
 }
 
-
-pub fn rule_data_node_ml(pair: Pair<Rule>) -> Result<Node, ()> {
-    // data_node_ml = { "." ~ key ~ value_ml }
-    let mut inner = pair.into_inner();
-    let key = inner.next().unwrap().as_str();
-    let value = inner.next().unwrap().as_str().trim();
-    Ok(Node::new(key, value))
-}
-
-pub fn rule_data_node_eof(pair: Pair<Rule>) -> Result<Node, ()> {
-    // data_node_eof = { "." ~ key ~ "<<" ~ PUSH(eof) ~ NEWLINE ~ value_eof ~ POP }
-    let mut inner = pair.into_inner();
-    let key = inner.next().unwrap().as_str();
-    let eof = inner.next().unwrap().as_str();
-    let value_eof = inner.next().unwrap().as_str().trim();
-    Ok(Node::new(key, value_eof))
-}
-
 pub fn rule_header_node_ml(pair: Pair<Rule>) -> Result<Node, ()> {
     // header_node_ml = { "@" ~ key ~ value_ml }
     let mut inner = pair.into_inner();
@@ -197,11 +179,29 @@ pub fn rule_header_node(pair: Pair<Rule>) -> Result<Node, ()> {
     }
 }
 
+pub fn rule_data_node_ml(pair: Pair<Rule>) -> Result<Node, ()> {
+    // data_node_ml = { "." ~ key ~ value_ml }
+    let mut inner = pair.into_inner();
+    let key = inner.next().unwrap().as_str();
+    let value = inner.next().unwrap().as_str().trim();
+    Ok(Node::new(key, value))
+}
+
+pub fn rule_data_node_eof(pair: Pair<Rule>) -> Result<Node, ()> {
+    // data_node_eof = { "." ~ key ~ "<<" ~ PUSH(eof) ~ NEWLINE ~ value_eof ~ POP }
+    let mut inner = pair.into_inner();
+    let key = inner.next().unwrap().as_str();
+    let eof = inner.next().unwrap().as_str();
+    let value_eof = inner.next().unwrap().as_str().trim();
+    Ok(Node::new(key, value_eof))
+}
+
 pub fn rule_data_node(pair: Pair<Rule>) -> Result<Node, ()> {
     // data_node = @{ data_node_eof | data_node_ml }
-    match pair.as_rule() {
-        Rule::data_node_eof => rule_data_node_eof(pair),
-        Rule::data_node_ml => rule_data_node_ml(pair),
+    let inner = pair.into_inner().next().unwrap();
+    match inner.as_rule() {
+        Rule::data_node_eof => rule_data_node_eof(inner),
+        Rule::data_node_ml => rule_data_node_ml(inner),
         _ => Err(())
     }
 }
@@ -210,7 +210,7 @@ pub fn rule_memo(pair: Pair<Rule>) -> Result<Memo, ()> {
     // memo = { header_node ~ (NEWLINE ~ data_node)* }
     let mut inner = pair.clone().into_inner();
     let p = inner.next().unwrap();
-    
+
     if let Ok(header) = rule_header_node(p) {
         let mut memo = Memo::new(header.key, header.value);
         for data_pair in inner {
@@ -250,6 +250,14 @@ mod tests {
         assert_eq!(node, Ok(Node::new("color", "blue")));        
     }
 
+    #[test]
+    fn test_fn_rule_data_node() {
+        let input = ".color blue";
+        let result = MemoParser::parse(Rule::data_node, &input);
+        let node = rule_data_node(result.unwrap().next().unwrap());
+        assert_eq!(node, Ok(Node::new("color", "blue")));
+    }
+    
     #[test]
     fn test_fn_rule_header_node_eof() {
         let input = "@color<<EOF\nblue\nEOF";
@@ -291,26 +299,14 @@ mod tests {
         let input = "@book The Lord of the Rings";
         let result = MemoParser::parse(Rule::memo, &input);
         let memo = rule_memo(result.unwrap().next().unwrap());
-        assert_eq!(
-            Ok(
-                Memo::new("book", "The Lord of the Rings")
-                    .with(("author", "Tolkien"))
-            ),
-            memo
-        );
-
-        // TODO: Memo does not compare data nodes properly!!!
+        let expect = Memo::new("book", "The Lord of the Rings");
+        assert_eq!(memo, Ok(expect));
 
         let input = "@book The Lord of the Rings\n.author Tolkien";
         let result = MemoParser::parse(Rule::memo, &input);
         let memo = rule_memo(result.unwrap().next().unwrap());
-        assert_eq!(
-            memo,
-            Ok(
-                Memo::new("book", "The Lord of the Rings")
-                    .with(("author", "Tolkien"))
-            )
-        );
-        
+        let expect = Memo::new("book", "The Lord of the Rings")
+            .with(("author", "Tolkien"));
+        assert_eq!(memo, Ok(expect));
     }
 }

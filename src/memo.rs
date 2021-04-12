@@ -256,12 +256,48 @@ mod tests {
             assert_eq!(node1.value, node2.value);
         }
     }
+
+    #[test]
+    fn partial_eq() {
+        let mut memo1 = Memo::new("book", "The Lord of the Rings")
+            .with(Node::new("author", "J.R.R. Tolkien"));
+
+        let mut memo2 = Memo::new("book", "The Lord of the Rings")
+            .with(Node::new("author", "J.R.R. Tolkien"));
+
+        assert_eq!(memo1, memo2);
+
+        memo1.push(Node::new("character", "Bilbo Baggins"));
+        assert_ne!(memo1, memo2);
+
+        let mut memo1 = Memo::new("book", "The Lord of the Rings")
+            .with(Node::new("author", "J.R.R. Tolkien"));
+
+        let mut memo2 = Memo::new("book", "The Lord of the Rings")
+            .with(Node::new("author", "J.R.R. Tolkien"));
+
+        memo1.push(Node::new("character", "Samweis Gamdschie"));
+        memo2.push(Node::new("character", "Frodo Baggins"));
+
+        assert_ne!(memo1, memo2);
+
+        let mut memo1 = Memo::new("book", "The Lord of the Rings");
+        let mut memo2 = Memo::new("book", "The Lord of the Rings");
+
+        memo1.push(Node::new("character", "Frodo Baggins"));
+        memo2.push(Node::new("character", "Frodo Baggins"));
+
+        assert_eq!(memo1, memo2);
+        
+    }
 }
 
 
 impl PartialEq for Memo {
     fn eq(&self, other: &Self) -> bool {
-        self.nodes.iter().zip(other.nodes.iter())
-            .all(|(n1, n2)| n1 == n2)        
+        // number of nodes must be equal for self and other
+        // contents of each node (and order) must be equal
+        (self.data_count() == other.data_count())
+            & self.nodes.iter().zip(other.nodes.iter()).all(|(n1, n2)| n1 == n2)
     }
 }
