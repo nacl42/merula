@@ -285,6 +285,20 @@ pub fn rule_memo(pair: Pair<Rule>) -> Result<Memo, ()> {
     }
 }
 
+pub fn rule_memos(pair: Pair<Rule>) -> Result<Vec<Memo>, ()> {
+    // memos = { (comment | memo | NEWLINE)* }
+    let mut memos = Vec::<Memo>::new();
+    for token in pair.into_inner() {
+        match token.as_rule() {
+            Rule::memo => {
+                memos.push(rule_memo(token)?) 
+            },
+            _ => {} // ignore silently
+        }
+    }
+    Ok(memos)
+}
+
 
 #[cfg(test)]
 mod tests {
@@ -413,5 +427,40 @@ mod tests {
             .with(("character", "Frodo"))
             .with(("character", "Samweis"));
         assert_eq!(memo, Ok(expect));
+    }
+
+    #[test]
+    fn test_fn_rule_memos() {
+        let input = "@book The Lord of the Rings\n@book The Hobbit";
+        let result = MemoParser::parse(Rule::memos, &input);
+        let memos = rule_memos(result.unwrap().next().unwrap());
+        let expect = vec!(Memo::new("book", "The Lord of the Rings"),
+                          Memo::new("book", "The Hobbit"));
+        assert_eq!(memos, Ok(expect));
+
+        let input = "@book The Lord of the Rings\n\n\n@book The Hobbit";
+        let result = MemoParser::parse(Rule::memos, &input);
+        let memos = rule_memos(result.unwrap().next().unwrap());
+        let expect = vec!(Memo::new("book", "The Lord of the Rings"),
+                          Memo::new("book", "The Hobbit"));
+        assert_eq!(memos, Ok(expect));
+
+        let input = "@book The Lord of the Rings\n.author Tolkien\n\n\n@book The Hobbit";
+        let result = MemoParser::parse(Rule::memos, &input);
+        let memos = rule_memos(result.unwrap().next().unwrap());
+        let expect = vec!(Memo::new("book", "The Lord of the Rings")
+                          .with(("author", "Tolkien")),
+                          Memo::new("book", "The Hobbit"));
+        assert_eq!(memos, Ok(expect));
+
+        let input = "# a sample file\n@book The Lord of the Rings\n.author Tolkien\n\n\n@book The Hobbit";
+        let result = MemoParser::parse(Rule::memos, &input);
+        let memos = rule_memos(result.unwrap().next().unwrap());
+        let expect = vec!(Memo::new("book", "The Lord of the Rings")
+                          .with(("author", "Tolkien")),
+                          Memo::new("book", "The Hobbit"));
+        assert_eq!(memos, Ok(expect));
+        
+
     }
 }

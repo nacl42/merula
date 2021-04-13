@@ -45,6 +45,7 @@ data_node = { data_node_eof | data_node_ml }
 data_multinode = { data_multinode_eof | data_multinode_ml }
 memo = { header_node ~ (NEWLINE ~ (data_multinode|data_node))* }
 
+memos = { (comment | memo | NEWLINE)* }
 
 file = {
       SOI ~
