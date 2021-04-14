@@ -226,7 +226,14 @@ pub fn rule_data_node_ml(pair: Pair<Rule>) -> Result<Node, ()> {
     let mut inner = pair.into_inner();
     let key = inner.next().unwrap().as_str();
     let value = inner.next().unwrap().as_str().trim();
-    Ok(Node::new(key, value))
+    let mut node = Node::new(key, value);
+    for attr in inner {
+        let mut attr_inner = attr.into_inner();
+        let attr_key = attr_inner.next().unwrap().as_str();
+        let attr_value = attr_inner.next().unwrap().as_str();
+        node.attrs.insert(attr_key.into(), attr_value.into());
+    }
+    Ok(node)
 }
 
 pub fn rule_data_node_eof(pair: Pair<Rule>) -> Result<Node, ()> {
@@ -387,7 +394,12 @@ mod tests {
         let result = MemoParser::parse(Rule::data_node_ml, &input);
         let node = rule_data_node_ml(result.unwrap().next().unwrap());
         assert_eq!(node, Ok(Node::new("colors", "blue\nred")));
-
+        
+        let input = ".colors blue\nred\n+tag foo";
+        let result = MemoParser::parse(Rule::data_node_ml, &input);
+        let node = rule_data_node_ml(result.unwrap().next().unwrap());
+        let expected = Node::new("colors", "blue\nred").set("tag", "foo");
+        assert_eq!(node, Ok(expected));
     }
 
     #[test]
@@ -461,6 +473,14 @@ mod tests {
                           Memo::new("book", "The Hobbit"));
         assert_eq!(memos, Ok(expect));
         
+        let input = "# a sample file\n@book The Lord of the Rings\n.author Tolkien\n+source Wikipedia\n\n@book The Hobbit";
+        let result = MemoParser::parse(Rule::memos, &input);
+        let memos = rule_memos(result.unwrap().next().unwrap());
+        let expect = vec!(Memo::new("book", "The Lord of the Rings")
+                          .with(("author", "Tolkien"))
+                          .with_attr("source", "Wikipedia"),
+                          Memo::new("book", "The Hobbit"));
+        assert_eq!(memos, Ok(expect));
 
     }
 }

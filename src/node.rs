@@ -25,6 +25,13 @@ impl Node {
             attrs: HashMap::new()
         }
     }
+
+    pub fn set<K, V>(mut self, key: K, value: V) -> Self
+    where K: Into<Key>, V: Into<Value>
+    {
+        self.attrs.insert(key.into(), value.into());
+        self
+    }
 }
 
 impl <K, V> From<(K, V)> for Node
@@ -35,3 +42,4 @@ where K: Into<Key>,
         Node::new(key, value)
     }
 }
+

@@ -60,6 +60,20 @@ impl Memo {
         self.nodes.push(node.into());
         self
     }
+
+    /// Adds given key-value pair to the last inserted Node and
+    /// returns the instance of the Memo.  With this method, the
+    /// builder pattern can be used to add multiple nodes with
+    /// attributes.
+    pub fn with_attr<K, V>(mut self, key: K, value: V) -> Self
+    where K: Into<Key>, V: Into<Value>
+    {
+        // TODO: won't work if Node.attr is not public anymore
+        // maybe make Node.attr pub only for the crate
+        let index = self.nodes.len() - 1;
+        self.nodes[index].attrs.insert(key.into(), value.into());
+        self
+    }
     
     /// Returns Memo collection (key of header node).
     pub fn collection(&self) -> Key {
