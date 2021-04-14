@@ -26,10 +26,16 @@ impl Node {
         }
     }
 
-    pub fn set<K, V>(mut self, key: K, value: V) -> Self
+    pub fn with_attr<K, V>(mut self, key: K, value: V) -> Self
     where K: Into<Key>, V: Into<Value>
     {
         self.attrs.insert(key.into(), value.into());
+        self
+    }
+
+    pub fn with_attrs(mut self, attrs: HashMap<Key, Value>) -> Self
+    {
+        self.attrs = attrs;
         self
     }
 }

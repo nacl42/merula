@@ -11,9 +11,10 @@ use pest::iterators::Pair;
 pub struct MemoParser;
 
 use std::fs;
+use std::collections::HashMap;
 use log::*;
 
-use crate::{Memo, Node, Value};
+use crate::{Memo, Node, Value, Key};
 use std::path::{Path, PathBuf};
 
 // TODO:
@@ -39,8 +40,8 @@ fn determine_include_path(current_filename: &'_ str, include_filename: &'_ str) 
 pub fn read_from_file(filename: &'_ str, drop_first: bool)
                       -> Result<Vec<Memo>, ()>
 {
-    read_from_file_internal(filename, drop_first, &mut vec!())
-    //read_from_file_internal_new(filename, drop_first, &mut vec!())
+    //read_from_file_internal(filename, drop_first, &mut vec!())
+    read_from_file_internal_new(filename, drop_first, &mut vec!())
 }
 
 fn read_from_file_internal_new(filename: &'_ str, drop_first: bool,
@@ -53,9 +54,10 @@ fn read_from_file_internal_new(filename: &'_ str, drop_first: bool,
     // 1. data_multinode_ml should accept attributes
     //
     // 2. include files is not working, as we read the whole thing
-    //    solution might be to have an alternative notation at the
+    //    a. solution might be to have an alternative notation at the
     //    very front. On the other hand we would like to keep
     //    the same notation for mr commands and for mr records.
+    //    b. or we could have two passes
     
     debug!("reading file {}", filename);
     let unparsed_file = fs::read_to_string(filename)
@@ -67,7 +69,7 @@ fn read_from_file_internal_new(filename: &'_ str, drop_first: bool,
         .expect("unsuccessful parse")
         .next().unwrap();
 
-    let mut memos = rule_memos(result)?;
+    let mut memos = rule_memos(result.into_inner().next().unwrap())?;
 
     if drop_first & (memos.len() > 0) {
         memos.remove(0);
@@ -223,13 +225,24 @@ pub fn rule_data_multinode_ml(pair: Pair<Rule>) -> Result<Vec<Node>, ()> {
         x => x
     };
     let values = inner.next().unwrap().as_str();
+    let mut attrs = HashMap::<Key, Value>::new();
+    for attr in inner {
+        let mut attr_inner = attr.into_inner();
+        let attr_key = attr_inner.next().unwrap().as_str();
+        let attr_value = attr_inner.next().unwrap().as_str();
+        attrs.insert(attr_key.into(), attr_value.into());
+    }
+
     // split value by given separator, each value is trimmed
     for value in values.split(sep) {
         let value = value.trim();
         if value.len() > 0 {
-            nodes.push(Node::new(key, value.trim()));
+            let node = Node::new(key, value.trim())
+                .with_attrs(attrs.clone());
+            nodes.push(node);
         }
     }
+
     Ok(nodes)
 }
 
@@ -333,9 +346,9 @@ pub fn rule_memos(pair: Pair<Rule>) -> Result<Vec<Memo>, ()> {
     for token in pair.into_inner() {
         match token.as_rule() {
             Rule::memo => {
-                memos.push(rule_memo(token)?) 
+                memos.push(rule_memo(token)?);
             },
-            _ => {} // ignore silently
+            _ => { } // ignore silently
         }
     }
     Ok(memos)
@@ -381,6 +394,15 @@ mod tests {
         let result = MemoParser::parse(Rule::data_multinode_ml, &input);
         let nodes = rule_data_multinode_ml(result.unwrap().next().unwrap());
         let expected = vec!(Node::new("color", "blue"), Node::new("color", "red"));
+        assert_eq!(nodes, Ok(expected));
+
+        let input = ".color, blue, red\n+tag foo";
+        let result = MemoParser::parse(Rule::data_multinode_ml, &input);
+        let nodes = rule_data_multinode_ml(result.unwrap().next().unwrap());
+        let expected = vec!(Node::new("color", "blue")
+                            .with_attr("tag", "foo"),
+                            Node::new("color", "red")
+                            .with_attr("tag", "foo"));
         assert_eq!(nodes, Ok(expected));
 
         let input = ".color|\nblue\nred";
@@ -433,7 +455,7 @@ mod tests {
         let input = ".colors blue\nred\n+tag foo";
         let result = MemoParser::parse(Rule::data_node_ml, &input);
         let node = rule_data_node_ml(result.unwrap().next().unwrap());
-        let expected = Node::new("colors", "blue\nred").set("tag", "foo");
+        let expected = Node::new("colors", "blue\nred").with_attr("tag", "foo");
         assert_eq!(node, Ok(expected));
     }
 
