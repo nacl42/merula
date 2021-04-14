@@ -41,23 +41,14 @@ pub fn read_from_file(filename: &'_ str, drop_first: bool)
                       -> Result<Vec<Memo>, ()>
 {
     //read_from_file_internal(filename, drop_first, &mut vec!())
-    read_from_file_internal_new(filename, drop_first, &mut vec!())
+    read_from_file_internal_new(filename, &mut vec!())
 }
 
-fn read_from_file_internal_new(filename: &'_ str, drop_first: bool,
-                               include_path_trail: &mut Vec<PathBuf>)
+fn read_from_file_internal_new(filename: &'_ str, include_path_trail: &mut Vec<PathBuf>)
                                -> Result<Vec<Memo>, ()>
 {
-    // TODO
-    // two things are not yet working:
-    //
-    // 1. data_multinode_ml should accept attributes
-    //
-    // 2. include files is not working, as we read the whole thing
-    //    a. solution might be to have an alternative notation at the
-    //    very front. On the other hand we would like to keep
-    //    the same notation for mr commands and for mr records.
-    //    b. or we could have two passes
+    // TODO: include files is not working, as we read the whole thing
+    // scan for @mr:include and read from all these files
     
     debug!("reading file {}", filename);
     let unparsed_file = fs::read_to_string(filename)
@@ -71,10 +62,34 @@ fn read_from_file_internal_new(filename: &'_ str, drop_first: bool,
 
     let mut memos = rule_memos(result.into_inner().next().unwrap())?;
 
-    if drop_first & (memos.len() > 0) {
-        memos.remove(0);
-    }
+    // Include memos from other files if `@mr:include filename` has
+    // been provided.
 
+    // TODO: maybe insert at proper position
+    let n_values = memos.iter().enumerate()
+        .filter(|(n, memo)| memo.collection() == "mr:include")
+        .map(|(n, m)| (n, m.title()));
+
+    for (index, value) in n_values.collect::<Vec<(usize, String)>>()
+    {
+        let include_path = determine_include_path(&filename, &value);
+        debug!("include path is '{:#?}'", include_path.to_str());
+
+        // we could have an include path trail and check if the include
+        // is in there. OR even simpler, we could just allow one include :-)
+        debug!("trying to include {}", include_path.to_str().unwrap());
+        if include_path_trail.len() < 2 {
+            let included_memos = read_from_file_internal_new(
+                include_path.to_str().unwrap(), include_path_trail
+            ).unwrap();
+            info!("included {} memos from included file '{}'", included_memos.len(), include_path.to_str().unwrap());
+            // TODO: include memos at given position
+            memos.extend(included_memos);
+        } else {
+            eprintln!("merula currently does not supporting nested includes");
+        }
+    }
+    
     Ok(memos)        
 }
 
