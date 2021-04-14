@@ -38,6 +38,11 @@ impl Node {
         self.attrs = attrs;
         self
     }
+
+    pub fn attrs<'a>(&'a self) -> &'a HashMap<Key, Value>
+    {
+        &self.attrs
+    }
 }
 
 impl <K, V> From<(K, V)> for Node

@@ -161,6 +161,12 @@ fn main() {
                                          ".".red(),
                                          node.key.red(),
                                          node.value.to_string().white());
+                                for (key, value) in node.attrs() {
+                                    println!("{}{} {}",
+                                             "+".yellow(),
+                                             key.yellow(),
+                                             value.to_string().white());
+                                }
                             }
                         }
                         println!("");
@@ -172,6 +178,13 @@ fn main() {
                                      ".".red(),
                                      node.key.red(),
                                      node.value.to_string().white());
+
+                            for (key, value) in node.attrs() {
+                                println!("{}{} {}",
+                                         "+".yellow(),
+                                         key.yellow(),
+                                         value.to_string().white());
+                            }
                         }
                         println!("");
                     },
