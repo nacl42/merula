@@ -47,6 +47,8 @@ memo = { header_node ~ (NEWLINE ~ (data_multinode|data_node))* }
 
 memos = { (comment | memo | NEWLINE)* }
 
+file_new = { SOI ~ memos ~ EOI }
+
 file = {
       SOI ~
       ((comment | header | multiline_node | multivalue_node | node | attr )? ~ NEWLINE)* ~

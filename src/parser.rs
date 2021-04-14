@@ -40,7 +40,42 @@ pub fn read_from_file(filename: &'_ str, drop_first: bool)
                       -> Result<Vec<Memo>, ()>
 {
     read_from_file_internal(filename, drop_first, &mut vec!())
+    //read_from_file_internal_new(filename, drop_first, &mut vec!())
 }
+
+fn read_from_file_internal_new(filename: &'_ str, drop_first: bool,
+                               include_path_trail: &mut Vec<PathBuf>)
+                               -> Result<Vec<Memo>, ()>
+{
+    // TODO
+    // two things are not yet working:
+    //
+    // 1. data_multinode_ml should accept attributes
+    //
+    // 2. include files is not working, as we read the whole thing
+    //    solution might be to have an alternative notation at the
+    //    very front. On the other hand we would like to keep
+    //    the same notation for mr commands and for mr records.
+    
+    debug!("reading file {}", filename);
+    let unparsed_file = fs::read_to_string(filename)
+        .expect("cannot read mr file");
+
+    include_path_trail.push(Path::new(filename).to_path_buf());
+
+    let result = MemoParser::parse(Rule::file_new, &unparsed_file)
+        .expect("unsuccessful parse")
+        .next().unwrap();
+
+    let mut memos = rule_memos(result)?;
+
+    if drop_first & (memos.len() > 0) {
+        memos.remove(0);
+    }
+
+    Ok(memos)        
+}
+
 
 fn read_from_file_internal(filename: &'_ str, drop_first: bool,
                            include_path_trail: &mut Vec<PathBuf>)

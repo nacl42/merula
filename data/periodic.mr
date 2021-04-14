@@ -237,7 +237,7 @@
 .density 1.3954
 +state liquid, at boiling point
 .discovery, Lord Rayleigh, William Ramsay
-+date 1894
+#+date 1894
 
 @element K
 .name potassium
@@ -322,6 +322,7 @@
 +state when liquid at melting point
 .discovery Louis Nicolas Vauquelin
 +date 1794
+
 @element Mn
 .name manganese
 .number 25
