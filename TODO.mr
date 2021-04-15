@@ -2,8 +2,23 @@
 # TODO file for merula
 #
 
-@mr:filter active
-.mql status=active
+# list all open issues:
+# $ cargo run -- list TODO.mr --filter open -vv
+
+# list all open issues being actively worked on and containing the text 'EOF'
+# $ cargo run -- list TODO.mr --filter assigned -vv --mql ~EOF
+
+# list all resolved issues:
+# $ cargo run --list TODO.mr --filter done -vv
+
+# list all open issues which require clarification
+# $ cargo run -- list TODO.mr --filter open --vv --mql tag=clarify
+
+@mr:filter open
+.mql status=open
+
+@mr:filter assigned
+.mql .assigned
 
 @mr:filter done
 .mql status=done
@@ -12,7 +27,9 @@
 @TODO add CHANGELOG file
 
 @TODO add tests for parsing memo strings and files
-.status active
+.status open
+.assigned nacl42
+.tag clarify
 .doc<<EOF
 First, we need to shorten the setup of a Memo in the source code, so that we can write the tests more efficently.
 Second, we need to add all kinds of tests, especially for values.
@@ -20,19 +37,13 @@ When done, we can consider to rewrite the parser.
 Long-term-goal: Include attributes in the short-hand notation (inline attributes).
 EOF
 
-@TODO parse multiline values without EOF delimiter
-.status active
-.doc<<EOF
-It should be possible to define multiline values without
-the `<<EOF` syntax, i.e. if no separator is given, then the
-next node will be the delimiter.
-(with the blank lines until the next memo removed).
-EOF
 
 @TODO merge mql.pest and memo.pest
+.status open
 
 @TODO index range
-.status active
+.status open
+.assigned nacl42
 .doc<<EOF
 mql 'tag[0:1]~s' currently means:
 - filter for all nodes with name 'tag'
@@ -103,7 +114,8 @@ Alternatively, the attribute notation could be shorter, just {date} or
 EOF
 
 @TODO add some proper tests in the source code
-.status active
+.status open
+.assigned nacl42
 
 @TODO extend equal comparison to perform type conversion
 .tag mql
@@ -298,3 +310,11 @@ have more characters, such as Umlaute.
 
 => look at predefined groups in pest parser
 EOF
+
+@TODO parse multiline values without EOF delimiter
+.status done
+.finished 2021-04-14
+.doc It should be possible to define multiline values without
+the `<<EOF` syntax, i.e. if no separator is given, then the
+next node will be the delimiter.
+(with the blank lines until the next memo removed).
