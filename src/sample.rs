@@ -1,4 +1,4 @@
-use crate::Memo;
+use crate::memo::Memo;
 
 pub fn setup_memos() -> Vec<Memo> {
     let mut memos: Vec<Memo> = vec!();

@@ -23,6 +23,12 @@
 @mr:filter done
 .mql status=done
 
+
+@TODO write gui frontend
+.status open
+.doc
+using either tui-rs or cursive as backend
+
 @TODO add ROADMAP file
 @TODO add CHANGELOG file
 
@@ -318,3 +324,8 @@ EOF
 the `<<EOF` syntax, i.e. if no separator is given, then the
 next node will be the delimiter.
 (with the blank lines until the next memo removed).
+
+@TODO move to lib
+.status done
+.finished 2021-04-22
+

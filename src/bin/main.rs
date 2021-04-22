@@ -5,29 +5,23 @@
 //! production purposes.
 //!
 
-#[macro_use] extern crate pest_derive;
+use merula::{
+    memo::{Memo},
+    node::Node,
+    value::{Value, Key},
+    filter::{NodeFilter, KeyFilter, ValueFilter, MemoFilter},
+    parser::read_from_file,
+    mql::parse_mql
+};
+
+use simplelog::*;
+use log::*;
+use colored::*;
 
 #[allow(unused_imports)]
 use clap::{App, crate_version, Arg};
 #[allow(unused_imports)]
 use clap_generate::{generate, generators::Bash};
-
-pub mod memo;
-pub mod node;
-pub mod value;
-pub mod sample;
-pub mod parser;
-pub mod filter;
-pub mod mql;
-
-use memo::{Memo};
-use node::Node;
-use value::{Value, Key};
-use filter::{NodeFilter, KeyFilter, ValueFilter, MemoFilter};
-use mql::parse_mql;
-use simplelog::*;
-use log::*;
-use colored::*;
 
 fn init_logger(log_level: u8) {
 
@@ -89,7 +83,7 @@ fn main() {
             let verbosity = matches.occurrences_of("verbose") as u8;
 
             debug!("loading input file '{}'", input);
-            let memos = parser::read_from_file(input, true).unwrap();
+            let memos = read_from_file(input, true).unwrap();
             debug!("read {} memos", memos.len());
 
             let mut memo_filter = MemoFilter::new();
@@ -202,7 +196,7 @@ fn main() {
             //let verbosity = matches.occurrences_of("verbose") as u8;
 
             debug!("loading input file '{}'", input);
-            let memos = parser::read_from_file(input, true).unwrap();
+            let memos = read_from_file(input, true).unwrap();
             debug!("read {} memos", memos.len());
 
             let memo_count = memos.len();
