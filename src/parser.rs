@@ -24,16 +24,17 @@ use std::path::{Path, PathBuf};
 // - nested includes are not possible, instead we are simply limiting
 //   to one include
 
-fn determine_include_path(current_filename: &'_ str, include_filename: &'_ str) -> PathBuf {
-    let include_path = Path::new(current_filename);
-    if include_path.is_relative() {
-        // if given filename is relative, create complete
-        // file path from the current working directory
-        let cwd = Path::new(current_filename);
-        cwd.with_file_name(include_filename)
-    } else {
-        // if given filename is absolute, then use it
-        include_path.to_path_buf()
+
+// Return PathBuf for a given include file.  If the file name is
+// relative, rebase it to the the root path of the given master_file.
+fn absolute_include_path<F1, F2>(include_file: F1, master_file: F2) -> PathBuf
+where F1: Into<PathBuf>,
+      F2: Into<PathBuf>
+{
+    let include_file = include_file.into();
+    match include_file.is_relative() {
+        true => master_file.into().with_file_name(include_file),
+        false => include_file
     }
 }
 
@@ -70,7 +71,7 @@ fn read_from_file_internal(filename: &'_ str, include_path_trail: &mut Vec<PathB
 
     for (_index, value) in n_values.collect::<Vec<(usize, String)>>()
     {
-        let include_path = determine_include_path(&filename, &value);
+        let include_path = absolute_include_path(&value, &filename);
         debug!("include path is '{:#?}'", include_path.to_str());
 
         // we could have an include path trail and check if the include
@@ -261,7 +262,28 @@ pub fn rule_memos(pair: Pair<Rule>) -> Result<Vec<Memo>, ()> {
 
 
 #[cfg(test)]
-mod tests {
+mod test_other {
+    use super::*;
+
+    #[test]
+    fn test_absolute_include_path() {
+        let files = ("foo.txt", "/tmp/bar.mr", "/tmp/foo.txt");
+        let result = absolute_include_path(files.0, files.1);
+        assert_eq!(PathBuf::from(files.2), result);
+
+        let files = ("foo.txt", "", "foo.txt");
+        let result = absolute_include_path(files.0, files.1);
+        assert_eq!(PathBuf::from(files.2), result);
+
+        let files = ("/tmp/foo.txt", "/tmp/bar.mr", "/tmp/foo.txt");
+        let result = absolute_include_path(files.0, files.1);
+        assert_eq!(PathBuf::from(files.2), result);
+    }
+}
+
+
+#[cfg(test)]
+mod test_parser {
     use super::*;
 
     #[test]
