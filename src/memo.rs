@@ -36,6 +36,7 @@ impl Memo {
     /// # Examples
     ///
     /// ```
+    /// use merula::memo::Memo;
     /// let mut memo = Memo::new("book", "The Lord of the Rings");
     /// ```
     pub fn new<K, V>(collection: K, title: V) -> Self

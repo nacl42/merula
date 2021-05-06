@@ -6,9 +6,6 @@
 //!
 
 use merula::{
-    memo::{Memo},
-    node::Node,
-    value::{Value, Key},
     filter::{NodeFilter, KeyFilter, ValueFilter, MemoFilter},
     parser::read_from_file,
     mql::parse_mql
@@ -83,7 +80,7 @@ fn main() {
             let verbosity = matches.occurrences_of("verbose") as u8;
 
             debug!("loading input file '{}'", input);
-            let memos = read_from_file(input, true).unwrap();
+            let memos = read_from_file(input).unwrap();
             debug!("read {} memos", memos.len());
 
             let mut memo_filter = MemoFilter::new();
@@ -196,7 +193,7 @@ fn main() {
             //let verbosity = matches.occurrences_of("verbose") as u8;
 
             debug!("loading input file '{}'", input);
-            let memos = read_from_file(input, true).unwrap();
+            let memos = read_from_file(input).unwrap();
             debug!("read {} memos", memos.len());
 
             let memo_count = memos.len();
