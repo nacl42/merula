@@ -26,14 +26,31 @@ A very simple example looks like this:
 .url https://github.com/nacl42/merula
 .tag, software, database, plain-text
 .doc Merula is a plain-text, flat file database
-.license gplv3
+.license MIT or Apache 2.0
 ```
 
 This defines the memo with the title `merula` and which belongs to the
 collection `app`. It has a `url`, a `doc` string and three different
 `tag` nodes ("software", "database" and "plain-text").
 
-More elaborate examples can be found in the `data` directory.
+More elaborate examples can be found in the `data` directory:
+
+* Take a look at `data/periodic.mr` which gathers information from the
+  periodic table of elements. Even if you are not into science, you
+  will find that even though the number of elements is limited (118 at
+  the time of writing), the data for each element can be quite
+  extensive. While there are some data fields present for every
+  element (such as the `name`), others may only be available for
+  certain elements.
+* The file `data/filter_periodic.mr` contains some pre-defined filters
+  (using the `@mr:filter` directive). This is an example how the
+  behaviour of merula can be extended from within the `.mr` file
+  itself. The filter is only useful when using it alongside the
+  original dataset, therefore it is included in `data/periodic.mr` by
+  default (using the `@mr:include` directive).
+* The file `data/apps.mr` lists other note-taking or simple database
+  software. It shows off some of the features such as multi-line
+  values (with or without explicit delimiter) and multi-value lines.
 
 ## Features and Limitations
 

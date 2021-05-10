@@ -4,7 +4,7 @@
 .url https://github.com/nacl42/merula
 .tag, software, database, plain-text
 .doc Merula is a plain-text, flat file database
-.license gplv3
+.license MIT/Apache 2.0
 .extension mr
 
 @app recutils
@@ -44,13 +44,12 @@ EOF
 
 @app Zettelkasten
 .url http://www.zettelkasten.danielluedecke.de/
-.doc<<EOF
+.doc
 Mit Hilfe dieses Programms können Sie die tägliche Arbeit mit
 (wissenschaftlichen) Texten erleichtern und wesentlich effektiver
 gestalten. Sowohl das Sammeln und Verwalten wichtiger Textstellen,
 Exzerpte und Gedanken als auch die anschließende Verwendung dieser
 Textsammlung zwecks Textproduktion werden durch den Zettelkasten
 erheblich vereinfacht.
-EOF
 .extension zkn3
 
