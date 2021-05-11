@@ -9,6 +9,11 @@
 .doc element of the periodic table
 .require, number, group, period, amu
 
+@mr:template basic
+.doc very basic template to demonstrate the mechanism
+.header # --- csv output --- 
+.body {number},{name},{electrons}
+
 @element H
 .name hydrogen
 .number 1

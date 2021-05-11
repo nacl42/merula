@@ -89,6 +89,20 @@ impl std::fmt::Display for Value {
     }
 }
 
+// TODO: This is inconsistent: when printing multiline values as
+// string, we never print out separators.
+impl From<Value> for String {
+    fn from(value: Value) -> String {
+        match value {
+            Value::Text(text) => format!("{}", text),
+            Value::MultiLineText(text, sep) => format!("{}\n", text),
+            Value::Integer(n) => format!("{}", n),
+            Value::Float(x) => format!("{}", x),
+            Value::Bool(b) => format!("{}", b)
+        }
+    }
+}
+    
 impl From<&str> for Value {
     fn from(s: &str) -> Value {
         if s.contains("\n") {

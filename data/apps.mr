@@ -1,5 +1,12 @@
 # list of note-taking software
 
+@mr:template basic
+.doc very basic template to demonstrate the mechanism
+.body
+=== {app} ===
+
+{doc}
+
 @app merula
 .url https://github.com/nacl42/merula
 .tag, software, database, plain-text

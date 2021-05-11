@@ -11,6 +11,7 @@ use merula::{
     mql::parse_mql
 };
 
+use regex::{Regex, Captures};
 use simplelog::*;
 use log::*;
 use colored::*;
@@ -65,6 +66,12 @@ fn main() {
                 .about("print memo statistics")
                 .arg("<input> 'sets an input file'")
                 .arg("-v --verbose... 'Sets the verbosity level'")
+        )
+        .subcommand(
+            App::new("export")
+                .about("export data using a template")
+                .arg("<input> 'sets an input file'")
+                .arg("--template=[TEMPLATE] 'name of the template expression'")
         );
 
     let matches = app.get_matches();
@@ -185,6 +192,59 @@ fn main() {
         }        
     }
 
+    // --- SUBCOMMAND `export` ---
+    
+    if let Some(ref matches) = matches.subcommand_matches("export") {
+        // read memos from .mr file into database
+        // TODO: matches.values_of("input") -> Vec<_>
+        if let Some(input) = matches.value_of("input") {
+
+            debug!("loading input file '{}'", input);
+            let memos = read_from_file(input).unwrap();
+            debug!("read {} memos", memos.len());
+
+            // check if a pre-defined template has been supplied
+            if let Some(template_name) = matches.value_of("template") {
+                debug!("looking for pre-defined template '{}'", template_name);
+                let mut mf = MemoFilter::new();
+                let nf = NodeFilter::default()
+                    .with_key(KeyFilter::Equals("mr:template".into()))
+                    .with_value(ValueFilter::Equals(template_name.into()));
+                mf.add(nf);
+                if let Some(tpl_memo) =
+                    memos.iter().filter(|&memo| mf.check(memo)).next()
+                {
+                    //debug!("Resulting template: {:#?}", tpl_memo);
+                    // get header if available
+                    if let Some(header) = tpl_memo.get("header") {
+                        println!("{}", header.value);
+                    }
+                    // get body if available
+                    if let Some(body) = tpl_memo.get("body") {
+                        let tpl = &body.value.to_string();
+                        debug!("template text = {}", tpl);
+                        let re: Regex = Regex::new("\\{(.*?)\\}").unwrap();
+                        
+                        // TODO: filter memos
+                        for memo in memos.iter() {
+                            let result = re.replace_all(tpl, |caps: &Captures| {
+                                if let Some(node) = memo.get(&caps[1]) {
+                                    format!("{}", node.value)
+                                    //&node.value.clone().to_string()
+                                } else {
+                                    String::from(&caps[0])
+                                }
+                            });
+                            println!("{}", result);
+                        }
+                    }
+                } else {
+                    error!("template '{}' not found", template_name);
+                }
+            }
+        }
+    }
+    
     // --- SUBCOMMAND `stats` ---
     
     if let Some(ref matches) = matches.subcommand_matches("stats") {
