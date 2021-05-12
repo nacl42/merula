@@ -1,0 +1,11 @@
+# biased selection of useful tools
+
+@app exa
+@app bat
+@app ripgrep
+@app alacritty
+@app git
+@app emacs
+@app ttf-nerd-fonts-symbols
+@app bash-completion
+
