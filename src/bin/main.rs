@@ -8,7 +8,8 @@
 use merula::{
     filter::{NodeFilter, KeyFilter, ValueFilter, MemoFilter},
     parser::read_from_file,
-    mql::parse_mql
+    mql::parse_mql,
+    memo::Memo
 };
 
 use regex::{Regex, Captures};
@@ -47,6 +48,34 @@ fn init_logger(log_level: u8) {
 }
 
 
+fn lookup_filter(memos: &Vec<Memo>, filter_name: &str)
+                 -> Result<MemoFilter, String>
+{
+    debug!("looking for pre-defined filter '{}'", filter_name);
+    let mut mf = MemoFilter::new();
+    let nf = NodeFilter::default()
+        .with_key(KeyFilter::Equals("mr:filter".into()))
+        .with_value(ValueFilter::Equals(filter_name.into()));
+    mf.add(nf);
+    
+    if let Some(mql_memo) = memos.iter().filter(|&memo| mf.check(memo)).next() {
+        debug!("Resulting filter: {:#?}", mql_memo);
+        if let Some(node) = mql_memo.nodes().filter(|&node| node.key == "mql").next() {
+            debug!("Resulting node: {:#?}", node);
+            let mql = node.value.to_string();
+            debug!("Resulting mql: {}", mql);
+            match parse_mql(mql.as_str()) {
+                Ok(filter) => Ok(filter),
+                Err(msg) => Err(String::from(msg))
+            }
+        } else {
+            Err(format!("pre-defined filter '{}' found, but it contains no `.mql` node", filter_name))
+        }
+    } else {
+        Err(format!("could not find pre-defined filter '{}'", filter_name))
+    }
+}
+
 fn main() {
     let app = App::new("merula")
         .version(crate_version!())
@@ -57,8 +86,8 @@ fn main() {
             App::new("list")
                 .about("list memos")
                 .arg("<input> 'sets an input file'")
-                .arg("--mql=[MQL] 'sets a mql expression'")
                 .arg("--filter=[FILTER] 'load an mql expression from a pre-defined filter'")
+                .arg("--mql=[MQL] 'sets a mql expression'")
                 .arg("-v --verbose... 'Sets the verbosity level'")
         )
         .subcommand(
@@ -71,6 +100,8 @@ fn main() {
             App::new("export")
                 .about("export data using a template")
                 .arg("<input> 'sets an input file'")
+                .arg("--filter=[FILTER] 'load an mql expression from a pre-defined filter'")
+                .arg("--mql=[MQL] 'sets a mql expression'")
                 .arg("--template=[TEMPLATE] 'name of the template expression'")
         );
 
@@ -89,36 +120,16 @@ fn main() {
             debug!("loading input file '{}'", input);
             let memos = read_from_file(input).unwrap();
             debug!("read {} memos", memos.len());
-
-            let mut memo_filter = MemoFilter::new();
             
             // check if a pre-defined filter has been supplied
+            let mut memo_filter = MemoFilter::new();
             if let Some(filter_name) = matches.value_of("filter") {
-                debug!("looking for pre-defined filter '{}'", filter_name);
-                let mut mf = MemoFilter::new();
-                let nf = NodeFilter::default()
-                    .with_key(KeyFilter::Equals("mr:filter".into()))
-                    .with_value(ValueFilter::Equals(filter_name.into()));
-                mf.add(nf);
-                if let Some(mql_memo) =
-                    memos.iter().filter(|&memo| mf.check(memo)).next()
-                {
-                    debug!("Resulting filter: {:#?}", mql_memo);
-                    if let Some(node) = mql_memo.nodes().filter(|&node| node.key == "mql").next() {
-                        debug!("Resulting node: {:#?}", node);
-                        let mql = node.value.to_string();
-                        debug!("Resulting mql: {}", mql);
-                        if let Ok(filter) = parse_mql(mql.as_str()) {
-                            debug!("resulting node filter = {:#?}", filter);
-                            memo_filter = filter;
-                        } else {
-                            eprintln!("couldn't parse filter expression!");
-                            std::process::exit(1);
-                        }
+                match lookup_filter(&memos, filter_name) {
+                    Ok(mf) => memo_filter = mf,
+                    Err(msg) => {
+                        eprintln!("{}", msg);
+                        std::process::exit(1);
                     }
-                } else {
-                    eprintln!("could not find pre-defined filter '{}'", filter_name);
-                    std::process::exit(1);
                 }
             }
 
@@ -224,9 +235,34 @@ fn main() {
                         let tpl = &body.value.to_string();
                         debug!("template text = {}", tpl);
                         let re: Regex = Regex::new("\\{(.*?)\\}").unwrap();
-                        
-                        // TODO: filter memos
-                        for memo in memos.iter() {
+
+                        // check if a pre-defined filter has been supplied
+                        let mut memo_filter = MemoFilter::new();
+                        if let Some(filter_name) = matches.value_of("filter") {
+                            match lookup_filter(&memos, filter_name) {
+                                Ok(mf) => memo_filter = mf,
+                                Err(msg) => {
+                                    eprintln!("{}", msg);
+                                    std::process::exit(1);
+                                }
+                            }
+                        }
+
+                        // check if a mql filter clause has been supplied
+                        // any mql condition will be appended to the existing filter
+                        // it is therefore possible to define both --filter (as base filter)
+                        // and --mql (as refinement)
+                        if let Some(mql) = matches.value_of("mql") {
+                            debug!("mql filter expression is: '{}'", mql);
+                            if let Ok(mql_filter) = parse_mql(mql) {
+                                debug!("resulting mql filter = {:#?}", mql_filter);
+                                memo_filter.extend(mql_filter)
+                            } else {
+                                eprintln!("couldn't parse mql filter expression '{}'!", mql);
+                            }
+                        }
+
+                        for memo in memos.iter().filter(|&memo| memo_filter.check(memo)) {
                             let result = re.replace_all(tpl, |caps: &Captures| {
                                 if let Some(node) = memo.get(&caps[1]) {
                                     format!("{}", node.value)
