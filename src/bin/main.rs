@@ -9,7 +9,7 @@ use merula::{
     filter::{NodeFilter, KeyFilter, ValueFilter, MemoFilter},
     parser::read_from_file,
     mql::parse_mql,
-    memo::Memo
+    memo::{Memo, NodeType}
 };
 
 use regex::{Regex, Captures};
@@ -18,7 +18,7 @@ use log::*;
 use colored::*;
 
 #[allow(unused_imports)]
-use clap::{App, crate_version, Arg};
+use clap::{App, crate_version, Arg, ArgGroup};
 #[allow(unused_imports)]
 use clap_generate::{generate, generators::Bash};
 
@@ -89,6 +89,12 @@ fn main() {
                 .arg("--filter=[FILTER] 'load an mql expression from a pre-defined filter'")
                 .arg("--mql=[MQL] 'sets a mql expression'")
                 .arg("-v --verbose... 'Sets the verbosity level'")
+                .arg("--all 'use all memos (default)'")
+                .arg("--only-mr 'only internal memos (@mr:xxx)'")
+                .arg("--only-user 'only user memos'")
+                .group(ArgGroup::new("default-filter")
+                       .args(&["all", "only-mr", "only-user"])
+                       .multiple(false))
         )
         .subcommand(
             App::new("stats")
@@ -103,6 +109,12 @@ fn main() {
                 .arg("--filter=[FILTER] 'load an mql expression from a pre-defined filter'")
                 .arg("--mql=[MQL] 'sets a mql expression'")
                 .arg("--template=[TEMPLATE] 'name of the template expression'")
+                .arg("--all 'use all memos (default)'")
+                .arg("--only-mr 'only internal memos (@mr:xxx)'")
+                .arg("--only-user 'only user memos'")
+                .group(ArgGroup::new("default-filter")
+                       .args(&["all", "only-mr", "only-user"])
+                       .multiple(false))
         );
 
     let matches = app.get_matches();
@@ -120,9 +132,27 @@ fn main() {
             debug!("loading input file '{}'", input);
             let memos = read_from_file(input).unwrap();
             debug!("read {} memos", memos.len());
+
+            // setup filter
+            let mut memo_filter = MemoFilter::new();
+
+            // set default filter
+            if matches.is_present("only-mr") {
+                memo_filter.add(
+                    NodeFilter::default()
+                        .with_node_type(NodeType::Header)
+                        .with_key(KeyFilter::StartsWith("mr:".into()))
+                );
+            } else if matches.is_present("only-user") {
+                memo_filter.add(
+                    NodeFilter::default()
+                        .with_node_type(NodeType::Header)
+                        .with_key(KeyFilter::Not(
+                            Box::new(KeyFilter::StartsWith("mr:".into()))))
+                );
+            }
             
             // check if a pre-defined filter has been supplied
-            let mut memo_filter = MemoFilter::new();
             if let Some(filter_name) = matches.value_of("filter") {
                 match lookup_filter(&memos, filter_name) {
                     Ok(mf) => memo_filter = mf,
@@ -236,8 +266,26 @@ fn main() {
                         debug!("template text = {}", tpl);
                         let re: Regex = Regex::new("\\{(.*?)\\}").unwrap();
 
-                        // check if a pre-defined filter has been supplied
+                        // setup filter
                         let mut memo_filter = MemoFilter::new();
+                        
+                        // set default filter
+                        if matches.is_present("only-mr") {
+                            memo_filter.add(
+                                NodeFilter::default()
+                                    .with_node_type(NodeType::Header)
+                                    .with_key(KeyFilter::StartsWith("mr:".into()))
+                            );
+                        } else if matches.is_present("only-user") {
+                            memo_filter.add(
+                                NodeFilter::default()
+                                    .with_node_type(NodeType::Header)
+                                    .with_key(KeyFilter::Not(
+                                        Box::new(KeyFilter::StartsWith("mr:".into()))))
+                            );
+                        }
+            
+                        // check if a pre-defined filter has been supplied
                         if let Some(filter_name) = matches.value_of("filter") {
                             match lookup_filter(&memos, filter_name) {
                                 Ok(mf) => memo_filter = mf,

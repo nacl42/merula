@@ -7,7 +7,10 @@ use std::collections::HashSet;
 #[derive(Debug, PartialEq)]
 pub enum KeyFilter {
     Any,
-    Equals(String)
+    Equals(String),
+    StartsWith(String),
+    StartsNotWith(String),
+    Not(Box<KeyFilter>)  // TODO: Does not work properly yet
 }
 
 impl KeyFilter {
@@ -15,6 +18,9 @@ impl KeyFilter {
         match self {
             KeyFilter::Any => true,
             KeyFilter::Equals(x) => key == x,
+            KeyFilter::StartsWith(x) => key.starts_with(x),
+            KeyFilter::StartsNotWith(x) => !key.starts_with(x),
+            KeyFilter::Not(inner) => !inner.check(key)
         }
     }
 }
