@@ -80,8 +80,9 @@ impl std::fmt::Display for Value {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Value::Text(text) => write!(f, "{}", text),
-            Value::MultiLineText(text, sep) =>
-                write!(f, "<<{}\n{}\n{}", sep, text, sep),
+            Value::MultiLineText(text, _) => write!(f, "{}", text),
+            // Value::MultiLineText(text, sep) =>
+            //     write!(f, "<<{}\n{}\n{}", sep, text, sep),
             Value::Integer(n) => write!(f, "{}", n),
             Value::Float(x) => write!(f, "{}", x),
             Value::Bool(b) => write!(f, "{}", b)

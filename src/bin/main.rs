@@ -266,7 +266,6 @@ fn main() {
                             let result = re.replace_all(tpl, |caps: &Captures| {
                                 if let Some(node) = memo.get(&caps[1]) {
                                     format!("{}", node.value)
-                                    //&node.value.clone().to_string()
                                 } else {
                                     String::from(&caps[0])
                                 }
