@@ -249,28 +249,8 @@ fn cmd_export(cmd: CmdExport) {
             debug!("template text = {}", tpl);
             let re: Regex = Regex::new("\\{(.*?)\\}").unwrap();
 
-            // setup filter
-            let mut memo_filter = MemoFilter::new();
-                        
             // set default filter
-            match cmd.default_filter {
-                DefaultFilter::System => {
-                    memo_filter.add(
-                        NodeFilter::default()
-                            .with_node_type(NodeType::Header)
-                            .with_key(KeyFilter::StartsWith("mr:".into()))
-                    );
-                },
-                DefaultFilter::Data => {
-                    memo_filter.add(
-                        NodeFilter::default()
-                            .with_node_type(NodeType::Header)
-                            .with_key(KeyFilter::Not(
-                                Box::new(KeyFilter::StartsWith("mr:".into()))))
-                    );
-                },
-                DefaultFilter::All => {}
-            }
+            let mut memo_filter: MemoFilter = cmd.default_filter.into();
 
             // check if a pre-defined filter has been supplied
             if let Some(filter_name) = cmd.filter {
@@ -302,12 +282,22 @@ fn cmd_export(cmd: CmdExport) {
                     if let Some(node) = memo.get(&caps[1]) {
                         format!("{}", node.value)
                     } else {
-                        String::from(&caps[0])
+                        // TODO: maybe have an option whether to print
+                        // an empty string or the initial template
+                        // string {key}
+                        format!("")
+                        //String::from(&caps[0])
                     }
                 });
                 println!("{}", result);
             }
         }
+
+        // get footer if available
+        if let Some(footer) = tpl_memo.get("footer") {
+            println!("{}", footer.value);
+        }
+
     } else {
         error!("template '{}' not found", cmd.template);
     }
