@@ -133,6 +133,8 @@ fn cmd_list(cmd: CmdList) {
     if let Some(filter_name) = cmd.filter {
         match lookup_filter(&memos, &filter_name) {
             // TODO: concatenate filter to existing one
+            // memo_filter.extend(mf) would AND the condition,
+            // while we really want to have an OR, don't we?
             Ok(mf) => memo_filter = mf,
             Err(msg) => {
                 eprintln!("{}", msg);
@@ -374,6 +376,7 @@ fn main() {
         .author("nacl42 <code@sreblov.de>")
         .about("simple cli frontend to access merula files (.mr)")
         .arg("-d --debug... 'Sets the debug level'")
+        
         .subcommand(
             App::new("list")
                 .about("list memos")
@@ -408,6 +411,7 @@ fn main() {
                 .arg("<input> 'sets an input file'")
                 .arg("--filter=[FILTER] 'load an mql expression from a pre-defined filter'")
                 .arg("--mql=[MQL] 'sets a mql expression'")
+                .arg("-v --verbose... 'Sets the verbosity level'")
                 .arg("--template=[TEMPLATE] 'name of the template expression'")
                 .arg("--all 'use all memos (default)'")
                 .arg("--system 'only internal memos (@mr:xxx)'")
