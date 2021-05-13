@@ -76,6 +76,131 @@ fn lookup_filter(memos: &Vec<Memo>, filter_name: &str)
     }
 }
 
+enum DefaultFilter { All, System, Data }
+
+struct CmdList {
+    input: String,
+    verbosity: u8,
+    default_filter: DefaultFilter,
+    filter: Option<String>,
+    mql: Option<String>
+}
+
+
+
+// read memos from .mr file into database
+fn cmd_list(cmd: CmdList) {
+    // TODO: matches.values_of("input") -> Vec<_>
+
+    debug!("loading input file '{}'", cmd.input);
+    let memos = read_from_file(&cmd.input).unwrap();
+    debug!("read {} memos", memos.len());
+
+    // setup filter
+    let mut memo_filter = MemoFilter::new();
+
+    // set default filter
+    match cmd.default_filter {
+        DefaultFilter::System => {
+            memo_filter.add(
+                NodeFilter::default()
+                    .with_node_type(NodeType::Header)
+                    .with_key(KeyFilter::StartsWith("mr:".into()))
+            );
+        },
+        DefaultFilter::Data => {
+            memo_filter.add(
+                NodeFilter::default()
+                    .with_node_type(NodeType::Header)
+                    .with_key(KeyFilter::Not(
+                        Box::new(KeyFilter::StartsWith("mr:".into()))))
+            );
+        },
+        DefaultFilter::All => {}
+    }
+        
+        
+    // check if a pre-defined filter has been supplied
+    if let Some(filter_name) = cmd.filter {
+        match lookup_filter(&memos, &filter_name) {
+            Ok(mf) => memo_filter = mf,
+            Err(msg) => {
+                eprintln!("{}", msg);
+                std::process::exit(1);
+            }
+        }
+    }
+
+    // check if a mql filter clause has been supplied
+    // any mql condition will be appended to the existing filter
+    // it is therefore possible to define both --filter (as base filter)
+    // and --mql (as refinement)
+    if let Some(mql)= cmd.mql {
+        debug!("mql filter expression is: '{}'", mql);
+        if let Ok(mql_filter) = parse_mql(&mql) {
+            debug!("resulting mql filter = {:#?}", mql_filter);
+            memo_filter.extend(mql_filter)
+        } else {
+            eprintln!("couldn't parse mql filter expression '{}'!", mql);
+        }
+    }
+        
+    for memo in memos.iter().filter(|&memo| memo_filter.check(memo)) {
+        // always print header
+        println!("{}{} {}",
+                 "@".red().bold(),
+                 memo.collection().red().bold(),
+                 memo.title().white().bold()
+        );
+        
+        match cmd.verbosity {
+            1 => {
+                // print only matching nodes
+                // currently, this includes the header node as well
+                
+                for idx in memo_filter.select_indices(&memo) {
+                    // skip header node, as it is already printed above
+                    // actually, this code relies on an implementation detail, i.e.
+                    // that the header node has index 0
+                    if idx > 0 {
+                        let node = memo.get_by_index(idx).unwrap();
+                        println!("{}{} {}",
+                                 ".".red(),
+                                 node.key.red(),
+                                 node.value.to_string().white());
+                        for (key, value) in node.attrs() {
+                            println!("{}{} {}",
+                                     "+".yellow(),
+                                     key.yellow(),
+                                     value.to_string().white());
+                        }
+                    }
+                }
+                println!("");
+            },
+            2 => {
+                // print all nodes
+                for node in memo.data() {
+                    println!("{}{} {}",
+                             ".".red(),
+                             node.key.red(),
+                             node.value.to_string().white());
+                    
+                    for (key, value) in node.attrs() {
+                        println!("{}{} {}",
+                                 "+".yellow(),
+                                 key.yellow(),
+                                 value.to_string().white());
+                    }
+                }
+                println!("");
+            },
+            _ => {}
+        }
+    }   
+}            
+
+
 fn main() {
     let app = App::new("merula")
         .version(crate_version!())
@@ -90,10 +215,10 @@ fn main() {
                 .arg("--mql=[MQL] 'sets a mql expression'")
                 .arg("-v --verbose... 'Sets the verbosity level'")
                 .arg("--all 'use all memos (default)'")
-                .arg("--only-mr 'only internal memos (@mr:xxx)'")
-                .arg("--only-user 'only user memos'")
+                .arg("--system 'only internal memos (@mr:xxx)'")
+                .arg("--data 'only data memos'")
                 .group(ArgGroup::new("default-filter")
-                       .args(&["all", "only-mr", "only-user"])
+                       .args(&["all", "system", "data"])
                        .multiple(false))
         )
         .subcommand(
@@ -110,10 +235,10 @@ fn main() {
                 .arg("--mql=[MQL] 'sets a mql expression'")
                 .arg("--template=[TEMPLATE] 'name of the template expression'")
                 .arg("--all 'use all memos (default)'")
-                .arg("--only-mr 'only internal memos (@mr:xxx)'")
-                .arg("--only-user 'only user memos'")
+                .arg("--system 'only internal memos (@mr:xxx)'")
+                .arg("--data 'only data memos'")
                 .group(ArgGroup::new("default-filter")
-                       .args(&["all", "only-mr", "only-user"])
+                       .args(&["all", "system", "data"])
                        .multiple(false))
         );
 
@@ -124,113 +249,22 @@ fn main() {
     // --- SUBCOMMAND `list` ---
     
     if let Some(ref matches) = matches.subcommand_matches("list") {
-        // read memos from .mr file into database
-        // TODO: matches.values_of("input") -> Vec<_>
-        if let Some(input) = matches.value_of("input") {
-            let verbosity = matches.occurrences_of("verbose") as u8;
+        let cmd = CmdList {
+            input: matches.value_of("input").expect("missing input file").to_string(),
+            verbosity: matches.occurrences_of("verbose") as u8,
+            default_filter:
+            if matches.is_present("system") {
+                DefaultFilter::System
+            } else if matches.is_present("all") {
+                DefaultFilter::All
+            } else {
+                DefaultFilter::Data
+            },
+            filter: matches.value_of("filter").map(|s| s.to_string()),
+            mql: matches.value_of("mql").map(|s| s.to_string())
+        };
 
-            debug!("loading input file '{}'", input);
-            let memos = read_from_file(input).unwrap();
-            debug!("read {} memos", memos.len());
-
-            // setup filter
-            let mut memo_filter = MemoFilter::new();
-
-            // set default filter
-            if matches.is_present("only-mr") {
-                memo_filter.add(
-                    NodeFilter::default()
-                        .with_node_type(NodeType::Header)
-                        .with_key(KeyFilter::StartsWith("mr:".into()))
-                );
-            } else if matches.is_present("only-user") {
-                memo_filter.add(
-                    NodeFilter::default()
-                        .with_node_type(NodeType::Header)
-                        .with_key(KeyFilter::Not(
-                            Box::new(KeyFilter::StartsWith("mr:".into()))))
-                );
-            }
-            
-            // check if a pre-defined filter has been supplied
-            if let Some(filter_name) = matches.value_of("filter") {
-                match lookup_filter(&memos, filter_name) {
-                    Ok(mf) => memo_filter = mf,
-                    Err(msg) => {
-                        eprintln!("{}", msg);
-                        std::process::exit(1);
-                    }
-                }
-            }
-
-            // check if a mql filter clause has been supplied
-            // any mql condition will be appended to the existing filter
-            // it is therefore possible to define both --filter (as base filter)
-            // and --mql (as refinement)
-            if let Some(mql) = matches.value_of("mql") {
-                debug!("mql filter expression is: '{}'", mql);
-                if let Ok(mql_filter) = parse_mql(mql) {
-                    debug!("resulting mql filter = {:#?}", mql_filter);
-                    memo_filter.extend(mql_filter)
-                } else {
-                    eprintln!("couldn't parse mql filter expression '{}'!", mql);
-                }
-            }
-            
-            for memo in memos.iter().filter(|&memo| memo_filter.check(memo)) {
-                // always print header
-                println!("{}{} {}",
-                         "@".red().bold(),
-                         memo.collection().red().bold(),
-                         memo.title().white().bold()
-                );
-
-                match verbosity {
-                    1 => {
-                        // print only matching nodes
-                        // currently, this includes the header node as well
-                        
-                        for idx in memo_filter.select_indices(&memo) {
-                            // skip header node, as it is already printed above
-                            // actually, this code relies on an implementation detail, i.e.
-                            // that the header node has index 0
-                            if idx > 0 {
-                                let node = memo.get_by_index(idx).unwrap();
-                                println!("{}{} {}",
-                                         ".".red(),
-                                         node.key.red(),
-                                         node.value.to_string().white());
-                                for (key, value) in node.attrs() {
-                                    println!("{}{} {}",
-                                             "+".yellow(),
-                                             key.yellow(),
-                                             value.to_string().white());
-                                }
-                            }
-                        }
-                        println!("");
-                    },
-                    2 => {
-                        // print all nodes
-                        for node in memo.data() {
-                            println!("{}{} {}",
-                                     ".".red(),
-                                     node.key.red(),
-                                     node.value.to_string().white());
-
-                            for (key, value) in node.attrs() {
-                                println!("{}{} {}",
-                                         "+".yellow(),
-                                         key.yellow(),
-                                         value.to_string().white());
-                            }
-                        }
-                        println!("");
-                    },
-                    _ => {}
-                }
-            }   
-        }        
+        cmd_list(cmd);
     }
 
     // --- SUBCOMMAND `export` ---
@@ -270,13 +304,13 @@ fn main() {
                         let mut memo_filter = MemoFilter::new();
                         
                         // set default filter
-                        if matches.is_present("only-mr") {
+                        if matches.is_present("system") {
                             memo_filter.add(
                                 NodeFilter::default()
                                     .with_node_type(NodeType::Header)
                                     .with_key(KeyFilter::StartsWith("mr:".into()))
                             );
-                        } else if matches.is_present("only-user") {
+                        } else if matches.is_present("data") {
                             memo_filter.add(
                                 NodeFilter::default()
                                     .with_node_type(NodeType::Header)
