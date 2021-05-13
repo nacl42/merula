@@ -84,9 +84,34 @@ fn lookup_filter(memos: &Vec<Memo>, filter_name: &str)
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 enum DefaultFilter { All, System, Data }
 
+impl From<DefaultFilter> for MemoFilter {
+    fn from(df: DefaultFilter) -> MemoFilter {
+        let mut mf = MemoFilter::new();
+        match df {
+            DefaultFilter::System => {
+                mf.add(
+                    NodeFilter::default()
+                        .with_node_type(NodeType::Header)
+                        .with_key(KeyFilter::StartsWith("mr:".into()))
+                );
+            },
+            DefaultFilter::Data => {
+                mf.add(
+                    NodeFilter::default()
+                        .with_node_type(NodeType::Header)
+                        .with_key(KeyFilter::Not(
+                            Box::new(KeyFilter::StartsWith("mr:".into()))))
+                );
+            },
+            DefaultFilter::All => {}
+        };
+        mf
+    }
+}
+       
 struct CmdList {
     input: String,
     verbosity: u8,
@@ -102,31 +127,12 @@ fn cmd_list(cmd: CmdList) {
     debug!("read {} memos", memos.len());
 
     // setup filter
-    let mut memo_filter = MemoFilter::new();
-
-    // set default filter
-    match cmd.default_filter {
-        DefaultFilter::System => {
-            memo_filter.add(
-                NodeFilter::default()
-                    .with_node_type(NodeType::Header)
-                    .with_key(KeyFilter::StartsWith("mr:".into()))
-            );
-        },
-        DefaultFilter::Data => {
-            memo_filter.add(
-                NodeFilter::default()
-                    .with_node_type(NodeType::Header)
-                    .with_key(KeyFilter::Not(
-                        Box::new(KeyFilter::StartsWith("mr:".into()))))
-            );
-        },
-        DefaultFilter::All => {}
-    }
+    let mut memo_filter: MemoFilter = cmd.default_filter.into();
                 
     // check if a pre-defined filter has been supplied
     if let Some(filter_name) = cmd.filter {
         match lookup_filter(&memos, &filter_name) {
+            // TODO: concatenate filter to existing one
             Ok(mf) => memo_filter = mf,
             Err(msg) => {
                 eprintln!("{}", msg);
@@ -319,29 +325,9 @@ fn cmd_stats(cmd: CmdStats) {
     let memos = read_from_file(&cmd.input).unwrap();
     debug!("read {} memos", memos.len());
 
-    // setup filter
-    let mut memo_filter = MemoFilter::new();
-
     // set default filter
-    match cmd.default_filter {
-        DefaultFilter::System => {
-            memo_filter.add(
-                NodeFilter::default()
-                    .with_node_type(NodeType::Header)
-                    .with_key(KeyFilter::StartsWith("mr:".into()))
-            );
-        },
-        DefaultFilter::Data => {
-            memo_filter.add(
-                NodeFilter::default()
-                    .with_node_type(NodeType::Header)
-                    .with_key(KeyFilter::Not(
-                        Box::new(KeyFilter::StartsWith("mr:".into()))))
-            );
-        },
-        DefaultFilter::All => {}
-    }
-                
+    let mut memo_filter: MemoFilter = cmd.default_filter.into();
+               
     // check if a pre-defined filter has been supplied
     if let Some(filter_name) = cmd.filter {
         match lookup_filter(&memos, &filter_name) {
@@ -435,21 +421,19 @@ fn main() {
 
     init_logger(matches.occurrences_of("debug") as u8);
 
-    let default_filter = if matches.is_present("system") {
-        DefaultFilter::System
-    } else if matches.is_present("all") {
-        DefaultFilter::All
-    } else {
-        DefaultFilter::Data
-    };
-
     // --- SUBCOMMAND `list` ---
     
     if let Some(ref matches) = matches.subcommand_matches("list") {
         let cmd = CmdList {
             input: matches.value_of("input").expect("missing input file").to_string(),
             verbosity: matches.occurrences_of("verbose") as u8,
-            default_filter: default_filter.clone(),
+            default_filter: if matches.is_present("system") {
+                DefaultFilter::System
+            } else if matches.is_present("all") {
+                DefaultFilter::All
+            } else {
+                DefaultFilter::Data
+            },
             filter: matches.value_of("filter").map(|s| s.to_string()),
             mql: matches.value_of("mql").map(|s| s.to_string())
         };
@@ -463,7 +447,13 @@ fn main() {
         let cmd = CmdExport {
             input: matches.value_of("input").expect("missing input file").to_string(),
             verbosity: matches.occurrences_of("verbose") as u8,
-            default_filter: default_filter.clone(),
+            default_filter: if matches.is_present("system") {
+                DefaultFilter::System
+            } else if matches.is_present("all") {
+                DefaultFilter::All
+            } else {
+                DefaultFilter::Data
+            },
             filter: matches.value_of("filter").map(|s| s.to_string()),
             mql: matches.value_of("mql").map(|s| s.to_string()),
             template: matches.value_of("template")
@@ -479,7 +469,13 @@ fn main() {
         let cmd = CmdStats {
             input: matches.value_of("input").expect("missing input file").to_string(),
             verbosity: matches.occurrences_of("verbose") as u8,
-            default_filter: default_filter.clone(),
+            default_filter: if matches.is_present("system") {
+                DefaultFilter::System
+            } else if matches.is_present("all") {
+                DefaultFilter::All
+            } else {
+                DefaultFilter::Data
+            },
             filter: matches.value_of("filter").map(|s| s.to_string()),
             mql: matches.value_of("mql").map(|s| s.to_string()),
         };
