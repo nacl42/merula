@@ -97,8 +97,6 @@ struct CmdList {
 
 // read memos from .mr file into database
 fn cmd_list(cmd: CmdList) {
-    // TODO: matches.values_of("input") -> Vec<_>
-
     debug!("loading input file '{}'", cmd.input);
     let memos = read_from_file(&cmd.input).unwrap();
     debug!("read {} memos", memos.len());
@@ -308,6 +306,82 @@ fn cmd_export(cmd: CmdExport) {
 }
 
 
+struct CmdStats {
+    input: String,
+    verbosity: u8,
+    default_filter: DefaultFilter,
+    filter: Option<String>,
+    mql: Option<String>
+}
+
+fn cmd_stats(cmd: CmdStats) {
+    debug!("loading input file '{}'", cmd.input);
+    let memos = read_from_file(&cmd.input).unwrap();
+    debug!("read {} memos", memos.len());
+
+    // setup filter
+    let mut memo_filter = MemoFilter::new();
+
+    // set default filter
+    match cmd.default_filter {
+        DefaultFilter::System => {
+            memo_filter.add(
+                NodeFilter::default()
+                    .with_node_type(NodeType::Header)
+                    .with_key(KeyFilter::StartsWith("mr:".into()))
+            );
+        },
+        DefaultFilter::Data => {
+            memo_filter.add(
+                NodeFilter::default()
+                    .with_node_type(NodeType::Header)
+                    .with_key(KeyFilter::Not(
+                        Box::new(KeyFilter::StartsWith("mr:".into()))))
+            );
+        },
+        DefaultFilter::All => {}
+    }
+                
+    // check if a pre-defined filter has been supplied
+    if let Some(filter_name) = cmd.filter {
+        match lookup_filter(&memos, &filter_name) {
+            Ok(mf) => memo_filter = mf,
+            Err(msg) => {
+                eprintln!("{}", msg);
+                std::process::exit(1);
+            }
+        }
+    }
+
+    // check if a mql filter clause has been supplied
+    // any mql condition will be appended to the existing filter
+    // it is therefore possible to define both --filter (as base filter)
+    // and --mql (as refinement)
+    if let Some(mql)= cmd.mql {
+        debug!("mql filter expression is: '{}'", mql);
+        if let Ok(mql_filter) = parse_mql(&mql) {
+            debug!("resulting mql filter = {:#?}", mql_filter);
+            memo_filter.extend(mql_filter)
+        } else {
+            eprintln!("couldn't parse mql filter expression '{}'!", mql);
+        }
+    }
+
+    let count = memos.iter()
+        .filter(|&memo| memo_filter.check(memo))
+        .fold(
+            // (#memos, #nodes)
+            (0, 0), |acc, m| (acc.0 + 1, acc.1 + m.data_count() + 1)
+        );
+
+    
+    println!("Statistics for '{}':", cmd.input);
+
+    println!("#Memos = {}", count.0);
+    println!("#Nodes = {}", count.1);
+}
+
+
 fn main() {
     let app = App::new("merula")
         .version(crate_version!())
@@ -333,6 +407,14 @@ fn main() {
                 .about("print memo statistics")
                 .arg("<input> 'sets an input file'")
                 .arg("-v --verbose... 'Sets the verbosity level'")
+                .arg("--filter=[FILTER] 'load an mql expression from a pre-defined filter'")
+                .arg("--mql=[MQL] 'sets a mql expression'")
+                .arg("--all 'use all memos (default)'")
+                .arg("--system 'only internal memos (@mr:xxx)'")
+                .arg("--data 'only data memos'")
+                .group(ArgGroup::new("default-filter")
+                       .args(&["all", "system", "data"])
+                       .multiple(false))
         )
         .subcommand(
             App::new("export")
@@ -394,24 +476,14 @@ fn main() {
     // --- SUBCOMMAND `stats` ---
     
     if let Some(ref matches) = matches.subcommand_matches("stats") {
-        // read memos from .mr file into database
-        if let Some(input) = matches.value_of("input") {
-            //let verbosity = matches.occurrences_of("verbose") as u8;
+        let cmd = CmdStats {
+            input: matches.value_of("input").expect("missing input file").to_string(),
+            verbosity: matches.occurrences_of("verbose") as u8,
+            default_filter: default_filter.clone(),
+            filter: matches.value_of("filter").map(|s| s.to_string()),
+            mql: matches.value_of("mql").map(|s| s.to_string()),
+        };
 
-            debug!("loading input file '{}'", input);
-            let memos = read_from_file(input).unwrap();
-            debug!("read {} memos", memos.len());
-
-            let memo_count = memos.len();
-            // TODO: implement Memo.len()
-            let node_count = memos.iter().fold(0, |acc, m| acc + m.data_count() + 1);
-
-            println!("Statistics for '{}':", input);
-            println!("#Memos = {}", memo_count);
-            println!("#Nodes = {}", node_count);
-
-            // TODO: we could allow --filter and --mql options
-            // and yield a statistic on the filtered nodes
-        }
+        cmd_stats(cmd);
     }
 }
