@@ -1,3 +1,6 @@
+//! A library to parse .mr files
+//!
+
 #[macro_use] extern crate pest_derive;
 
 pub mod memo;

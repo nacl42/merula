@@ -48,15 +48,23 @@ fn init_logger(log_level: u8) {
 }
 
 
+// Look up memo with the type 'mr:filter' and the given `filter_name`.
+// If found, try to construct a MemoFilter object from the first node
+// with the key 'mql'.
+//
+// Example filter:
+//
+// ```
+// @mr:filter child
+// .mql age<18
+// ```
+//
 fn lookup_filter(memos: &Vec<Memo>, filter_name: &str)
                  -> Result<MemoFilter, String>
 {
     debug!("looking for pre-defined filter '{}'", filter_name);
-    let mut mf = MemoFilter::new();
-    let nf = NodeFilter::default()
-        .with_key(KeyFilter::Equals("mr:filter".into()))
-        .with_value(ValueFilter::Equals(filter_name.into()));
-    mf.add(nf);
+    
+    let mf = MemoFilter::key_value_equals("mr:filter", filter_name);
     
     if let Some(mql_memo) = memos.iter().filter(|&memo| mf.check(memo)).next() {
         debug!("Resulting filter: {:#?}", mql_memo);
@@ -142,7 +150,8 @@ fn cmd_list(cmd: CmdList) {
             eprintln!("couldn't parse mql filter expression '{}'!", mql);
         }
     }
-        
+
+    println!("verbosity: {}", cmd.verbosity);
     for memo in memos.iter().filter(|&memo| memo_filter.check(memo)) {
         // always print header
         println!("{}{} {}",
@@ -150,7 +159,7 @@ fn cmd_list(cmd: CmdList) {
                  memo.collection().red().bold(),
                  memo.title().white().bold()
         );
-        
+
         match cmd.verbosity {
             1 => {
                 // print only matching nodes
@@ -344,7 +353,6 @@ fn main() {
 
     init_logger(matches.occurrences_of("debug") as u8);
 
-    let verbosity = matches.occurrences_of("verbose") as u8;
     let default_filter = if matches.is_present("system") {
         DefaultFilter::System
     } else if matches.is_present("all") {
@@ -358,7 +366,7 @@ fn main() {
     if let Some(ref matches) = matches.subcommand_matches("list") {
         let cmd = CmdList {
             input: matches.value_of("input").expect("missing input file").to_string(),
-            verbosity,
+            verbosity: matches.occurrences_of("verbose") as u8,
             default_filter: default_filter.clone(),
             filter: matches.value_of("filter").map(|s| s.to_string()),
             mql: matches.value_of("mql").map(|s| s.to_string())
@@ -372,11 +380,12 @@ fn main() {
     if let Some(ref matches) = matches.subcommand_matches("export") {
         let cmd = CmdExport {
             input: matches.value_of("input").expect("missing input file").to_string(),
-            verbosity,
+            verbosity: matches.occurrences_of("verbose") as u8,
             default_filter: default_filter.clone(),
             filter: matches.value_of("filter").map(|s| s.to_string()),
             mql: matches.value_of("mql").map(|s| s.to_string()),
-            template: matches.value_of("template").expect("missing template name").to_string()                
+            template: matches.value_of("template")
+                .expect("missing template name").to_string()                
         };
 
         cmd_export(cmd);        

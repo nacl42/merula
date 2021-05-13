@@ -1,3 +1,8 @@
+//! Construct different kinds of filter to select only
+//! memos that match certain conditions.
+//!
+//!
+
 use crate::{Memo, Node, Key, Value};
 use crate::memo::NodeType;
 
@@ -116,21 +121,25 @@ impl Default for NodeFilter {
 
 impl NodeFilter {
 
+    /// Builder function to specify a certain NodeType
     pub fn with_node_type(mut self, node_type: NodeType) -> Self {
         self.node_type = node_type;
         self
     }
-    
+
+    /// Builder function to specify a certain KeyFilter
     pub fn with_key(mut self, key: KeyFilter) -> Self {
         self.key = key;
         self            
     }
 
+    /// Builder function to specify a certain IndexFilter
     pub fn with_index(mut self, index: IndexFilter) -> Self {
         self.index = index;
         self
     }
-    
+
+    /// Builder function to specify a certain ValueFilter
     pub fn with_value(mut self, value: ValueFilter) -> Self {
         self.value = value;
         self
@@ -159,6 +168,8 @@ impl NodeFilter {
             .next().is_some()
     }
 
+    /// Return an Iterator that yields all Nodes matching the filter
+    /// conditions.
     pub fn select<'a>(&'a self, memo: &'a Memo) -> impl Iterator<Item=&'a Node> {
         // stepwise selection and filtering
 
@@ -179,7 +190,11 @@ impl NodeFilter {
         )
     }
 
-    pub fn select_indices<'a>(&'a self, memo: &'a Memo) -> impl Iterator<Item=usize> + 'a {
+    /// Return an Iterator that yields all node indices matching the
+    /// filter conditions.
+    pub fn select_indices<'a>(&'a self, memo: &'a Memo)
+                              -> impl Iterator<Item=usize> + 'a
+    {
         // stepwise selection and filtering
 
         // (1) check for node type is done by enumerate_nodes method
@@ -212,6 +227,21 @@ impl MemoFilter {
         }
     }
 
+    // MemoFilter::key_value_equals("mr:filter", filter_name)
+    // TODO: write test
+    pub fn key_value_equals<K, V>(key: K, value: V) -> MemoFilter
+    where K: Into<String>,
+          V: Into<String>
+    {
+        MemoFilter {
+            node_filters: vec!(
+                NodeFilter::default()
+                    .with_key(KeyFilter::Equals(key.into()))
+                    .with_value(ValueFilter::Equals(value.into()))
+            )
+        }
+    }
+    
     pub fn and(mut self, nf: NodeFilter) -> Self {
         self.node_filters.push(nf);
         self
