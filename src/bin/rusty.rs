@@ -113,13 +113,27 @@ fn main() {
     if rl.load_history("history.txt").is_err() {
         println!("no previous history");
     }
-    
+
+    println!("Use 'q' to quit and 'h' for help.");
     loop {
         let readline = rl.readline("» ");
         match readline {
             Ok(line) => {
                 rl.add_history_entry(line.as_str());
-                println!("Line: {:?}", line);
+
+                match line.trim().as_ref() {
+                    "q" | "quit" => {
+                        println!("quit!!!");
+                        return;
+                    },
+                    "h" | "help" => {
+                        println!("help text");
+                    },
+                    "" => {}, // ignore empty input
+                    &_ => {
+                        println!("unrecognized command '{:?}'", line);
+                    }
+                };
             },
             Err(ReadlineError::Interrupted) => {
                 println!("Quit");
@@ -135,5 +149,5 @@ fn main() {
             }
         }
     }
-    rl.append_history("hystory.txt");
+    let _ = rl.append_history("history.txt");
 }
