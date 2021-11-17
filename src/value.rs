@@ -96,7 +96,7 @@ impl From<Value> for String {
     fn from(value: Value) -> String {
         match value {
             Value::Text(text) => format!("{}", text),
-            Value::MultiLineText(text, sep) => format!("{}\n", text),
+            Value::MultiLineText(text, _sep) => format!("{}\n", text),
             Value::Integer(n) => format!("{}", n),
             Value::Float(x) => format!("{}", x),
             Value::Bool(b) => format!("{}", b)
