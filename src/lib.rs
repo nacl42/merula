@@ -10,6 +10,7 @@ pub mod sample;
 pub mod parser;
 pub mod filter;
 pub mod mql;
+pub mod prelude;
 
 use memo::Memo;
 use node::Node;

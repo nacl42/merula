@@ -5,11 +5,11 @@
 //! production purposes.
 //!
 
+use merula::prelude::*;
+
 use merula::{
-    filter::{NodeFilter, KeyFilter, ValueFilter, MemoFilter},
     parser::read_from_file,
     mql::parse_mql,
-    memo::{Memo, NodeType}
 };
 
 use regex::{Regex, Captures};
