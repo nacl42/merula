@@ -1,10 +1,33 @@
-//! Experimental CLI frontend
+//! Experimental readline frontend
+
+//! TODOs
+
+//! In a first step, implement read-only actions, i.e. duplicate the
+//! functionality of the command line client. We should then be able
+//! to move code common to the readline and command line interface
+//! into the merula library itself.
+//!
+
+//! - load = load database from file
+//! - ls = list memos
+//! - mql ... = set mql expression
+//! - filter ... = use pre-defined filter
+//! - prompt: filter, number of memos, current memo
+//!   [density > 5] (20/100)
+//! - proper completion for commands and arguments
+
+//! TODO: allow command line arguments, such as loading a file
+
+//! Manipulation of items is a much more difficult step and goes
+//! beyond the functionality provided by the current merula
+//! executable.
+
+//! TODO: take a look at the ropey library to perform inline
+//! manipulation of text files (in this case, the database .mr file)
 
 use std::borrow::Cow::{self, Borrowed, Owned};
 
-use merula::{
-    memo::{Memo, NodeType}
-};
+use merula::prelude::*;
 
 use rustyline::{
     highlight::Highlighter,
