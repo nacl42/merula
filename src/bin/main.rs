@@ -5,11 +5,11 @@
 //! production purposes.
 //!
 
+use merula::prelude::*;
+
 use merula::{
-    filter::{NodeFilter, KeyFilter, ValueFilter, MemoFilter},
     parser::read_from_file,
     mql::parse_mql,
-    memo::{Memo, NodeType}
 };
 
 use regex::{Regex, Captures};
@@ -216,7 +216,7 @@ fn cmd_list(cmd: CmdList) {
 
 struct CmdExport {
     input: String,
-    verbosity: u8,
+    #[allow(dead_code)] verbosity: u8,
     default_filter: DefaultFilter,
     filter: Option<String>,
     mql: Option<String>,
@@ -306,7 +306,7 @@ fn cmd_export(cmd: CmdExport) {
 
 struct CmdStats {
     input: String,
-    verbosity: u8,
+    #[allow(dead_code)] verbosity: u8,
     default_filter: DefaultFilter,
     filter: Option<String>,
     mql: Option<String>
