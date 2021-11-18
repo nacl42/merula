@@ -8,13 +8,15 @@
 //! into the merula library itself.
 //!
 
-//! - load = load database from file
-//! - ls = list memos
+//! - for now: load sample data by default (later: command line arg)
+//! - move printing of memo into a common function, so that it can
+//!   be used from both backends
 //! - mql ... = set mql expression
 //! - filter ... = use pre-defined filter
 //! - prompt: filter, number of memos, current memo
 //!   [density > 5] (20/100)
 //! - proper completion for commands and arguments
+//! - ls | ls <n> | ls all
 
 //! TODO: allow command line arguments, such as loading a file
 
@@ -28,6 +30,12 @@
 use std::borrow::Cow::{self, Borrowed, Owned};
 
 use merula::prelude::*;
+
+use merula::{
+    parser::read_from_file,
+    mql::parse_mql,
+};
+
 
 use rustyline::{
     highlight::Highlighter,
@@ -137,24 +145,66 @@ fn main() {
         println!("no previous history");
     }
 
+    let mut memos: Vec<Memo> = vec!();
+    
     println!("Use 'q' to quit and 'h' for help.");
     loop {
-        let readline = rl.readline("» ");
+        let prompt = format!(
+            "{len} {prompt} ",
+            len = memos.len(),
+            prompt = "»".bold()
+        );
+        let readline = rl.readline(&prompt);
         match readline {
             Ok(line) => {
                 rl.add_history_entry(line.as_str());
 
-                match line.trim().as_ref() {
-                    "q" | "quit" => {
+                let line = line.trim();
+                let mut args = line.split_whitespace();
+                let cmd = args.next();
+                match cmd {
+                    Some("q") | Some("quit") => {
                         println!("quit!!!");
                         return;
                     },
-                    "h" | "help" => {
-                        println!("help text");
+                    Some("h") | Some("help") => {
+                        println!("commands:");
+                        println!("h | help         print this help");
+                        println!("q | quit         quit");
+                        println!("load file        load .mr data file");
+                        println!("ls               list all loaded memos");
+                        println!("clear            clear memo database");
                     },
-                    "" => {}, // ignore empty input
-                    &_ => {
-                        println!("unrecognized command '{:?}'", line);
+                    Some("load") => {
+                        println!("load file");
+                        for arg in args {
+                            print!("reading from file '{}'...", arg);
+                            if let Ok(new_memos) = read_from_file(&arg) {
+                                println!("{} memos", new_memos.len());
+                                memos.extend(new_memos);
+                            } else {
+                                println!("failed!");
+                            }
+                           
+                        };
+                    },
+                    Some("ls") => {
+                        for memo in memos.iter() { //.filter(|&memo| memo_filter.check(memo)) {
+                            // always print header
+                            println!("{}{} {}",
+                                     "@".red().bold(),
+                                     memo.collection().red().bold(),
+                                     memo.title().white().bold()
+                            );
+                        };
+                    },
+                    Some("clear") => {
+                        memos.clear();
+                        println!("all memos removed");
+                    }
+                    None => {}, // ignore empty input
+                    Some(_) => {
+                        println!("unrecognized command '{:?}'", cmd);
                     }
                 };
             },
