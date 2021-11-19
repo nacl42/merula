@@ -10,6 +10,7 @@ use merula::prelude::*;
 use merula::{
     parser::read_from_file,
     mql::parse_mql,
+    display
 };
 
 use regex::{Regex, Captures};
@@ -160,11 +161,7 @@ fn cmd_list(cmd: CmdList) {
     println!("verbosity: {}", cmd.verbosity);
     for memo in memos.iter().filter(|&memo| memo_filter.check(memo)) {
         // always print header
-        println!("{}{} {}",
-                 "@".red().bold(),
-                 memo.collection().red().bold(),
-                 memo.title().white().bold()
-        );
+        display::print_header(&memo);
 
         match cmd.verbosity {
             1 => {
@@ -192,20 +189,7 @@ fn cmd_list(cmd: CmdList) {
                 println!("");
             },
             2 => {
-                // print all nodes
-                for node in memo.data() {
-                    println!("{}{} {}",
-                             ".".red(),
-                             node.key.red(),
-                             node.value.to_string().white());
-                    
-                    for (key, value) in node.attrs() {
-                        println!("{}{} {}",
-                                 "+".yellow(),
-                                 key.yellow(),
-                                 value.to_string().white());
-                    }
-                }
+                display::print_data_nodes(&memo);
                 println!("");
             },
             _ => {}

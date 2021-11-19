@@ -11,6 +11,7 @@ pub mod parser;
 pub mod filter;
 pub mod mql;
 pub mod prelude;
+pub mod display;
 
 use memo::Memo;
 use node::Node;

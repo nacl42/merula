@@ -9,14 +9,22 @@
 //!
 
 //! - for now: load sample data by default (later: command line arg)
-//! - move printing of memo into a common function, so that it can
-//!   be used from both backends
+
 //! - mql ... = set mql expression
+
 //! - filter ... = use pre-defined filter
+
 //! - prompt: filter, number of memos, current memo
 //!   [density > 5] (20/100)
+
 //! - proper completion for commands and arguments
-//! - ls | ls <n> | ls all
+
+//! - ls | ls all
+
+//! - stats collection
+//!   094 book
+//!   005 note
+//!   001 mr:filter
 
 //! TODO: allow command line arguments, such as loading a file
 
@@ -27,6 +35,8 @@
 //! TODO: take a look at the ropey library to perform inline
 //! manipulation of text files (in this case, the database .mr file)
 
+//!----------------------------------------------------------------------
+
 use std::borrow::Cow::{self, Borrowed, Owned};
 
 use merula::prelude::*;
@@ -34,6 +44,7 @@ use merula::prelude::*;
 use merula::{
     parser::read_from_file,
     mql::parse_mql,
+    display,
 };
 
 
@@ -126,6 +137,14 @@ impl ConditionalEventHandler for TabEventHandler {
     }
 }
 
+
+#[derive(Default)]
+struct AppState {
+    memos: Vec<Memo>,
+}
+
+
+
 fn main() {
     init_logger(1);
 
@@ -145,13 +164,13 @@ fn main() {
         println!("no previous history");
     }
 
-    let mut memos: Vec<Memo> = vec!();
+    let mut state = AppState::default();
     
     println!("Use 'q' to quit and 'h' for help.");
     loop {
         let prompt = format!(
             "{len} {prompt} ",
-            len = memos.len(),
+            len = state.memos.len(),
             prompt = "»".bold()
         );
         let readline = rl.readline(&prompt);
@@ -174,6 +193,7 @@ fn main() {
                         println!("load file        load .mr data file");
                         println!("ls               list all loaded memos");
                         println!("clear            clear memo database");
+                        println!("v | view <n>     view memo with given id")
                     },
                     Some("load") => {
                         println!("load file");
@@ -181,7 +201,7 @@ fn main() {
                             print!("reading from file '{}'...", arg);
                             if let Ok(new_memos) = read_from_file(&arg) {
                                 println!("{} memos", new_memos.len());
-                                memos.extend(new_memos);
+                                state.memos.extend(new_memos);
                             } else {
                                 println!("failed!");
                             }
@@ -189,17 +209,32 @@ fn main() {
                         };
                     },
                     Some("ls") => {
-                        for memo in memos.iter() { //.filter(|&memo| memo_filter.check(memo)) {
-                            // always print header
-                            println!("{}{} {}",
-                                     "@".red().bold(),
-                                     memo.collection().red().bold(),
-                                     memo.title().white().bold()
+                        for (n, memo) in state.memos.iter().enumerate() {
+                            //.filter(|&memo| memo_filter.check(memo)) {
+                            print!(
+                                "{}",
+                                format!("{:<5} ", n).white()
                             );
+                            display::print_header(&memo);
                         };
                     },
+                    Some("v") | Some("view")=> {
+                        if let Some(n) = args.next() {
+                            if let Ok(n) = n.parse::<usize>() {
+                                //println!("view #{}", n);
+                                if let Some(memo) = state.memos.get(n) {
+                                    display::print_header(&memo);
+                                    display::print_data_nodes(&memo);
+                                } else {
+                                    println!("invalid memo #{}, not found", n);
+                                }
+                            } else {
+                                println!("please specify an integer for the memo id");
+                            }
+                        }
+                    },
                     Some("clear") => {
-                        memos.clear();
+                        state.memos.clear();
                         println!("all memos removed");
                     }
                     None => {}, // ignore empty input
